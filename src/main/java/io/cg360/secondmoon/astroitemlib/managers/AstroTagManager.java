@@ -85,7 +85,7 @@ public class AstroTagManager {
     }
 
     @Listener(beforeModifications = true, order = Order.BEFORE_POST)
-    public void onUseLeftEvent(InteractItemEvent.Primary event, @First Player player){
+    public void onUseLeft(InteractItemEvent.Primary event, @First Player player){
         if(overrideLeftClick) {
             overrideLeftClick = false;
             return;
@@ -124,7 +124,7 @@ public class AstroTagManager {
     }
 
     @Listener(beforeModifications = true, order = Order.BEFORE_POST)
-    public void onUseRightEvent(InteractItemEvent.Secondary event, @First Player player){
+    public void onUseRight(InteractItemEvent.Secondary event, @First Player player){
         if(overrideRightClick) {
             overrideRightClick = false;
             return;
