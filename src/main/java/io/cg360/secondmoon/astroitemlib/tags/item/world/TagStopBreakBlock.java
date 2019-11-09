@@ -18,7 +18,7 @@ public class TagStopBreakBlock extends AbstractTag {
 
     @Override
     public boolean run(ExecutionTypes type, String tag, ItemStackSnapshot itemStack, ExecutionContext context) {
-        if(type == ExecutionTypes.BREAK_BLOCK) ((BlockBreakContext) context).getEvent().setCancelled(true);
+        if(type == ExecutionTypes.BLOCK_BREAK) ((BlockBreakContext) context).getEvent().setCancelled(true);
         return true;
     }
 }

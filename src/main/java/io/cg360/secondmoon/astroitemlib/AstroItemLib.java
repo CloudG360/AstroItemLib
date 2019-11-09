@@ -147,11 +147,11 @@ public class AstroItemLib {
         // -- TAG REGISTERING --
 
         getAstroTagManager()
-                .registerTag(new TagDevCookie("dev_cookie", TagPriority.NORMAL, ExecutionTypes.USED))
-                .registerTag(new TagDevCatapult("dev_catapult", TagPriority.HIGH, ExecutionTypes.HIT))
+                .registerTag(new TagDevCookie("dev_cookie", TagPriority.NORMAL, ExecutionTypes.ITEM_USED))
+                .registerTag(new TagDevCatapult("dev_catapult", TagPriority.HIGH, ExecutionTypes.ENTITY_HIT))
 
-                .registerTag(new TagUnplaceable("unplaceable", TagPriority.HIGH, ExecutionTypes.PLACE_BLOCK))
-                .registerTag(new TagStopBreakBlock("stopbreakblock", TagPriority.HIGH, ExecutionTypes.BREAK_BLOCK));
+                .registerTag(new TagUnplaceable("unplaceable", TagPriority.HIGH, ExecutionTypes.BLOCK_PLACE))
+                .registerTag(new TagStopBreakBlock("stopbreakblock", TagPriority.HIGH, ExecutionTypes.BLOCK_BREAK));
 
 
 

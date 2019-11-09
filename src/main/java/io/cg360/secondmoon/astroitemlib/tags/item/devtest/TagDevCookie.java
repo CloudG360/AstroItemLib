@@ -22,7 +22,7 @@ public class TagDevCookie extends AbstractTag {
 
     @Override
     public boolean run(ExecutionTypes type, String tag, ItemStackSnapshot itemStack, ExecutionContext context) {
-        if(getType() == ExecutionTypes.USED){
+        if(getType() == ExecutionTypes.ITEM_USED){
             context.getPlayer().getInventory().offer(ItemStack.builder().itemType(ItemTypes.COOKIE).build());
         }
         return true;

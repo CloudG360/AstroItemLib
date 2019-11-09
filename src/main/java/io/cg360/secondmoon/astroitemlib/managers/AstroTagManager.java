@@ -99,7 +99,7 @@ public class AstroTagManager {
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
                     boolean result = true;
-                    if(t.getType() == ExecutionTypes.USED) { result = t.run(ExecutionTypes.USED, tag, istack, new UsedContext(player, type, UsedContext.ClickType.RIGHT)); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, type, UsedContext.ClickType.RIGHT)); }
                     if(!result) return;
                 }
             }
@@ -138,7 +138,7 @@ public class AstroTagManager {
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
                     boolean result = true;
-                    if(t.getType() == ExecutionTypes.USED) { result = t.run(ExecutionTypes.USED, tag, istack, new UsedContext(player, type, UsedContext.ClickType.RIGHT)); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, type, UsedContext.ClickType.RIGHT)); }
 
                     if(!result) return;
                 }
@@ -169,8 +169,8 @@ public class AstroTagManager {
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
-                if(t.getType() == ExecutionTypes.HIT) { result = t.run(ExecutionTypes.HIT, tag, istack, new EntityHitContext(player, event)); }
-                if(t.getType() == ExecutionTypes.USED) { result = t.run(ExecutionTypes.USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.ENTITY_HIT) { result = t.run(ExecutionTypes.ENTITY_HIT, tag, istack, new EntityHitContext(player, event)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
                 if(!result) return;
             }
         }
@@ -197,8 +197,8 @@ public class AstroTagManager {
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
-                if(t.getType() == ExecutionTypes.INTERACT_ENTITY) { result = t.run(ExecutionTypes.INTERACT_ENTITY, tag, istack, new EntityInteractContext(player, event)); }
-                if(t.getType() == ExecutionTypes.USED) { result = t.run(ExecutionTypes.USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, istack, new EntityInteractContext(player, event)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
                 if(!result) return;
             }
         }
@@ -225,15 +225,15 @@ public class AstroTagManager {
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
-                if(t.getType() == ExecutionTypes.INTERACT_BLOCK) { result = t.run(ExecutionTypes.INTERACT_BLOCK, tag, istack, new BlockInteractContext(player, event)); }
-                if(t.getType() == ExecutionTypes.USED) { result = t.run(ExecutionTypes.USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.BLOCK_INTERACT) { result = t.run(ExecutionTypes.BLOCK_INTERACT, tag, istack, new BlockInteractContext(player, event)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
                 if(!result) return;
             }
         }
     }
 
     @Listener(beforeModifications = true, order = Order.DEFAULT)
-    public void blockPlaceEvent(ChangeBlockEvent.Place event, @First Player player){
+    public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player){
         Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
         if(!s.isPresent()) return;
         ItemStackSnapshot istack = s.get();
@@ -253,15 +253,15 @@ public class AstroTagManager {
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
-                if(t.getType() == ExecutionTypes.PLACE_BLOCK) { result = t.run(ExecutionTypes.PLACE_BLOCK, tag, istack, new BlockPlaceContext(player, event)); }
-                if(t.getType() == ExecutionTypes.USED) { result = t.run(ExecutionTypes.USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.BLOCK_PLACE) { result = t.run(ExecutionTypes.BLOCK_PLACE, tag, istack, new BlockPlaceContext(player, event)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
                 if(!result) return;
             }
         }
     }
 
     @Listener(beforeModifications = true, order = Order.DEFAULT)
-    public void blockBreakEvent(ChangeBlockEvent.Break event, @First Player player){
+    public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player){
         Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
         if(!s.isPresent()) return;
         ItemStackSnapshot istack = s.get();
@@ -281,8 +281,8 @@ public class AstroTagManager {
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
-                if(t.getType() == ExecutionTypes.BREAK_BLOCK) { result = t.run(ExecutionTypes.BREAK_BLOCK, tag, istack, new BlockBreakContext(player, event)); }
-                if(t.getType() == ExecutionTypes.USED) { result = t.run(ExecutionTypes.USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.BLOCK_BREAK) { result = t.run(ExecutionTypes.BLOCK_BREAK, tag, istack, new BlockBreakContext(player, event)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
                 if(!result) return;
             }
         }

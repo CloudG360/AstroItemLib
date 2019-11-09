@@ -19,7 +19,7 @@ public class TagDevCatapult extends AbstractTag {
 
     @Override
     public boolean run(ExecutionTypes type, String tag, ItemStackSnapshot itemStack, ExecutionContext context) {
-        if(getType() == ExecutionTypes.HIT) {
+        if(getType() == ExecutionTypes.ENTITY_HIT) {
             EntityHitContext entityHitContext = (EntityHitContext) context;
             entityHitContext.getEvent().setCancelled(true);
             entityHitContext.getEvent().getTargetEntity().setVelocity(new Vector3d(0, 5, 0));

@@ -16,7 +16,7 @@ public class TagUnplaceable  extends AbstractTag {
 
     @Override
     public boolean run(ExecutionTypes type, String tag, ItemStackSnapshot itemStack, ExecutionContext context) {
-        if(type == ExecutionTypes.PLACE_BLOCK) ((BlockPlaceContext) context).getEvent().setCancelled(true);
+        if(type == ExecutionTypes.BLOCK_PLACE) ((BlockPlaceContext) context).getEvent().setCancelled(true);
 
         return true;
     }
