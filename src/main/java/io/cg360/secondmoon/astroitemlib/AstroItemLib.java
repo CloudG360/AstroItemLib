@@ -75,7 +75,7 @@ public class AstroItemLib {
         // -- COMMAND REGISTERING --
 
         // Admin
-        CommandSpec adminReloadPools = CommandSpec.builder()
+        CommandSpec adminReloadAstro = CommandSpec.builder()
                 .description(Text.of("Reloads all pools. Can be used to update pools without resetting the server."))
                 .permission("astro.admin.reload")
                 .executor(new CommandReloadPools())
@@ -124,7 +124,7 @@ public class AstroItemLib {
                 .build();
 
         // - Registering -
-        Sponge.getCommandManager().register(this, adminReloadPools, "reloadpools");
+        Sponge.getCommandManager().register(this, adminReloadAstro, "reloadastro");
         Sponge.getCommandManager().register(this, adminListPools, "listpools");
         Sponge.getCommandManager().register(this, adminListItems, "listitems");
 
