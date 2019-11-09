@@ -9,16 +9,16 @@ public class ClickedContext extends ExecutionContext {
 
     private ClickInventoryEvent event;
     private ClickType clickType;
-    private boolean usedShift;
+    private boolean shiftUsed;
 
-    public ClickedContext(Player player, ClickInventoryEvent event, ClickType clickType, boolean usedShift) {
+    public ClickedContext(Player player, ClickInventoryEvent event, ClickType clickType, boolean shiftUsed) {
         super(player);
         this.event = event;
         this.clickType = clickType;
-        this.usedShift = usedShift;
+        this.shiftUsed = shiftUsed;
     }
 
     public ClickInventoryEvent getEvent() { return event; }
     public ClickType getClickType() { return clickType; }
-    public boolean isUsedShift() { return usedShift; }
+    public boolean isShiftUsed() { return shiftUsed; }
 }
