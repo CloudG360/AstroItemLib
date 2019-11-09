@@ -4,11 +4,12 @@ import io.cg360.secondmoon.astroitemlib.AstroItemLib;
 import io.cg360.secondmoon.astroitemlib.data.AstroKeys;
 import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;
 import io.cg360.secondmoon.astroitemlib.tags.ExecutionTypes;
-import io.cg360.secondmoon.astroitemlib.tags.data.HitContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.UsedContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockBreakContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockInteractContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockPlaceContext;
+import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityHitContext;
+import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityInteractContext;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -18,6 +19,7 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -145,13 +147,6 @@ public class AstroTagManager {
         }
     }
 
-    /**
-     * Triggers event under the event rather than scheduling it
-     * to allow for event control.
-     *
-     * @param event
-     * @param player
-     */
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onEntityHit(DamageEntityEvent event, @First Player player){
         Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
@@ -174,20 +169,41 @@ public class AstroTagManager {
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
-                if(t.getType() == ExecutionTypes.HIT) { result = t.run(ExecutionTypes.HIT, tag, istack, new HitContext(player, event)); }
+                if(t.getType() == ExecutionTypes.HIT) { result = t.run(ExecutionTypes.HIT, tag, istack, new EntityHitContext(player, event)); }
                 if(t.getType() == ExecutionTypes.USED) { result = t.run(ExecutionTypes.USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
                 if(!result) return;
             }
         }
     }
 
-    /**
-     * Triggers event under the event rather than scheduling it
-     * to allow for event control.
-     *
-     * @param event
-     * @param player
-     */
+    @Listener(beforeModifications = true, order = Order.DEFAULT)
+    public void onEntityInteract(InteractEntityEvent event, @First Player player){
+        Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
+        if(!s.isPresent()) return;
+        ItemStackSnapshot istack = s.get();
+
+        Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
+        if(!tgs.isPresent()) return;
+        List<String> tags = tgs.get();
+
+        String[] otags = orderedTags(tags.toArray(new String[0]));
+
+        overrideRightClick = true;
+
+        HandType handType = HandTypes.OFF_HAND;
+        if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
+
+        for(String tag: otags){
+            if(getTag(tag).isPresent()){
+                AbstractTag t = getTag(tag).get();
+                boolean result = true;
+                if(t.getType() == ExecutionTypes.INTERACT_ENTITY) { result = t.run(ExecutionTypes.INTERACT_ENTITY, tag, istack, new EntityInteractContext(player, event)); }
+                if(t.getType() == ExecutionTypes.USED) { result = t.run(ExecutionTypes.USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
+                if(!result) return;
+            }
+        }
+    }
+
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onBlockInteract(InteractBlockEvent event, @First Player player){
         Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
