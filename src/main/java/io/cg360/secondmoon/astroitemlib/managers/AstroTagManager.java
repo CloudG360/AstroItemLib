@@ -44,7 +44,7 @@ public class AstroTagManager {
     }
 
     public AstroTagManager registerTag(AbstractTag tag){
-        tagMap.put(tag.getId(), tag);
+        tagMap.put(tag.getId().split(Pattern.quote(":"))[0].toLowerCase(), tag);
         return this;
     }
 
