@@ -1,4 +1,4 @@
-package io.cg360.secondmoon.astroitemlib.tags.item.world;
+package io.cg360.secondmoon.astroitemlib.tags.impl.world;
 
 import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;
 import io.cg360.secondmoon.astroitemlib.tags.ExecutionTypes;

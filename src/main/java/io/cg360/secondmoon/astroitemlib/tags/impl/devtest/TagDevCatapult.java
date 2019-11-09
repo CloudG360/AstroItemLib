@@ -1,4 +1,4 @@
-package io.cg360.secondmoon.astroitemlib.tags.item.devtest;
+package io.cg360.secondmoon.astroitemlib.tags.impl.devtest;
 
 import com.flowpowered.math.vector.Vector3d;
 import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;

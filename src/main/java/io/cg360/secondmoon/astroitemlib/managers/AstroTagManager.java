@@ -3,13 +3,15 @@ package io.cg360.secondmoon.astroitemlib.managers;
 import io.cg360.secondmoon.astroitemlib.AstroItemLib;
 import io.cg360.secondmoon.astroitemlib.data.AstroKeys;
 import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;
+import io.cg360.secondmoon.astroitemlib.tags.ClickType;
 import io.cg360.secondmoon.astroitemlib.tags.ExecutionTypes;
-import io.cg360.secondmoon.astroitemlib.tags.data.UsedContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockBreakContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockInteractContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockPlaceContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityHitContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityInteractContext;
+import io.cg360.secondmoon.astroitemlib.tags.data.item.ClickedContext;
+import io.cg360.secondmoon.astroitemlib.tags.data.item.UsedContext;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -21,6 +23,7 @@ import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
@@ -99,7 +102,7 @@ public class AstroTagManager {
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
                     boolean result = true;
-                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, type, UsedContext.ClickType.RIGHT)); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, type, ClickType.RIGHT)); }
                     if(!result) return;
                 }
             }
@@ -138,7 +141,7 @@ public class AstroTagManager {
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
                     boolean result = true;
-                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, type, UsedContext.ClickType.RIGHT)); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, type, ClickType.RIGHT)); }
 
                     if(!result) return;
                 }
@@ -146,6 +149,41 @@ public class AstroTagManager {
 
         }
     }
+
+    // Inventory Click Events
+
+    @Listener(beforeModifications = true, order = Order.DEFAULT)
+    public void onInventoryClick(ClickInventoryEvent event, @First Player player){
+        ItemStackSnapshot istack = event.getCursorTransaction().getOriginal();
+        Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
+        if(!tgs.isPresent()) return;
+        List<String> tags = tgs.get();
+
+        //TODO: Determine ClickType & If shift.
+        ClickType clickType = null;
+        boolean isShift = false;
+
+        if(event instanceof ClickInventoryEvent.Primary) clickType = ClickType.LEFT;
+        if(event instanceof ClickInventoryEvent.Secondary) clickType = ClickType.RIGHT;
+        if(event instanceof ClickInventoryEvent.Middle) clickType = ClickType.MIDDLE;
+        if(event instanceof ClickInventoryEvent.Shift) isShift = true;
+
+
+        String[] otags = orderedTags(tags.toArray(new String[0]));
+
+        for(String tag: otags){
+            if(getTag(tag).isPresent()){
+                AbstractTag t = getTag(tag).get();
+                boolean result = true;
+                if(t.getType() == ExecutionTypes.ITEM_CLICKED) { result = t.run(ExecutionTypes.ITEM_CLICKED, tag, istack, new ClickedContext(player, event, clickType, isShift)); }
+                if(!result) return;
+            }
+        }
+    }
+
+
+    // -----
+
 
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onEntityHit(DamageEntityEvent event, @First Player player){
@@ -170,7 +208,7 @@ public class AstroTagManager {
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
                 if(t.getType() == ExecutionTypes.ENTITY_HIT) { result = t.run(ExecutionTypes.ENTITY_HIT, tag, istack, new EntityHitContext(player, event)); }
-                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, ClickType.RIGHT)); }
                 if(!result) return;
             }
         }
@@ -198,7 +236,7 @@ public class AstroTagManager {
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
                 if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, istack, new EntityInteractContext(player, event)); }
-                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, ClickType.RIGHT)); }
                 if(!result) return;
             }
         }
@@ -226,7 +264,7 @@ public class AstroTagManager {
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
                 if(t.getType() == ExecutionTypes.BLOCK_INTERACT) { result = t.run(ExecutionTypes.BLOCK_INTERACT, tag, istack, new BlockInteractContext(player, event)); }
-                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, ClickType.RIGHT)); }
                 if(!result) return;
             }
         }
@@ -254,7 +292,7 @@ public class AstroTagManager {
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
                 if(t.getType() == ExecutionTypes.BLOCK_PLACE) { result = t.run(ExecutionTypes.BLOCK_PLACE, tag, istack, new BlockPlaceContext(player, event)); }
-                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, ClickType.RIGHT)); }
                 if(!result) return;
             }
         }
@@ -282,7 +320,7 @@ public class AstroTagManager {
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
                 if(t.getType() == ExecutionTypes.BLOCK_BREAK) { result = t.run(ExecutionTypes.BLOCK_BREAK, tag, istack, new BlockBreakContext(player, event)); }
-                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, UsedContext.ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, ClickType.RIGHT)); }
                 if(!result) return;
             }
         }

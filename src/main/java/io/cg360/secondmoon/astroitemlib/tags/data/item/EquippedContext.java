@@ -1,5 +1,6 @@
-package io.cg360.secondmoon.astroitemlib.tags.data;
+package io.cg360.secondmoon.astroitemlib.tags.data.item;
 
+import io.cg360.secondmoon.astroitemlib.tags.data.ExecutionContext;
 import org.spongepowered.api.entity.living.player.Player;
 
 public class EquippedContext extends ExecutionContext {

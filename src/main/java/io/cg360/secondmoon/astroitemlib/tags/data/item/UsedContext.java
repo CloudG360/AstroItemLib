@@ -1,5 +1,7 @@
-package io.cg360.secondmoon.astroitemlib.tags.data;
+package io.cg360.secondmoon.astroitemlib.tags.data.item;
 
+import io.cg360.secondmoon.astroitemlib.tags.ClickType;
+import io.cg360.secondmoon.astroitemlib.tags.data.ExecutionContext;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -7,9 +9,6 @@ public class UsedContext extends ExecutionContext {
 
     private HandType handType;
     private ClickType clickType;
-
-
-    public enum ClickType {LEFT, RIGHT}
 
     /**
      *
