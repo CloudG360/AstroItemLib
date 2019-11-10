@@ -14,10 +14,12 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
 import java.util.Random;
+import java.util.regex.Pattern;
 
 public class TagButterfingers extends AbstractTag {
 
     public static final float BUTTERFINGERS_CHANCE  = 0.2f;
+    public static final double DEFAULT_DISTANCE = 1.5f;
 
     public TagButterfingers(String id, TagPriority priority, ExecutionTypes type) {
         super(id, priority, type);
@@ -29,8 +31,17 @@ public class TagButterfingers extends AbstractTag {
             HoldContext d = (HoldContext) context;
             Random random = new Random();
             if(random.nextFloat() <= BUTTERFINGERS_CHANCE){
+                double distance = DEFAULT_DISTANCE;
+
+                try {
+                    String[] params = tag.split(Pattern.quote(":"));
+                    if(params.length > 1){
+                        distance = Double.parseDouble(params[1]);
+                    }
+                } catch (Exception ignored) {}
+
                 d.getEvent().getFinalSlot().set(ItemStack.builder().itemType(ItemTypes.AIR).build());
-                Utils.dropItem(d.getPlayer(), itemStack);
+                Utils.dropItem(d.getPlayer(), itemStack, distance);
                 d.getPlayer().sendMessage(Text.of(TextColors.YELLOW, "Watch out, ", TextColors.GOLD, TextStyles.BOLD, "BUTTERFINGERS!"));
             }
         }
