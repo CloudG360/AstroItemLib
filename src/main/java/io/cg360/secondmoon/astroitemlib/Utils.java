@@ -80,9 +80,9 @@ public class Utils {
         }
     }
 
-    public static void dropItem (Player player, ItemStackSnapshot snapshot){
+    public static void dropItem (Player player, ItemStackSnapshot snapshot, double distance){
 
-        Vector3d velocity = new Vector3d(1, 0.25, 1).mul(convertYawToWorld(player.getHeadRotation().getY(), 1.5));
+        Vector3d velocity = new Vector3d(1, 0.25, 1).mul(convertYawToWorld(player.getHeadRotation().getY(), distance));
 
         Location<World> loc = player.getLocation();
 
