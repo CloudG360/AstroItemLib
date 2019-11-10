@@ -11,10 +11,7 @@ import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockInteractContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockPlaceContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityHitContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityInteractContext;
-import io.cg360.secondmoon.astroitemlib.tags.data.item.ClickedContext;
-import io.cg360.secondmoon.astroitemlib.tags.data.item.DroppedContext;
-import io.cg360.secondmoon.astroitemlib.tags.data.item.PickupContext;
-import io.cg360.secondmoon.astroitemlib.tags.data.item.UsedContext;
+import io.cg360.secondmoon.astroitemlib.tags.data.item.*;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -159,7 +156,6 @@ public class AstroTagManager {
     public void onInventoryClick(ClickInventoryEvent event, @First Player player){
         if(event instanceof ClickInventoryEvent.Open) return;
         if(event instanceof ClickInventoryEvent.Close) return;
-        if(event instanceof ClickInventoryEvent.Held) return;
 
         event.getTransactions().forEach(transaction -> {
             ItemStackSnapshot istack = transaction.getOriginal();
@@ -178,11 +174,13 @@ public class AstroTagManager {
             if(event instanceof ClickInventoryEvent.Shift) isShift = true;
             if(event instanceof ClickInventoryEvent.Transfer){ clickType = ClickType.QUICK_SWITCH; }
             if(event instanceof ClickInventoryEvent.NumberPress){ clickType = ClickType.QUICK_SWITCH; }
-            if(event instanceof ClickInventoryEvent.Drag){ clickType = ClickType.LEFT;isShift = true; }
+            if(event instanceof ClickInventoryEvent.SwapHand){ clickType = ClickType.QUICK_SWITCH; }
+            if(event instanceof ClickInventoryEvent.Drag){ clickType = ClickType.LEFT; isShift = true; }
             if(event instanceof ClickInventoryEvent.Creative) { clickType = ClickType.CREATIVE; }
 
-            if(event instanceof ClickInventoryEvent.Drop) state = InventoryChangeStates.DROP;
-            if(event instanceof ClickInventoryEvent.Pickup) state = InventoryChangeStates.PICKUP;
+            if(event instanceof ClickInventoryEvent.Drop){ state = InventoryChangeStates.DROP; }
+            if(event instanceof ClickInventoryEvent.Pickup){ state = InventoryChangeStates.PICKUP; }
+            if(event instanceof ClickInventoryEvent.Held){ state = InventoryChangeStates.HOLD; }
 
             if(clickType == ClickType.UNKNOWN && state == InventoryChangeStates.NOTHING) return;
 
@@ -201,6 +199,9 @@ public class AstroTagManager {
                             break;
                         case PICKUP:
                             if (t.getType() == ExecutionTypes.ITEM_PICKUP) { result = t.run(ExecutionTypes.ITEM_PICKUP, tag, istack, new PickupContext(player, (ClickInventoryEvent.Pickup) event)); }
+                            break;
+                        case HOLD:
+                            if (t.getType() == ExecutionTypes.ITEM_HOLD) { result = t.run(ExecutionTypes.ITEM_HOLD, tag, istack, new HoldContext(player, (ClickInventoryEvent.Held) event)); }
                             break;
                     }
                     if(!result) return;
