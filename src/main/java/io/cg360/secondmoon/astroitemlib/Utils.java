@@ -1,10 +1,17 @@
 package io.cg360.secondmoon.astroitemlib;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -24,6 +31,69 @@ public class Utils {
     public static String pickRandomFromList(String[] list){
          Random random = new Random();
          return list[random.nextInt(list.length)];
+    }
+
+    public static Vector3d convertYawToWorld(double yaw, double distance){
+        // +Z is 0
+        // +X is -90
+
+        // + 180 =
+        // -X is 0
+        // +Z is 90
+        // +X is 180
+        // -Z is 270
+
+        double yawajusted = yaw + 180;
+
+        double nfix = (yawajusted < 0) ? yawajusted * -1 : yawajusted;
+
+        double y = nfix % 360;
+
+
+        int q = (int) Math.floor(y/90);
+        switch (q){
+
+            // (Z, X) circle
+
+            case 0:
+                // -x A | +z O | dist H
+                double x0 = -(Math.cos(y)*distance);
+                double z0 = Math.sin(y)*distance;
+                return new Vector3d(x0, 1, z0);
+            case 1:
+                //+Z A | +X O | dist H
+                double z1 = Math.cos(y-90)*distance;
+                double x1 = Math.sin(y-90)*distance;
+                return new Vector3d(z1, 1, x1);
+            case 2:
+                double x2 = Math.cos(y-180)*distance;
+                double z2 = -(Math.sin(y-180)*distance);
+                return new Vector3d(x2, 1, z2);
+                //+X and -Z
+            case 3:
+                // -Z and -X
+                double z3 = -(Math.cos(y-270)*distance);
+                double x3 = -(Math.sin(y-270)*distance);
+                return new Vector3d(z3, 1, x3);
+            default:
+                return new Vector3d(0, 1, 0);
+        }
+    }
+
+    public static void dropItem (Player player, ItemStackSnapshot snapshot){
+
+        Vector3d velocity = new Vector3d(1, 0.25, 1).mul(convertYawToWorld(player.getHeadRotation().getY(), 1.5));
+
+        Location<World> loc = player.getLocation();
+
+        Entity e = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
+        e.offer(Keys.REPRESENTED_ITEM, snapshot);
+        e.offer(Keys.PICKUP_DELAY, 20);
+        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
+            loc.getExtent().spawnEntity(e);
+        }
+        e.setVelocity(velocity);
     }
 
     public static void givePlayerItem(UUID uuid, ItemStackSnapshot snapshot){
