@@ -22,7 +22,7 @@ public class TagDevCatapult extends AbstractTag {
         if(getType() == ExecutionTypes.ENTITY_HIT) {
             EntityHitContext entityHitContext = (EntityHitContext) context;
             entityHitContext.getEvent().setCancelled(true);
-            entityHitContext.getEvent().getTargetEntity().setVelocity(new Vector3d(0, 5, 0));
+            entityHitContext.getEvent().getTargetEntity().setVelocity(new Vector3d(0, 3, 0));
             ParticleEffect e = ParticleEffect.builder().type(ParticleTypes.HUGE_EXPLOSION).quantity(1).build();
 
             entityHitContext.getEvent().getTargetEntity().getLocation().getExtent()
