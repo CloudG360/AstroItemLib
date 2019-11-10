@@ -5,7 +5,7 @@ import com.google.common.annotations.Beta;
 public enum ExecutionTypes {
 
     /** Continuous execution at an interval when an item is held in one of a player's hands. Interval can be specified in constructor.*/
-    ITEM_HELD,
+    ITEM_HOLDING,
 
     /** Continuous execution at an interval when a piece of armour is equipped. Interval can be specified in constructor.*/
     ITEM_EQUIPPED,
