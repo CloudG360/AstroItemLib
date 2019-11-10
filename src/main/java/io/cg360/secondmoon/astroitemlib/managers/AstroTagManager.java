@@ -5,12 +5,15 @@ import io.cg360.secondmoon.astroitemlib.data.AstroKeys;
 import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;
 import io.cg360.secondmoon.astroitemlib.tags.ClickType;
 import io.cg360.secondmoon.astroitemlib.tags.ExecutionTypes;
+import io.cg360.secondmoon.astroitemlib.tags.InventoryChangeStates;
 import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockBreakContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockInteractContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockPlaceContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityHitContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityInteractContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.item.ClickedContext;
+import io.cg360.secondmoon.astroitemlib.tags.data.item.DroppedContext;
+import io.cg360.secondmoon.astroitemlib.tags.data.item.PickupContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.item.UsedContext;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
@@ -154,31 +157,56 @@ public class AstroTagManager {
 
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onInventoryClick(ClickInventoryEvent event, @First Player player){
-        ItemStackSnapshot istack = event.getCursorTransaction().getOriginal();
-        Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
-        if(!tgs.isPresent()) return;
-        List<String> tags = tgs.get();
+        if(event instanceof ClickInventoryEvent.Open) return;
+        if(event instanceof ClickInventoryEvent.Close) return;
+        if(event instanceof ClickInventoryEvent.Held) return;
 
-        //TODO: Determine ClickType & If shift.
-        ClickType clickType = null;
-        boolean isShift = false;
+        event.getTransactions().forEach(transaction -> {
+            ItemStackSnapshot istack = transaction.getOriginal();
+            Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
+            if(!tgs.isPresent()) return;
+            List<String> tags = tgs.get();
 
-        if(event instanceof ClickInventoryEvent.Primary) clickType = ClickType.LEFT;
-        if(event instanceof ClickInventoryEvent.Secondary) clickType = ClickType.RIGHT;
-        if(event instanceof ClickInventoryEvent.Middle) clickType = ClickType.MIDDLE;
-        if(event instanceof ClickInventoryEvent.Shift) isShift = true;
+            //TODO: Determine ClickType & If shift.
+            ClickType clickType = ClickType.UNKNOWN;
+            InventoryChangeStates state = InventoryChangeStates.NOTHING;
+            boolean isShift = false;
 
+            if(event instanceof ClickInventoryEvent.Primary) clickType = ClickType.LEFT;
+            if(event instanceof ClickInventoryEvent.Secondary) clickType = ClickType.RIGHT;
+            if(event instanceof ClickInventoryEvent.Middle) clickType = ClickType.MIDDLE;
+            if(event instanceof ClickInventoryEvent.Shift) isShift = true;
+            if(event instanceof ClickInventoryEvent.Transfer){ clickType = ClickType.QUICK_SWITCH; }
+            if(event instanceof ClickInventoryEvent.NumberPress){ clickType = ClickType.QUICK_SWITCH; }
+            if(event instanceof ClickInventoryEvent.Drag){ clickType = ClickType.LEFT;isShift = true; }
+            if(event instanceof ClickInventoryEvent.Creative) { clickType = ClickType.CREATIVE; }
 
-        String[] otags = orderedTags(tags.toArray(new String[0]));
+            if(event instanceof ClickInventoryEvent.Drop) state = InventoryChangeStates.DROP;
+            if(event instanceof ClickInventoryEvent.Pickup) state = InventoryChangeStates.PICKUP;
 
-        for(String tag: otags){
-            if(getTag(tag).isPresent()){
-                AbstractTag t = getTag(tag).get();
-                boolean result = true;
-                if(t.getType() == ExecutionTypes.ITEM_CLICKED) { result = t.run(ExecutionTypes.ITEM_CLICKED, tag, istack, new ClickedContext(player, event, clickType, isShift)); }
-                if(!result) return;
+            if(clickType == ClickType.UNKNOWN && state == InventoryChangeStates.NOTHING) return;
+
+            String[] otags = orderedTags(tags.toArray(new String[0]));
+
+            for(String tag: otags){
+                if(getTag(tag).isPresent()){
+                    AbstractTag t = getTag(tag).get();
+                    boolean result = true;
+                    switch (state) {
+                        case NOTHING:
+                            if (t.getType() == ExecutionTypes.ITEM_CLICKED) { result = t.run(ExecutionTypes.ITEM_CLICKED, tag, istack, new ClickedContext(player, event, clickType, isShift)); }
+                            break;
+                        case DROP:
+                            if (t.getType() == ExecutionTypes.ITEM_DROPPED) { result = t.run(ExecutionTypes.ITEM_DROPPED, tag, istack, new DroppedContext(player, (ClickInventoryEvent.Drop) event)); }
+                            break;
+                        case PICKUP:
+                            if (t.getType() == ExecutionTypes.ITEM_PICKUP) { result = t.run(ExecutionTypes.ITEM_PICKUP, tag, istack, new PickupContext(player, (ClickInventoryEvent.Pickup) event)); }
+                            break;
+                    }
+                    if(!result) return;
+                }
             }
-        }
+        });
     }
 
 

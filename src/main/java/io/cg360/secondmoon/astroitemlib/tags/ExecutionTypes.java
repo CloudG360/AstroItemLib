@@ -32,15 +32,13 @@ public enum ExecutionTypes {
      */
     ITEM_USED,
 
-    @Beta
     ITEM_CLICKED,
 
-    /** Single Execution, triggers when dropped.
-     *
-     * BETA: Currently Unimplemented
-     */
-    @Beta
+    /** Single Execution, triggers when dropped.*/
     ITEM_DROPPED,
+
+    /** Single Execution, triggers when picked up.*/
+    ITEM_PICKUP,
 
     /** Single Execution, supports cooldowns.
      * Only supports left-click hit. Triggered when successfully
