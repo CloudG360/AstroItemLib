@@ -27,6 +27,7 @@ import io.cg360.secondmoon.astroitemlib.tags.TagPriority;
 import io.cg360.secondmoon.astroitemlib.tags.impl.devtest.TagDevCatapult;
 import io.cg360.secondmoon.astroitemlib.tags.impl.devtest.TagDevCookie;
 import io.cg360.secondmoon.astroitemlib.tags.impl.devtest.TagDevTestInventory;
+import io.cg360.secondmoon.astroitemlib.tags.impl.item.TagButterfingers;
 import io.cg360.secondmoon.astroitemlib.tags.impl.item.TagUndroppable;
 import io.cg360.secondmoon.astroitemlib.tags.impl.world.TagStopBreakBlock;
 import io.cg360.secondmoon.astroitemlib.tags.impl.world.TagUnplaceable;
@@ -156,6 +157,7 @@ public class AstroItemLib {
                 .registerTag(new TagUnplaceable("unplaceable", TagPriority.HIGH, ExecutionTypes.BLOCK_PLACE))
                 .registerTag(new TagStopBreakBlock("stopbreakblock", TagPriority.HIGH, ExecutionTypes.BLOCK_BREAK))
 
+                .registerTag(new TagButterfingers("butterfingers", TagPriority.HIGHEST, ExecutionTypes.ITEM_HOLD))
                 .registerTag(new TagUndroppable("undroppable", TagPriority.HIGH, ExecutionTypes.ITEM_DROPPED));
 
 
