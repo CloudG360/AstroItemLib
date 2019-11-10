@@ -40,6 +40,9 @@ public enum ExecutionTypes {
     /** Single Execution, triggers when picked up.*/
     ITEM_PICKUP,
 
+    /** Single Execution, Different to Item Held (As it's a single exe)*/
+    ITEM_HOLD,
+
     /** Single Execution, supports cooldowns.
      * Only supports left-click hit. Triggered when successfully
      * hitting an entity.
