@@ -25,6 +25,7 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.*;
@@ -150,12 +151,36 @@ public class AstroTagManager {
         }
     }
 
+    @Listener(beforeModifications = true, order = Order.DEFAULT)
+    public void onInventorySingleHold(ClickInventoryEvent.Held event, @First Player player){
+        Optional<ItemStack> s = event.getFinalSlot().peek();
+        if(!s.isPresent()) return;
+        ItemStackSnapshot istack = s.get().createSnapshot();
+
+        Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
+        if(!tgs.isPresent()) return;
+        List<String> tags = tgs.get();
+
+        String[] otags = orderedTags(tags.toArray(new String[0]));
+
+        for(String tag: otags){
+            if(getTag(tag).isPresent()){
+                AbstractTag t = getTag(tag).get();
+                boolean result = true;
+                if(t.getType() == ExecutionTypes.ITEM_HOLD) { result = t.run(ExecutionTypes.ITEM_HOLD, tag, istack, new HoldContext(player, event)); }
+                if(!result) return;
+            }
+        }
+    }
+
     // Inventory Click Events
 
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onInventoryClick(ClickInventoryEvent event, @First Player player){
         if(event instanceof ClickInventoryEvent.Open) return;
         if(event instanceof ClickInventoryEvent.Close) return;
+
+        AstroItemLib.getLogger().info("Click");
 
         event.getTransactions().forEach(transaction -> {
             ItemStackSnapshot istack = transaction.getOriginal();
@@ -180,7 +205,7 @@ public class AstroTagManager {
 
             if(event instanceof ClickInventoryEvent.Drop){ state = InventoryChangeStates.DROP; }
             if(event instanceof ClickInventoryEvent.Pickup){ state = InventoryChangeStates.PICKUP; }
-            if(event instanceof ClickInventoryEvent.Held){ state = InventoryChangeStates.HOLD; }
+            if(event instanceof ClickInventoryEvent.Held){ state = InventoryChangeStates.HOLD; AstroItemLib.getLogger().info("Hold"); }
 
             if(clickType == ClickType.UNKNOWN && state == InventoryChangeStates.NOTHING) return;
 

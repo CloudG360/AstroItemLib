@@ -1,5 +1,6 @@
 package io.cg360.secondmoon.astroitemlib.tags.impl.item;
 
+import io.cg360.secondmoon.astroitemlib.AstroItemLib;
 import io.cg360.secondmoon.astroitemlib.Utils;
 import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;
 import io.cg360.secondmoon.astroitemlib.tags.ExecutionTypes;
@@ -28,6 +29,7 @@ public class TagButterfingers extends AbstractTag {
     @Override
     public boolean run(ExecutionTypes type, String tag, ItemStackSnapshot itemStack, ExecutionContext context) {
         if(type == ExecutionTypes.ITEM_HOLD){
+            AstroItemLib.getLogger().info("BUTTERFINGERS");
             HoldContext d = (HoldContext) context;
             Random random = new Random();
             if(random.nextFloat() <= BUTTERFINGERS_CHANCE){
