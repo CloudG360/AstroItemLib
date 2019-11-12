@@ -56,25 +56,24 @@ public class Utils {
             // (Z, X) circle
 
             case 0:
-                // -x A | +z O | dist H
-                double x0 = -(Math.cos(y)*distance);
-                double z0 = Math.sin(y)*distance;
+                // +z A | +x O | dist H
+                double z0 = Math.cos(y)*distance;
+                double x0 = Math.sin(y)*distance;
                 return new Vector3d(x0, 1, z0);
             case 1:
-                //+Z A | +X O | dist H
-                double z1 = Math.cos(y-90)*distance;
-                double x1 = Math.sin(y-90)*distance;
-                return new Vector3d(z1, 1, x1);
+                //+x A | -z O | dist H
+                double x1 = Math.cos(y-90)*distance;
+                double z1 = -(Math.sin(y-90)*distance);
+                return new Vector3d(x1, 1, z1);
             case 2:
-                double x2 = Math.cos(y-180)*distance;
-                double z2 = -(Math.sin(y-180)*distance);
+                double z2 = -(Math.cos(y-180)*distance);
+                double x2 = -(Math.sin(y-180)*distance);
                 return new Vector3d(x2, 1, z2);
-                //+X and -Z
             case 3:
-                // -Z and -X
-                double z3 = -(Math.cos(y-270)*distance);
-                double x3 = -(Math.sin(y-270)*distance);
-                return new Vector3d(z3, 1, x3);
+                // -x A | +z O | dist H
+                double x3 = -(Math.cos(y-270)*distance);
+                double z3 = Math.sin(y-270)*distance;
+                return new Vector3d(x3, 1, z3);
             default:
                 return new Vector3d(0, 1, 0);
         }
