@@ -43,37 +43,44 @@ public class Utils {
         // +X is 180
         // -Z is 270
 
-        double yawajusted = yaw + 180;
+        // +Z 0, -x 90
 
-        double nfix = (yawajusted < 0) ? yawajusted * -1 : yawajusted;
+        if(yaw > 360 || yaw < 0){
+            //Out of bounds angle
+            AstroItemLib.getLogger().info("Out of range yaw.");
+            return new Vector3d(0, 1, 0);
+        }
 
-        double y = nfix % 360;
+        double y = yaw;
 
+        // Have 5 cases. -2 to 2 where the two extremes are the same.
 
         int q = (int) Math.floor(y/90);
+        AstroItemLib.getLogger().info("Q: "+q);
         switch (q){
-
-            // (Z, X) circle
-
-            case 0:
-                // +z A | +x O | dist H
-                double z0 = Math.cos(y)*distance;
-                double x0 = Math.sin(y)*distance;
-                return new Vector3d(x0, 1, z0);
-            case 1:
-                //+x A | -z O | dist H
-                double x1 = Math.cos(y-90)*distance;
-                double z1 = -(Math.sin(y-90)*distance);
+            case -2:
+                // x+ = O | z- = A | dist = H
+                double x = Math.sin(y+180)*distance;
+                double z = -(Math.cos(y+180)*distance);
+                return new Vector3d(x, 1, z);
+            case -1:
+                // x+ A | z+ O | dist H
+                double x1 = Math.cos(y+90)*distance;
+                double z1 = Math.sin(y+90)*distance;
                 return new Vector3d(x1, 1, z1);
-            case 2:
-                double z2 = -(Math.cos(y-180)*distance);
-                double x2 = -(Math.sin(y-180)*distance);
+            case 0:
+                // z+ A | -x O | dist H
+                double z2 = Math.cos(y)*distance;
+                double x2 = -(Math.sin(y)*distance);
                 return new Vector3d(x2, 1, z2);
-            case 3:
-                // -x A | +z O | dist H
-                double x3 = -(Math.cos(y-270)*distance);
-                double z3 = Math.sin(y-270)*distance;
+            case 1:
+                // -x A | -z O | dist H
+                double x3 = -(Math.cos(y-90)*distance);
+                double z3 = -(Math.sin(y-90)*distance);
                 return new Vector3d(x3, 1, z3);
+            case 2:
+                // Anticipates rogue +180
+                return new Vector3d(0, 1, -distance);
             default:
                 return new Vector3d(0, 1, 0);
         }
@@ -81,11 +88,16 @@ public class Utils {
 
     public static void dropItem (Player player, ItemStackSnapshot snapshot, double distance){
 
-        Vector3d velocity = new Vector3d(1, 0.1, 1).mul(convertYawToWorld(player.getHeadRotation().getY(), distance));
+        double yaw = player.getHeadRotation().getY();
+        Vector3d view = convertYawToWorld(yaw, distance);
+
+        Vector3d velocity = new Vector3d(1, 0.1, 1).mul(view);
+
+        AstroItemLib.getLogger().info(String.format("Yaw: %s, View: %s, Velocity: %s", yaw, view, velocity));
 
         Location<World> loc = player.getLocation();
 
-        Entity e = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
+        Entity e = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition().add(0, 1, 0));
         e.offer(Keys.REPRESENTED_ITEM, snapshot);
         e.offer(Keys.PICKUP_DELAY, 20);
         try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
