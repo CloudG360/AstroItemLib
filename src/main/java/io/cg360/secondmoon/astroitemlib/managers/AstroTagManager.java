@@ -79,6 +79,10 @@ public class AstroTagManager {
                         tags.add(i, t);
                         break;
                     }
+
+                    if (i == tags.size()-1){
+                        tags.add(t);
+                    }
                 }
             }
         }
@@ -143,7 +147,6 @@ public class AstroTagManager {
                     AbstractTag t = getTag(tag).get();
                     boolean result = true;
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, type, ClickType.RIGHT)); }
-
                     if(!result) return;
                 }
             }
@@ -180,8 +183,6 @@ public class AstroTagManager {
         if(event instanceof ClickInventoryEvent.Open) return;
         if(event instanceof ClickInventoryEvent.Close) return;
 
-        AstroItemLib.getLogger().info("Click");
-
         event.getTransactions().forEach(transaction -> {
             ItemStackSnapshot istack = transaction.getOriginal();
             Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
@@ -205,7 +206,7 @@ public class AstroTagManager {
 
             if(event instanceof ClickInventoryEvent.Drop){ state = InventoryChangeStates.DROP; }
             if(event instanceof ClickInventoryEvent.Pickup){ state = InventoryChangeStates.PICKUP; }
-            if(event instanceof ClickInventoryEvent.Held){ state = InventoryChangeStates.HOLD; AstroItemLib.getLogger().info("Hold"); }
+            if(event instanceof ClickInventoryEvent.Held){ state = InventoryChangeStates.HOLD; }
 
             if(clickType == ClickType.UNKNOWN && state == InventoryChangeStates.NOTHING) return;
 
@@ -312,6 +313,7 @@ public class AstroTagManager {
 
         HandType handType = HandTypes.OFF_HAND;
         if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
+
 
         for(String tag: otags){
             if(getTag(tag).isPresent()){
