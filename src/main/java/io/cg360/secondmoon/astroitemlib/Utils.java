@@ -58,16 +58,6 @@ public class Utils {
         int q = (int) Math.floor(y/90);
         AstroItemLib.getLogger().info("Q: "+q);
         switch (q){
-            case -2:
-                // x+ = O | z- = A | dist = H
-                double x = Math.sin(y+180)*distance;
-                double z = -(Math.cos(y+180)*distance);
-                return new Vector3d(x, 1, z);
-            case -1:
-                // x+ A | z+ O | dist H
-                double x1 = Math.cos(y+90)*distance;
-                double z1 = Math.sin(y+90)*distance;
-                return new Vector3d(x1, 1, z1);
             case 0:
                 // z+ A | -x O | dist H
                 double z2 = Math.cos(y)*distance;
@@ -79,8 +69,17 @@ public class Utils {
                 double z3 = -(Math.sin(y-90)*distance);
                 return new Vector3d(x3, 1, z3);
             case 2:
-                // Anticipates rogue +180
-                return new Vector3d(0, 1, -distance);
+                // x+ = O | z- = A | dist = H
+                double x = Math.sin(y-180)*distance;
+                double z = -(Math.cos(y-180)*distance);
+                return new Vector3d(x, 1, z);
+            case 3:
+                // x+ A | z+ O | dist H
+                double x1 = Math.cos(y-270)*distance;
+                double z1 = Math.sin(y-270)*distance;
+                return new Vector3d(x1, 1, z1);
+            case 4:
+                return new Vector3d(0, 1, distance);
             default:
                 return new Vector3d(0, 1, 0);
         }
@@ -91,7 +90,7 @@ public class Utils {
         double yaw = player.getHeadRotation().getY();
         Vector3d view = convertYawToWorld(yaw, distance);
 
-        Vector3d velocity = new Vector3d(1, 0.1, 1).mul(view);
+        Vector3d velocity = new Vector3d(0.2, 0.05, 0.2).mul(view);
 
         AstroItemLib.getLogger().info(String.format("Yaw: %s, View: %s, Velocity: %s", yaw, view, velocity));
 
