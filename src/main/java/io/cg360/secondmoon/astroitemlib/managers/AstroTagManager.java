@@ -74,16 +74,15 @@ public class AstroTagManager {
             if(tags.size() == 0){
                 tags.add(t);
             } else {
+                boolean added = false;
                 for(int i = 0; i < tags.size(); i++){
                     if(tagMap.get(shorttag).getPriority().getIntegerPriority() > tagMap.get(tags.get(i)).getPriority().getIntegerPriority()){
                         tags.add(i, t);
+                        added = true;
                         break;
                     }
-
-                    if (i == tags.size()-1){
-                        tags.add(t);
-                    }
                 }
+                if(!added) tags.add(t);
             }
         }
         return tags.toArray(new String[0]);
