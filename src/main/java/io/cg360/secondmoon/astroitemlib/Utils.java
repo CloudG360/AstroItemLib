@@ -4,6 +4,8 @@ import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
@@ -28,11 +30,20 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
+    /** Picks a random String out of an array.*/
     public static String pickRandomFromList(String[] list){
          Random random = new Random();
          return list[random.nextInt(list.length)];
     }
 
+    /**
+     * Previously used to calculate where an item should drop in
+     * relation to a player.
+     *
+     * Deprecated due to it not working reliably. Will be fixed in
+     * the future
+     */
+    @Deprecated
     public static Vector3d convertYawToWorld(double yaw, double distance){
         // +Z is 0
         // +X is -90
@@ -45,7 +56,7 @@ public class Utils {
 
         // +Z 0, -x 90
 
-        if(yaw > 360 || yaw < 0){
+        if(yaw > 360 || yaw < -360){
             //Out of bounds angle
             AstroItemLib.getLogger().info("Out of range yaw.");
             return new Vector3d(0, 1, 0);
@@ -58,52 +69,75 @@ public class Utils {
         int q = (int) Math.floor(y/90);
         AstroItemLib.getLogger().info("Q: "+q);
         switch (q){
+            case -3:
+                // -x A | -z O | dist H
+                double x3a = -(Math.cos(y+270)*distance);
+                double z3a = -(Math.sin(y+270)*distance);
+                return new Vector3d(x3a, 1, z3a);
+            case -2:
+                // x+ = O | z- = A | dist = H
+                double xa = Math.sin(y+180)*distance;
+                double za = -(Math.cos(y+180)*distance);
+                return new Vector3d(xa, 1, za);
+            case -1:
+                // x+ A | z+ O | dist H
+                double x1a = Math.cos(y+90)*distance;
+                double z1a = Math.sin(y+90)*distance;
+                return new Vector3d(-x1a, 1, -z1a);
             case 0:
                 // z+ A | -x O | dist H
                 double z2 = Math.cos(y)*distance;
                 double x2 = -(Math.sin(y)*distance);
-                return new Vector3d(x2, 1, z2);
+                return new Vector3d(z2, 1, x2);
             case 1:
                 // -x A | -z O | dist H
                 double x3 = -(Math.cos(y-90)*distance);
                 double z3 = -(Math.sin(y-90)*distance);
-                return new Vector3d(x3, 1, z3);
+                return new Vector3d(z3, 1, x3);
             case 2:
                 // x+ = O | z- = A | dist = H
                 double x = Math.sin(y-180)*distance;
                 double z = -(Math.cos(y-180)*distance);
-                return new Vector3d(x, 1, z);
+                return new Vector3d(z, 1, x);
             case 3:
                 // x+ A | z+ O | dist H
                 double x1 = Math.cos(y-270)*distance;
                 double z1 = Math.sin(y-270)*distance;
-                return new Vector3d(x1, 1, z1);
-            case 4:
-                return new Vector3d(0, 1, distance);
+                return new Vector3d(z1, 1, x1);
             default:
                 return new Vector3d(0, 1, 0);
         }
     }
 
+    /**
+     * Drops an itemstack for a player.
+     *
+     */
     public static void dropItem (Player player, ItemStackSnapshot snapshot, double distance){
 
-        double yaw = player.getHeadRotation().getY();
-        Vector3d view = convertYawToWorld(yaw, distance);
+        //double yaw = player.getHeadRotation().getY();
+        //Vector3d view = convertYawToWorld(yaw, distance);
 
-        Vector3d velocity = new Vector3d(0.2, 0.05, 0.2).mul(view);
+        //Vector3d velocity = new Vector3d(0.2, 0.05, 0.2).mul(view);
 
-        AstroItemLib.getLogger().info(String.format("Yaw: %s, View: %s, Velocity: %s", yaw, view, velocity));
+        //AstroItemLib.getLogger().info(String.format("Yaw: %s, View: %s, Velocity: %s", yaw, view, velocity));
 
         Location<World> loc = player.getLocation();
 
         Entity e = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition().add(0, 1, 0));
         e.offer(Keys.REPRESENTED_ITEM, snapshot);
-        e.offer(Keys.PICKUP_DELAY, 20);
+        e.offer(Keys.PICKUP_DELAY, 120);
         try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
             loc.getExtent().spawnEntity(e);
         }
-        e.setVelocity(velocity);
+        loc.getExtent().spawnParticles(
+                ParticleEffect.builder()
+                        .type(ParticleTypes.BARRIER)
+                        .build(),
+                loc.getPosition()
+        );
+        //e.setVelocity(new Vector3d(0.2, 0.2, 0.2).mul(d));
     }
 
     public static void givePlayerItem(UUID uuid, ItemStackSnapshot snapshot){
