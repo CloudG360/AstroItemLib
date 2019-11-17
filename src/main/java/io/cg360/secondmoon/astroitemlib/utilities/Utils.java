@@ -1,6 +1,7 @@
-package io.cg360.secondmoon.astroitemlib;
+package io.cg360.secondmoon.astroitemlib.utilities;
 
 import com.flowpowered.math.vector.Vector3d;
+import io.cg360.secondmoon.astroitemlib.AstroItemLib;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;

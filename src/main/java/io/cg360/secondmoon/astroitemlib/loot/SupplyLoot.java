@@ -1,11 +1,11 @@
 package io.cg360.secondmoon.astroitemlib.loot;
 
 import io.cg360.secondmoon.astroitemlib.AstroItemLib;
-import io.cg360.secondmoon.astroitemlib.Utils;
 import io.cg360.secondmoon.astroitemlib.exceptions.MalformedLootPoolException;
 import io.cg360.secondmoon.astroitemlib.items.ItemTemplate;
 import io.cg360.secondmoon.astroitemlib.items.SerializableItemEnchantment;
 import io.cg360.secondmoon.astroitemlib.items.SerializableItemKeys;
+import io.cg360.secondmoon.astroitemlib.utilities.Utils;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 

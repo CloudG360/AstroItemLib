@@ -1,11 +1,11 @@
 package io.cg360.secondmoon.astroitemlib.items;
 
 import io.cg360.secondmoon.astroitemlib.AstroItemLib;
-import io.cg360.secondmoon.astroitemlib.Utils;
 import io.cg360.secondmoon.astroitemlib.data.AstroItemData;
 import io.cg360.secondmoon.astroitemlib.data.AstroKeys;
 import io.cg360.secondmoon.astroitemlib.data.impl.AstroItemDataImpl;
 import io.cg360.secondmoon.astroitemlib.exceptions.InvalidItemException;
+import io.cg360.secondmoon.astroitemlib.utilities.Utils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.item.EnchantmentData;

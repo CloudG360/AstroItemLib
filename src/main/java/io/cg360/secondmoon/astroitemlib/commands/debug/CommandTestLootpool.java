@@ -1,8 +1,8 @@
 package io.cg360.secondmoon.astroitemlib.commands.debug;
 
 import io.cg360.secondmoon.astroitemlib.AstroItemLib;
-import io.cg360.secondmoon.astroitemlib.Utils;
 import io.cg360.secondmoon.astroitemlib.loot.SupplyLoot;
+import io.cg360.secondmoon.astroitemlib.utilities.Utils;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
