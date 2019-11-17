@@ -18,6 +18,7 @@ public enum ExecutionTypes {
     @Beta
     ITEM_CARRIED,
 
+    //TODO: Handle duplicates between ITEM_HOLDING and HOTBAR. Call for ITEM_CARRIED as well
     /** Continuous execution at an interval when an item is present in the hotbar.
      * Interval can be specified in constructor.
      *
