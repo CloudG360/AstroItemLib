@@ -169,7 +169,7 @@ public class AstroItemLib {
 
         Sponge.getEventManager().registerListeners(this, astroTagManager);
 
-        taskManager.registerTask(new RunnableManageContinousTags());
+        taskManager.registerTask(new RunnableManageContinousTags(1, 0));
     }
 
     @Listener
