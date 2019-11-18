@@ -103,7 +103,7 @@ public class AstroTagManager {
 
     // -----------------------------------------------------------------------------
 
-
+    @Listener(beforeModifications = true)
     public void onPlayerJoin(ClientConnectionEvent.Join event){
         for(UUID tagP : tagProcessors){
             Optional<IAstroTask> t = AstroItemLib.getTaskManager().getTask(tagP);
