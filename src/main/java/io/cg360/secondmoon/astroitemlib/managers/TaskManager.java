@@ -19,15 +19,14 @@ public final class TaskManager {
         this.ticks = 0;
         this.tasks = new HashMap<>();
         this.runningasynctasks = new ArrayList<>();
+        this.suspendedtasks = new ArrayList<>();
     }
 
     public void process() {
         HashMap<UUID, IAstroTask> clone = new HashMap<>(tasks);
         for(Map.Entry<UUID, IAstroTask> entry: clone.entrySet()){
-
             if(runningasynctasks.contains(entry.getKey())){ continue; } //Skips it if Async (implied) and on list
             if(suspendedtasks.contains(entry.getKey())){ continue; } //Skips it if scheduled to rerun later.
-
             if(entry.getValue().isAsync()){
                 Task.builder().async().execute(() -> {
                         runningasynctasks.add(entry.getKey());
@@ -38,9 +37,7 @@ public final class TaskManager {
                                     .execute(() -> {
                                         suspendedtasks.remove(entry.getKey());
                                     }).submit(AstroItemLib.get());
-                        } else {
-                            tasks.remove(entry.getKey());
-                        }
+                        } else { tasks.remove(entry.getKey()); }
                         runningasynctasks.remove(entry.getKey());
                 }).submit(AstroItemLib.get());
             } else {
@@ -51,26 +48,20 @@ public final class TaskManager {
                             .execute(() -> {
                                 suspendedtasks.remove(entry.getKey());
                             }).submit(AstroItemLib.get());
-                } else {
-                    tasks.remove(entry.getKey());
-                }
+                } else { tasks.remove(entry.getKey()); }
             }
         }
     }
-
     public void startTaskManager() {
         getManagerRoot().ifPresent(task -> {task.cancel(); taskManagerRoot = null; }); //Clear last process
         this.tasks = new HashMap<>();
+        this.suspendedtasks = new ArrayList<>();
         this.runningasynctasks = new ArrayList<>();
-        taskManagerRoot = Task.builder()
-                .intervalTicks(1)
-                .name("TaskManagerRoot")
+        taskManagerRoot = Task.builder().intervalTicks(1).name("TaskManagerRoot")
                 .execute(r -> {
                     process();
-                })
-                .submit(AstroItemLib.get());
+                }).submit(AstroItemLib.get());
     }
-
 
     public Optional<Task> getManagerRoot() { return Optional.ofNullable(this.taskManagerRoot); }
 }

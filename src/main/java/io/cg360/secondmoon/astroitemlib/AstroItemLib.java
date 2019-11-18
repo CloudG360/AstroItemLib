@@ -22,6 +22,7 @@ import io.cg360.secondmoon.astroitemlib.items.ItemTemplate;
 import io.cg360.secondmoon.astroitemlib.loot.SupplyLoot;
 import io.cg360.secondmoon.astroitemlib.managers.AstroItemManager;
 import io.cg360.secondmoon.astroitemlib.managers.AstroTagManager;
+import io.cg360.secondmoon.astroitemlib.managers.TaskManager;
 import io.cg360.secondmoon.astroitemlib.tags.ExecutionTypes;
 import io.cg360.secondmoon.astroitemlib.tags.TagPriority;
 import io.cg360.secondmoon.astroitemlib.tags.impl.devtest.TagDevCatapult;
@@ -72,6 +73,7 @@ public class AstroItemLib {
 
     private AstroItemManager astroItemManager;
     private AstroTagManager astroTagManager;
+    private TaskManager taskManager;
 
     @Listener
     public void preServerInit(GamePreInitializationEvent event){
@@ -143,6 +145,9 @@ public class AstroItemLib {
         plg = this;
         astroItemManager = new AstroItemManager();
         astroTagManager = new AstroTagManager();
+        taskManager = new TaskManager();
+
+        taskManager.startTaskManager();
 
         resetPools();
         resetItemTemplates();
