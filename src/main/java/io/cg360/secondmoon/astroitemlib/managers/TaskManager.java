@@ -33,11 +33,14 @@ public final class TaskManager {
 
     public void registerTask(IAstroTask task){
         verifyTask(task);
+        UUID id = UUID.randomUUID();
         if(task.getDelay() < 1) {
-            tasks.put(UUID.randomUUID(), task);
+            task.onRegister(id);
+            tasks.put(id, task);
         } else {
             Task.builder().delayTicks(task.getDelay()).execute(() -> {
-                tasks.put(UUID.randomUUID(), task);
+                task.onRegister(id);
+                tasks.put(id, task);
             }).submit(AstroItemLib.get());
         }
     }
@@ -58,9 +61,13 @@ public final class TaskManager {
                             suspendedtasks.add(entry.getKey());
                             Task.builder().delayTicks(entry.getValue().getRepeatRate())
                                     .execute(() -> {
+                                        entry.getValue().onRecycle(entry.getKey());
                                         suspendedtasks.remove(entry.getKey());
                                     }).submit(AstroItemLib.get());
-                        } else { tasks.remove(entry.getKey()); }
+                        } else {
+                            entry.getValue().onUnregister(entry.getKey());
+                            tasks.remove(entry.getKey());
+                        }
                         runningasynctasks.remove(entry.getKey());
                 }).submit(AstroItemLib.get());
             } else {
@@ -69,9 +76,13 @@ public final class TaskManager {
                     suspendedtasks.add(entry.getKey());
                     Task.builder().delayTicks(entry.getValue().getRepeatRate())
                             .execute(() -> {
+                                entry.getValue().onRecycle(entry.getKey());
                                 suspendedtasks.remove(entry.getKey());
                             }).submit(AstroItemLib.get());
-                } else { tasks.remove(entry.getKey()); }
+                } else {
+                    entry.getValue().onUnregister(entry.getKey());
+                    tasks.remove(entry.getKey());
+                }
             }
         }
     }
