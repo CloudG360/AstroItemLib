@@ -1,6 +1,7 @@
 package io.cg360.secondmoon.astroitemlib.managers;
 
 import io.cg360.secondmoon.astroitemlib.AstroItemLib;
+import io.cg360.secondmoon.astroitemlib.exceptions.InvalidTaskException;
 import io.cg360.secondmoon.astroitemlib.tasks.interfaces.IAstroTask;
 import org.spongepowered.api.scheduler.Task;
 
@@ -21,6 +22,28 @@ public final class TaskManager {
         this.runningasynctasks = new ArrayList<>();
         this.suspendedtasks = new ArrayList<>();
     }
+
+    public void verifyTask(IAstroTask task) throws InvalidTaskException {
+        if(task.getName() == null) throw new InvalidTaskException("Task did not have a specified name.");
+        if(task.getName().contains("#")) throw new InvalidTaskException("Task names cannot include '#'. ");
+        if(task.getName().contains(":")) throw new InvalidTaskException("Task names cannot include ':'. ");
+        if(task.getName().contains(";")) throw new InvalidTaskException("Task names cannot include ';'. ");
+        if(task.getDescription() == null) throw new InvalidTaskException("Task description cannot be null. Replace with an empty string.");
+    }
+
+    public void registerTask(IAstroTask task){
+        verifyTask(task);
+        if(task.getDelay() < 1) {
+            tasks.put(UUID.randomUUID(), task);
+        } else {
+            Task.builder().delayTicks(task.getDelay()).execute(() -> {
+                tasks.put(UUID.randomUUID(), task);
+            }).submit(AstroItemLib.get());
+        }
+    }
+
+    public Optional<IAstroTask> getTask(UUID uuid) { return Optional.ofNullable(tasks.get(uuid)); }
+    public Set<UUID> getTaskIDs() { return tasks.keySet(); }
 
     public void process() {
         HashMap<UUID, IAstroTask> clone = new HashMap<>(tasks);

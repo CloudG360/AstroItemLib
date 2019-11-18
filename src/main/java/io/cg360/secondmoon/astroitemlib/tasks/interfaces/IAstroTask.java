@@ -5,9 +5,12 @@ import com.sun.istack.internal.NotNull;
 public interface IAstroTask extends IKeyedDataProvider {
 
     @NotNull String getName();
-    @NotNull String getDescription();
+    @NotNull default String getDescription() { return "No description provided. Yee Haw."; }
+
     @NotNull boolean isAsync();
+
     @NotNull default int getRepeatRate(){ return 0; };
     @NotNull default int getDelay(){ return 0; };
+
     @NotNull void run();
 }
