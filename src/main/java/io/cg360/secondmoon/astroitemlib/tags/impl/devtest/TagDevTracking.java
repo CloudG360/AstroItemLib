@@ -24,7 +24,7 @@ public class TagDevTracking extends AbstractTag {
 
     @Override
     public boolean run(ExecutionTypes type, String tag, ItemStackSnapshot itemStack, ExecutionContext context) {
-        if(type == ExecutionTypes.ITEM_USED){
+        if(type == ExecutionTypes.ITEM_HOLDING){
             context.getPlayer().sendTitle(Title.builder()
                     .actionBar(Text.of(
                             TextColors.DARK_AQUA, TextStyles.BOLD, "Head Yaw: ", TextStyles.RESET, TextColors.AQUA, context.getPlayer().getHeadRotation().getY(),
