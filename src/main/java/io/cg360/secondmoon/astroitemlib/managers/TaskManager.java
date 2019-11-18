@@ -31,7 +31,7 @@ public final class TaskManager {
         if(task.getDescription() == null) throw new InvalidTaskException("Task description cannot be null. Replace with an empty string.");
     }
 
-    public void registerTask(IAstroTask task){
+    public UUID registerTask(IAstroTask task){
         verifyTask(task);
         UUID id = UUID.randomUUID();
         if(task.getDelay() < 1) {
@@ -43,6 +43,7 @@ public final class TaskManager {
                 tasks.put(id, task);
             }).submit(AstroItemLib.get());
         }
+        return id;
     }
 
     public Optional<IAstroTask> getTask(UUID uuid) { return Optional.ofNullable(tasks.get(uuid)); }

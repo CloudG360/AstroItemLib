@@ -12,6 +12,8 @@ import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockPlaceContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityHitContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityInteractContext;
 import io.cg360.secondmoon.astroitemlib.tags.data.item.*;
+import io.cg360.secondmoon.astroitemlib.tasks.RunnableManageContinousTags;
+import io.cg360.secondmoon.astroitemlib.tasks.interfaces.IAstroTask;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -25,6 +27,7 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
@@ -32,6 +35,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class AstroTagManager {
+
+    public static final int PROCESSOR_SIZE = 10000; // Change it to something like 50 and make the max difference 5 ticks (Theoretical max of 250 players)
 
     private Map<String, AbstractTag> tagMap;
     private List<UUID> tagProcessors;
@@ -93,6 +98,34 @@ public class AstroTagManager {
         }
         return tags.toArray(new String[0]);
     }
+
+
+
+    // -----------------------------------------------------------------------------
+
+
+    public void onPlayerJoin(ClientConnectionEvent.Join event){
+        for(UUID tagP : tagProcessors){
+            Optional<IAstroTask> t = AstroItemLib.getTaskManager().getTask(tagP);
+            if(t.isPresent()){
+                IAstroTask task = t.get();
+                if(task instanceof RunnableManageContinousTags){
+                    RunnableManageContinousTags processor = (RunnableManageContinousTags) task;
+                    if(processor.getPlayers().size() < PROCESSOR_SIZE){
+                        processor.addPlayer(event.getTargetEntity().getUniqueId());
+                        return;
+                    }
+                }
+            }
+        }
+        AstroItemLib.getLogger().info("Starting new TagProcessor...");
+        AstroItemLib.getTaskManager().registerTask(new RunnableManageContinousTags(1, tagProcessors.size()).addPlayer(event.getTargetEntity().getUniqueId()));
+
+    }
+
+
+    // -----------------------------------------------------------------------------
+
 
     @Listener(beforeModifications = true, order = Order.BEFORE_POST)
     public void onUseLeft(InteractItemEvent.Primary event, @First Player player){

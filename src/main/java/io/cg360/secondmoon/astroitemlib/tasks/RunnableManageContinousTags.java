@@ -9,6 +9,7 @@ import io.cg360.secondmoon.astroitemlib.tasks.interfaces.IAstroTask;
 import io.cg360.secondmoon.astroitemlib.utilities.HashMapBuilder;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.*;
@@ -36,11 +37,17 @@ public class RunnableManageContinousTags implements IAstroTask {
     @Override public void onRegister(UUID uuid) { AstroItemLib.getTagManager().addTagProcessor(uuid); }
     @Override public void onUnregister(UUID uuid) { AstroItemLib.getTagManager().removeTagProcessor(uuid); }
 
+    public ArrayList<UUID> getPlayers() { return players; }
+    public RunnableManageContinousTags addPlayer(UUID uuid){ players.add(uuid); return this; }
+
     @Override
     public void run() {
-        for(UUID uuid:players){
-            Sponge.getServer().getPlayer(uuid).ifPresent(player -> {
+        ArrayList<UUID> plist = new ArrayList<>(players);
+        for(UUID uuid:plist){
+            Optional<Player> p = Sponge.getServer().getPlayer(uuid);
 
+            if(p.isPresent()){
+                Player player = p.get();
                 // Main hand holding
                 if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
                     ItemStackSnapshot istack = player.getItemInHand(HandTypes.MAIN_HAND).get().createSnapshot();
@@ -89,7 +96,9 @@ public class RunnableManageContinousTags implements IAstroTask {
 
 
 
-            });
+            } else {
+                players.remove(uuid);
+            }
         }
     }
 

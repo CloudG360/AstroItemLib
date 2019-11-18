@@ -33,7 +33,6 @@ import io.cg360.secondmoon.astroitemlib.tags.impl.item.TagButterfingers;
 import io.cg360.secondmoon.astroitemlib.tags.impl.item.TagUndroppable;
 import io.cg360.secondmoon.astroitemlib.tags.impl.world.TagStopBreakBlock;
 import io.cg360.secondmoon.astroitemlib.tags.impl.world.TagUnplaceable;
-import io.cg360.secondmoon.astroitemlib.tasks.RunnableManageContinousTags;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -168,8 +167,6 @@ public class AstroItemLib {
                 .registerTag(new TagUndroppable("undroppable", TagPriority.HIGH, ExecutionTypes.ITEM_DROPPED));
 
         Sponge.getEventManager().registerListeners(this, astroTagManager);
-
-        taskManager.registerTask(new RunnableManageContinousTags(1, 0));
     }
 
     @Listener
@@ -313,9 +310,12 @@ public class AstroItemLib {
     public static PluginContainer getContainer() { return plg.getPlgContainer(); }
     public static AstroItemManager getAstroManager() { return plg.getAstroItemManager(); }
     public static AstroTagManager getTagManager() { return plg.getAstroTagManager(); }
+    public static TaskManager getTaskManager() { return plg.getAstroTaskManager(); }
+
 
     public Logger getPlgLogger() { return logger; }
     public PluginContainer getPlgContainer() { return pluginContainer; }
     public AstroItemManager getAstroItemManager() { return astroItemManager; }
     public AstroTagManager getAstroTagManager() { return astroTagManager; }
+    public TaskManager getAstroTaskManager() { return taskManager; }
 }
