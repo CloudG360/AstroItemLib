@@ -43,10 +43,10 @@ public class RunnableManageContinousTags implements IAstroTask {
 
                 // Main hand holding
                 if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
-                    Optional<List<String>> tgs = player.getItemInHand(HandTypes.MAIN_HAND).get().get(AstroKeys.FUNCTION_TAGS);
+                    ItemStackSnapshot istack = player.getItemInHand(HandTypes.MAIN_HAND).get().createSnapshot();
+                    Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
                     if (tgs.isPresent()) {
                         List<String> tags = tgs.get();
-                        ItemStackSnapshot istack = player.getItemInHand(HandTypes.MAIN_HAND).get().createSnapshot();
 
                         String[] otags = AstroItemLib.getTagManager().orderedTags(tags.toArray(new String[0]));
 
@@ -66,10 +66,10 @@ public class RunnableManageContinousTags implements IAstroTask {
 
                 //Secondary Hand Holding
                 if(player.getItemInHand(HandTypes.OFF_HAND).isPresent()) {
-                    Optional<List<String>> tgs = player.getItemInHand(HandTypes.OFF_HAND).get().get(AstroKeys.FUNCTION_TAGS);
+                    ItemStackSnapshot istack = player.getItemInHand(HandTypes.OFF_HAND).get().createSnapshot();
+                    Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
                     if (tgs.isPresent()) {
                         List<String> tags = tgs.get();
-                        ItemStackSnapshot istack = player.getItemInHand(HandTypes.OFF_HAND).get().createSnapshot();
 
                         String[] otags = AstroItemLib.getTagManager().orderedTags(tags.toArray(new String[0]));
 
