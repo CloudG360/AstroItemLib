@@ -57,7 +57,7 @@ public final class TaskManager {
                 Task.builder().async().execute(() -> {
                         runningasynctasks.add(entry.getKey());
                         entry.getValue().run();
-                        if(entry.getValue().getRepeatRate() > 1){
+                        if(entry.getValue().getRepeatRate() > 0){
                             suspendedtasks.add(entry.getKey());
                             Task.builder().delayTicks(entry.getValue().getRepeatRate())
                                     .execute(() -> {
@@ -72,7 +72,7 @@ public final class TaskManager {
                 }).submit(AstroItemLib.get());
             } else {
                 entry.getValue().run();
-                if(entry.getValue().getRepeatRate() > 1){
+                if(entry.getValue().getRepeatRate() > 0){
                     suspendedtasks.add(entry.getKey());
                     Task.builder().delayTicks(entry.getValue().getRepeatRate())
                             .execute(() -> {
