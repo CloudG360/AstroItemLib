@@ -17,14 +17,24 @@ public class RunnableManageContinousTags implements IAstroTask {
 
 
     private ArrayList<UUID> players;
+    private int repeatRate;
+    private int delay;
 
-    public RunnableManageContinousTags(){
-        players = new ArrayList<>();
+    public RunnableManageContinousTags(int repeatRate, int delay){
+        this.players = new ArrayList<>();
+        this.repeatRate = repeatRate;
+        this.delay = delay;
     }
 
     @Override public String getName() { return "astrotaghandler"; }
     @Override public String getDescription() { return "Handles the processing of Astro's item tags."; }
     @Override public boolean isAsync() { return false; }
+
+    @Override public int getRepeatRate() { return repeatRate; }
+    @Override public int getDelay() { return delay; }
+
+    @Override public void onRegister(UUID uuid) { AstroItemLib.getTagManager().addTagProcessor(uuid); }
+    @Override public void onUnregister(UUID uuid) { AstroItemLib.getTagManager().removeTagProcessor(uuid); }
 
     @Override
     public void run() {
