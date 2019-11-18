@@ -27,8 +27,8 @@ public class TagDevTracking extends AbstractTag {
         if(type == ExecutionTypes.ITEM_HOLDING){
             context.getPlayer().sendTitle(Title.builder()
                     .actionBar(Text.of(
-                            TextColors.DARK_AQUA, TextStyles.BOLD, "Head Yaw: ", TextStyles.RESET, TextColors.AQUA, context.getPlayer().getHeadRotation().getY(),
-                            TextColors.DARK_AQUA, TextStyles.BOLD, " Body Yaw: ", TextStyles.RESET, TextColors.AQUA, context.getPlayer().getRotation().getY()
+                            TextColors.DARK_AQUA, TextStyles.BOLD, "Head Yaw: ", TextStyles.RESET, TextColors.AQUA, (float) context.getPlayer().getHeadRotation().getY(),
+                            TextColors.DARK_AQUA, TextStyles.BOLD, " Body Yaw: ", TextStyles.RESET, TextColors.AQUA, (float) context.getPlayer().getRotation().getY()
                     )).build());
         }
         return true;
