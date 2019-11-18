@@ -125,7 +125,7 @@ public class Utils {
 
         Location<World> loc = player.getLocation();
 
-        Entity e = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition().add(0, 1, 0));
+        Entity e = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
         e.offer(Keys.REPRESENTED_ITEM, snapshot);
         e.offer(Keys.PICKUP_DELAY, 120);
         try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
