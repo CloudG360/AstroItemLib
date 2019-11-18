@@ -34,12 +34,14 @@ import java.util.regex.Pattern;
 public class AstroTagManager {
 
     private Map<String, AbstractTag> tagMap;
+    private List<UUID> tagProcessors;
 
     private boolean overrideLeftClick;
     private boolean overrideRightClick;
 
     public AstroTagManager(){
         this.tagMap = new HashMap<>();
+        this.tagProcessors = new ArrayList<>();
         overrideLeftClick = false;
         overrideRightClick = false;
     }
@@ -53,6 +55,10 @@ public class AstroTagManager {
         String t = tag.toLowerCase().split(Pattern.quote(":"))[0];
         return tagMap.containsKey(t) ? Optional.of(tagMap.get(t)) : Optional.empty();
     }
+
+    public List<UUID> getTagProcessorIDs(){ return tagProcessors; }
+    public void addTagProcessor(UUID uuid){ tagProcessors.add(uuid); }
+    public void removeTagProcessor(UUID uuid){ tagProcessors.remove(uuid); }
 
     /**
      * Takes in tags from an item and gives them a process order
