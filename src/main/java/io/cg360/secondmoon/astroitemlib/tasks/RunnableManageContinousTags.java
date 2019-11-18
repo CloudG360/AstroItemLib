@@ -17,11 +17,9 @@ public class RunnableManageContinousTags implements IAstroTask {
 
 
     private ArrayList<UUID> players;
-    private int tickCount;
 
     public RunnableManageContinousTags(){
         players = new ArrayList<>();
-        this.tickCount = 0;
     }
 
     @Override public String getName() { return "astrotaghandler"; }
@@ -89,7 +87,6 @@ public class RunnableManageContinousTags implements IAstroTask {
     public HashMap<String, String> toDataStringMap() {
         return HashMapBuilder.builder(String.class, String.class)
                 .addField("Players", Arrays.toString(players.toArray(new UUID[0])))
-                .addField("Tick Count", String.valueOf(tickCount))
                 .build();
     }
 }
