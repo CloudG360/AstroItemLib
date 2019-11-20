@@ -1,6 +1,6 @@
 package io.cg360.secondmoon.astroitemlib.tags;
 
-import io.cg360.secondmoon.astroitemlib.tags.data.ExecutionContext;
+import io.cg360.secondmoon.astroitemlib.tags.context.ExecutionContext;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 public abstract class AbstractTag {

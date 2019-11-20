@@ -6,12 +6,12 @@ import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;
 import io.cg360.secondmoon.astroitemlib.tags.ClickType;
 import io.cg360.secondmoon.astroitemlib.tags.ExecutionTypes;
 import io.cg360.secondmoon.astroitemlib.tags.InventoryChangeStates;
-import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockBreakContext;
-import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockInteractContext;
-import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockPlaceContext;
-import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityHitContext;
-import io.cg360.secondmoon.astroitemlib.tags.data.entities.EntityInteractContext;
-import io.cg360.secondmoon.astroitemlib.tags.data.item.*;
+import io.cg360.secondmoon.astroitemlib.tags.context.blocks.BlockBreakContext;
+import io.cg360.secondmoon.astroitemlib.tags.context.blocks.BlockInteractContext;
+import io.cg360.secondmoon.astroitemlib.tags.context.blocks.BlockPlaceContext;
+import io.cg360.secondmoon.astroitemlib.tags.context.entities.EntityHitContext;
+import io.cg360.secondmoon.astroitemlib.tags.context.entities.EntityInteractContext;
+import io.cg360.secondmoon.astroitemlib.tags.context.item.*;
 import io.cg360.secondmoon.astroitemlib.tasks.RunnableManageContinousTags;
 import io.cg360.secondmoon.astroitemlib.tasks.interfaces.IAstroTask;
 import org.spongepowered.api.data.type.HandType;
@@ -363,6 +363,8 @@ public class AstroTagManager {
             }
         }
     }
+
+    //TODO: Add the ability to modify block transactions. Cancel changes on the original list if conflicted.
 
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player){

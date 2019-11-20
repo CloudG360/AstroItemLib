@@ -1,4 +1,4 @@
-package io.cg360.secondmoon.astroitemlib.tags.data;
+package io.cg360.secondmoon.astroitemlib.tags.context;
 
 import org.spongepowered.api.entity.living.player.Player;
 

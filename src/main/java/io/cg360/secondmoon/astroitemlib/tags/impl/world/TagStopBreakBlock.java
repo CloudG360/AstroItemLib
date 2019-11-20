@@ -3,8 +3,8 @@ package io.cg360.secondmoon.astroitemlib.tags.impl.world;
 import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;
 import io.cg360.secondmoon.astroitemlib.tags.ExecutionTypes;
 import io.cg360.secondmoon.astroitemlib.tags.TagPriority;
-import io.cg360.secondmoon.astroitemlib.tags.data.ExecutionContext;
-import io.cg360.secondmoon.astroitemlib.tags.data.blocks.BlockBreakContext;
+import io.cg360.secondmoon.astroitemlib.tags.context.ExecutionContext;
+import io.cg360.secondmoon.astroitemlib.tags.context.blocks.BlockBreakContext;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 /**

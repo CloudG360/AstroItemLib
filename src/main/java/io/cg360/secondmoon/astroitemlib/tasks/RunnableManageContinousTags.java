@@ -4,7 +4,7 @@ import io.cg360.secondmoon.astroitemlib.AstroItemLib;
 import io.cg360.secondmoon.astroitemlib.data.AstroKeys;
 import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;
 import io.cg360.secondmoon.astroitemlib.tags.ExecutionTypes;
-import io.cg360.secondmoon.astroitemlib.tags.data.item.HoldingContext;
+import io.cg360.secondmoon.astroitemlib.tags.context.item.HoldingContext;
 import io.cg360.secondmoon.astroitemlib.tasks.interfaces.IAstroTask;
 import io.cg360.secondmoon.astroitemlib.utilities.HashMapBuilder;
 import org.spongepowered.api.Sponge;

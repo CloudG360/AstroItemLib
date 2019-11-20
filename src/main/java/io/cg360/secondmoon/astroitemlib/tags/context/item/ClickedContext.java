@@ -1,7 +1,7 @@
-package io.cg360.secondmoon.astroitemlib.tags.data.item;
+package io.cg360.secondmoon.astroitemlib.tags.context.item;
 
 import io.cg360.secondmoon.astroitemlib.tags.ClickType;
-import io.cg360.secondmoon.astroitemlib.tags.data.ExecutionContext;
+import io.cg360.secondmoon.astroitemlib.tags.context.ExecutionContext;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 
