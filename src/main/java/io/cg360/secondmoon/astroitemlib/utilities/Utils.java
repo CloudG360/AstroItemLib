@@ -114,7 +114,7 @@ public class Utils {
      * Drops an itemstack for a player.
      *
      */
-    public static void dropItem (Player player, ItemStackSnapshot snapshot, double distance){
+    public static void dropItem (Player player, ItemStackSnapshot snapshot, int delay){
 
         //double yaw = player.getHeadRotation().getY();
         //Vector3d view = convertYawToWorld(yaw, distance);
@@ -127,7 +127,7 @@ public class Utils {
 
         Entity e = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
         e.offer(Keys.REPRESENTED_ITEM, snapshot);
-        e.offer(Keys.PICKUP_DELAY, 120);
+        e.offer(Keys.PICKUP_DELAY, delay);
         try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
             loc.getExtent().spawnEntity(e);
