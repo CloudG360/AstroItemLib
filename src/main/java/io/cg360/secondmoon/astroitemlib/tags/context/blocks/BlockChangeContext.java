@@ -41,7 +41,18 @@ public class BlockChangeContext extends ExecutionContext {
         BlockSnapshot o = location.getBlock().snapshotFor(location);
         BlockSnapshot f = replacement.snapshotFor(location);
         String id = generateBlockID(f);
-        blockChanges.put(id, new BlockChange(o, f, BlockChangeType.PLACE, false));
+        if(blockChanges.containsKey(id)){
+            BlockChange change = blockChanges.get(id);
+            if(change.isOriginalTransaction()){
+                BlockChange blockChange = new BlockChange(o, f, BlockChangeType.PLACE, true);
+                blockChange.setModified(true);
+                blockChanges.put(id, blockChange);
+            } else {
+                BlockChange blockChange = new BlockChange(o, f, BlockChangeType.PLACE, false);
+                blockChange.setModified(true);
+                blockChanges.put(id, blockChange);
+            }
+        } else { blockChanges.put(id, new BlockChange(o, f, BlockChangeType.PLACE, false)); }
         return Optional.of(id);
     }
     /** @return String id. Empty if block change failed. */
@@ -50,7 +61,18 @@ public class BlockChangeContext extends ExecutionContext {
         BlockSnapshot o = location.getBlock().snapshotFor(location);
         BlockSnapshot f = BlockState.builder().blockType(BlockTypes.AIR).build().snapshotFor(location);
         String id = generateBlockID(f);
-        blockChanges.put(id, new BlockChange(o, f, BlockChangeType.BREAK, false));
+        if(blockChanges.containsKey(id)){
+            BlockChange change = blockChanges.get(id);
+            if(change.isOriginalTransaction()){
+                BlockChange blockChange = new BlockChange(o, f, BlockChangeType.BREAK, true);
+                blockChange.setModified(true);
+                blockChanges.put(id, blockChange);
+            } else {
+                BlockChange blockChange = new BlockChange(o, f, BlockChangeType.BREAK, false);
+                blockChange.setModified(true);
+                blockChanges.put(id, blockChange);
+            }
+        } else { blockChanges.put(id, new BlockChange(o, f, BlockChangeType.BREAK, false)); }
         return Optional.of(id);
     }
 
@@ -100,6 +122,11 @@ public class BlockChangeContext extends ExecutionContext {
             }
             return true;
         }
+
+        /** Internal method used by registering. */
+        private void setModified(boolean modified) { isModified = modified; }
+
+
         /** @param cancelled Sets the block change as cancelled.*/
         public void setCancelled(boolean cancelled) { this.isModified = true; this.isCancelled = cancelled; }
         /** @param itemDrops Sets what the change's block (If of type BREAK) will drop if it's destroyed. If empty, it drops the regular drops. */
