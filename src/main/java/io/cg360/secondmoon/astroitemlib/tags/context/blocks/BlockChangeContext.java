@@ -85,7 +85,7 @@ public class BlockChangeContext extends ExecutionContext {
     /** @return a <i>clone</i>  of the block changes list.*/
     public HashMap<String, BlockChange> getBlockChanges() { return new HashMap<>(blockChanges); };
     public boolean areAllChangesCancelled() { return cancelAllChanges; }
-
+    public void setCancelAllChanges(boolean cancelAllChanges) { this.cancelAllChanges = cancelAllChanges; }
     // ------------ Change Stuff
 
     public enum BlockChangeType { PLACE, BREAK }
