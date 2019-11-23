@@ -1,5 +1,6 @@
 package io.cg360.secondmoon.astroitemlib.managers;
 
+import com.flowpowered.math.vector.Vector3d;
 import io.cg360.secondmoon.astroitemlib.AstroItemLib;
 import io.cg360.secondmoon.astroitemlib.data.AstroKeys;
 import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;
@@ -20,6 +21,9 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleOptions;
+import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -445,6 +449,12 @@ public class AstroTagManager {
         if(blockChange.getDrops().size() == 0) {
             player.getWorld().digBlockWith(blockChange.getBlock().getPosition(), istack.createStack(), player.getProfile());
         } else {
+            player.spawnParticles(ParticleEffect.builder()
+                    .velocity(new Vector3d(0, 0.1, 0))
+                    .offset(new Vector3d(0.5, 0.5, 0.5))
+                    .type(ParticleTypes.BREAK_BLOCK)
+                    .option(ParticleOptions.BLOCK_STATE, blockChange.getBlock().getState())
+                    .build(), blockChange.getBlock().getPosition().toDouble());
             player.getWorld().setBlock(blockChange.getBlock().getPosition(), BlockState.builder().blockType(BlockTypes.AIR).build(), BlockChangeFlags.ALL);
             for(ItemStackSnapshot item:blockChange.getDrops()){ Utils.dropItem(player, item, 15); }
         }
