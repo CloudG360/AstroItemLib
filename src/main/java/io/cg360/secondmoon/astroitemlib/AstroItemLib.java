@@ -33,6 +33,8 @@ import io.cg360.secondmoon.astroitemlib.tags.impl.item.TagButterfingers;
 import io.cg360.secondmoon.astroitemlib.tags.impl.item.TagUndroppable;
 import io.cg360.secondmoon.astroitemlib.tags.impl.world.TagStopBreakBlock;
 import io.cg360.secondmoon.astroitemlib.tags.impl.world.TagUnplaceable;
+import me.ryanhamshire.griefprevention.GriefPrevention;
+import me.ryanhamshire.griefprevention.api.GriefPreventionApi;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -45,6 +47,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameRegistryEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
@@ -53,6 +56,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Iterator;
+import java.util.Optional;
 
 @Plugin(
         id = "astroitemlib",
@@ -60,6 +64,9 @@ import java.util.Iterator;
         description = "Implements Custom Item Tags, Templates, and Loot Pools (Loottables for Sponge)",
         authors = {
                 "CloudGamer360"
+        },
+        dependencies = {
+                @Dependency(id = "griefprevention", version = "4.0.3", optional = true)
         }
 )
 public class AstroItemLib {
@@ -74,6 +81,8 @@ public class AstroItemLib {
     private AstroItemManager astroItemManager;
     private AstroTagManager astroTagManager;
     private TaskManager taskManager;
+
+    private GriefPreventionApi griefPrevention;
 
     @Listener
     public void preServerInit(GamePreInitializationEvent event){
@@ -152,6 +161,12 @@ public class AstroItemLib {
         resetPools();
         resetItemTemplates();
 
+        try {
+            this.griefPrevention = GriefPrevention.getApi();
+        } catch (Exception err){
+            this.griefPrevention = null;
+        }
+
         // -- TAG REGISTERING --
 
         getAstroTagManager()
@@ -160,8 +175,9 @@ public class AstroItemLib {
                 .registerTag(new TagDevTestInventory("dev_test_click", TagPriority.NORMAL, ExecutionTypes.ITEM_CLICKED))
                 .registerTag(new TagDevTracking("dev_tracking", TagPriority.NORMAL, ExecutionTypes.ITEM_HOLDING))
 
-                .registerTag(new TagUnplaceable("unplaceable", TagPriority.HIGH, ExecutionTypes.BLOCK_PLACE))
-                .registerTag(new TagStopBreakBlock("stopbreakblock", TagPriority.HIGH, ExecutionTypes.BLOCK_BREAK))
+                //TODO: Add ability to ignore tag-blocking statements for stuff which should be ran last. "Append Tags" or something
+                .registerTag(new TagUnplaceable("unplaceable", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
+                .registerTag(new TagStopBreakBlock("stopbreakblock", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
 
                 .registerTag(new TagButterfingers("butterfingers", TagPriority.HIGHEST, ExecutionTypes.ITEM_HOLD))
                 .registerTag(new TagUndroppable("undroppable", TagPriority.HIGH, ExecutionTypes.ITEM_DROPPED));
@@ -311,11 +327,12 @@ public class AstroItemLib {
     public static AstroItemManager getAstroManager() { return plg.getAstroItemManager(); }
     public static AstroTagManager getTagManager() { return plg.getAstroTagManager(); }
     public static TaskManager getTaskManager() { return plg.getAstroTaskManager(); }
-
+    public static Optional<GriefPreventionApi> getGriefPrevention() { return plg.getGriefPreventionApi(); }
 
     public Logger getPlgLogger() { return logger; }
     public PluginContainer getPlgContainer() { return pluginContainer; }
     public AstroItemManager getAstroItemManager() { return astroItemManager; }
     public AstroTagManager getAstroTagManager() { return astroTagManager; }
     public TaskManager getAstroTaskManager() { return taskManager; }
+    public Optional<GriefPreventionApi> getGriefPreventionApi() { return Optional.ofNullable(griefPrevention); }
 }
