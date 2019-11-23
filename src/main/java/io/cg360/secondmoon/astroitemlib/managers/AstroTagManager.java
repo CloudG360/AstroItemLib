@@ -377,9 +377,9 @@ public class AstroTagManager {
 
     //TODO: Add the ability to modify block transactions. Cancel changes on the original list if conflicted.
 
-    @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) { onBlockEditCommon(event, player); }
+    @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) { overrideRightClick = true; onBlockEditCommon(event, player); }
 
-    @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) { onBlockEditCommon(event, player); }
+    @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) { overrideLeftClick = true; onBlockEditCommon(event, player); }
 
     // Should not have @Listener
     private void onBlockEditCommon(ChangeBlockEvent event, Player player) {
@@ -394,8 +394,6 @@ public class AstroTagManager {
         List<String> tags = tgs.get();
 
         String[] otags = orderedTags(tags.toArray(new String[0]));
-
-        overrideRightClick = true;
 
         HandType handType = HandTypes.OFF_HAND;
         if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
