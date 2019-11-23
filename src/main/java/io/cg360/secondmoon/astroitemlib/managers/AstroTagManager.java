@@ -13,6 +13,11 @@ import io.cg360.secondmoon.astroitemlib.tags.context.entities.EntityInteractCont
 import io.cg360.secondmoon.astroitemlib.tags.context.item.*;
 import io.cg360.secondmoon.astroitemlib.tasks.RunnableManageContinousTags;
 import io.cg360.secondmoon.astroitemlib.tasks.interfaces.IAstroTask;
+import io.cg360.secondmoon.astroitemlib.utilities.Utils;
+import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -29,6 +34,7 @@ import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.world.BlockChangeFlags;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -405,6 +411,44 @@ public class AstroTagManager {
                 if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
                 if(!result) return;
             }
+        }
+
+        if(usedContext.isCancelled()) { event.setCancelled(true); return; }
+        if(changecontext.areAllChangesCancelled()) { event.setCancelled(true); return; }
+
+        ArrayList<Transaction<BlockSnapshot>> originalBlockChanges = new ArrayList<>(event.getTransactions());
+        ArrayList<BlockSnapshot> finalblocks = new ArrayList<>();
+
+        for(BlockChangeContext.BlockChange blockChange : changecontext.getBlockChanges().values()){
+            if(blockChange.isOriginalTransaction()){
+                Optional<Transaction<BlockSnapshot>> t = originalBlockChanges.stream().filter(change -> change.getOriginal().getLocation() == blockChange.getOriginalBlock().getLocation()).findFirst();
+                if(!t.isPresent()){ AstroItemLib.getLogger().warn("Uh oh? A block change is missing? Someone messed up somehow. Skipping..."); finalblocks.add(blockChange.getBlock()); continue; }
+                if(blockChange.isCancelled()) { t.get().setValid(false); }
+                if(blockChange.isModified()){
+                    t.get().setValid(false);
+                    if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){
+                        digBlock(blockChange, istack, player);
+                        player.getWorld().placeBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState(), blockChange.getDirection(), player.getProfile());
+                    } else {
+                        digBlock(blockChange, istack, player);
+                    } //Skip original changes as really no change should be made here as this shouldn't happen.
+                }
+            } else {
+                if(blockChange.isCancelled()) continue;
+                digBlock(blockChange, istack, player);
+                if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){
+                    player.getWorld().placeBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState(), blockChange.getDirection(), player.getProfile());
+                }
+            }
+        }
+    }
+
+    private static void digBlock(BlockChangeContext.BlockChange blockChange, ItemStackSnapshot istack, Player player){
+        if(blockChange.getDrops().size() == 0) {
+            player.getWorld().digBlockWith(blockChange.getBlock().getPosition(), istack.createStack(), player.getProfile());
+        } else {
+            player.getWorld().setBlock(blockChange.getBlock().getPosition(), BlockState.builder().blockType(BlockTypes.AIR).build(), BlockChangeFlags.ALL);
+            for(ItemStackSnapshot item:blockChange.getDrops()){ Utils.dropItem(player, item, 15); }
         }
     }
     /*
