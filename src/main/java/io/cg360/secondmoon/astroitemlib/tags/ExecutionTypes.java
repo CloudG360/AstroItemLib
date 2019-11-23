@@ -58,8 +58,9 @@ public enum ExecutionTypes {
 
     BLOCK_INTERACT,
 
-    BLOCK_PLACE,
-
-    BLOCK_BREAK
+    /** Single Execution, supports cooldowns.
+     *
+     */
+    BLOCK_CHANGE
 
 }
