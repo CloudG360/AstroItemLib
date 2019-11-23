@@ -8,6 +8,7 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -95,6 +96,7 @@ public class BlockChangeContext extends ExecutionContext {
         private ArrayList<ItemStackSnapshot> itemDrops;
         private BlockSnapshot block;
         private BlockChangeType blockChangeType;
+        private Direction direction;
         // Used for changing a block change.
         private BlockSnapshot originalb;
         private BlockSnapshot finalb;
@@ -134,6 +136,8 @@ public class BlockChangeContext extends ExecutionContext {
         /** Internal method used by registering. */
         private void setOriginalType(BlockChangeType originalType) { this.originalType = originalType; }
 
+        /** @param direction Sets the direction of a block change.*/
+        public void setDirection(Direction direction) { this.direction = direction; }
         /** @param cancelled Sets the block change as cancelled.*/
         public void setCancelled(boolean cancelled) { this.isModified = true; this.isCancelled = cancelled; }
         /** @param itemDrops Sets what the change's block (If of type BREAK) will drop if it's destroyed. If empty, it drops the regular drops. */
@@ -154,6 +158,10 @@ public class BlockChangeContext extends ExecutionContext {
         public BlockSnapshot getOriginalBlock() { return originalb; }
         /** @return The original transaction type.*/
         public BlockChangeType getOriginalType() { return originalType; }
+        /** @return the direction a block is facing.*/
+        public Direction getDirection() {
+            return direction == null ? Direction.DOWN : direction;
+        }
     }
 
 }
