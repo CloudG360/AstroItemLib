@@ -46,10 +46,12 @@ public class BlockChangeContext extends ExecutionContext {
             if(change.isOriginalTransaction()){
                 BlockChange blockChange = new BlockChange(o, f, BlockChangeType.PLACE, true);
                 blockChange.setModified(true);
+                blockChange.setOriginalType(change.getOriginalType());
                 blockChanges.put(id, blockChange);
             } else {
                 BlockChange blockChange = new BlockChange(o, f, BlockChangeType.PLACE, false);
                 blockChange.setModified(true);
+                blockChange.setOriginalType(change.getOriginalType());
                 blockChanges.put(id, blockChange);
             }
         } else { blockChanges.put(id, new BlockChange(o, f, BlockChangeType.PLACE, false)); }
@@ -66,10 +68,12 @@ public class BlockChangeContext extends ExecutionContext {
             if(change.isOriginalTransaction()){
                 BlockChange blockChange = new BlockChange(o, f, BlockChangeType.BREAK, true);
                 blockChange.setModified(true);
+                blockChange.setOriginalType(change.getOriginalType());
                 blockChanges.put(id, blockChange);
             } else {
                 BlockChange blockChange = new BlockChange(o, f, BlockChangeType.BREAK, false);
                 blockChange.setModified(true);
+                blockChange.setOriginalType(change.getOriginalType());
                 blockChanges.put(id, blockChange);
             }
         } else { blockChanges.put(id, new BlockChange(o, f, BlockChangeType.BREAK, false)); }
@@ -94,12 +98,14 @@ public class BlockChangeContext extends ExecutionContext {
         // Used for changing a block change.
         private BlockSnapshot originalb;
         private BlockSnapshot finalb;
+        private BlockChangeType originalType;
 
         private BlockChange (BlockSnapshot originalb, BlockSnapshot finalb, BlockChangeType blockChangeType, boolean isOriginalTransaction){
             this.originalb = originalb;
             this.finalb = finalb;
             this.blockChangeType = blockChangeType;
             this.isOriginalTransaction = isOriginalTransaction;
+            this.originalType = blockChangeType;
 
             this.isCancelled = false;
             this.isModified = !isOriginalTransaction;
@@ -125,7 +131,8 @@ public class BlockChangeContext extends ExecutionContext {
 
         /** Internal method used by registering. */
         private void setModified(boolean modified) { isModified = modified; }
-
+        /** Internal method used by registering. */
+        private void setOriginalType(BlockChangeType originalType) { this.originalType = originalType; }
 
         /** @param cancelled Sets the block change as cancelled.*/
         public void setCancelled(boolean cancelled) { this.isModified = true; this.isCancelled = cancelled; }
@@ -145,6 +152,8 @@ public class BlockChangeContext extends ExecutionContext {
         public BlockChangeType getBlockChangeType() { return blockChangeType; }
         /** @return The original BlockSnapshot being replaced.*/
         public BlockSnapshot getOriginalBlock() { return originalb; }
+        /** @return The original transaction type.*/
+        public BlockChangeType getOriginalType() { return originalType; }
     }
 
 }
