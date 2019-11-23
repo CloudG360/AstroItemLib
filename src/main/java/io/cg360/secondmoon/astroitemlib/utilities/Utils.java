@@ -110,11 +110,19 @@ public class Utils {
         }
     }
 
+    public static String dataToMap(Map<?, ?> map){
+        String string = "";
+        for(Map.Entry<?, ?> entry : map.entrySet()){
+            string = string.concat(entry.getKey().toString()+": "+entry.getValue().toString()+",\n");
+        }
+        return string;
+    }
+
     /**
      * Drops an itemstack for a player.
      *
      */
-    public static void dropItem (Player player, ItemStackSnapshot snapshot, int delay){
+    public static void dropItem (Location<World> loc, ItemStackSnapshot snapshot, int delay){
 
         //double yaw = player.getHeadRotation().getY();
         //Vector3d view = convertYawToWorld(yaw, distance);
@@ -122,8 +130,6 @@ public class Utils {
         //Vector3d velocity = new Vector3d(0.2, 0.05, 0.2).mul(view);
 
         //AstroItemLib.getLogger().info(String.format("Yaw: %s, View: %s, Velocity: %s", yaw, view, velocity));
-
-        Location<World> loc = player.getLocation();
 
         Entity e = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
         e.offer(Keys.REPRESENTED_ITEM, snapshot);

@@ -43,7 +43,7 @@ public class TagButterfingers extends AbstractTag {
                 } catch (Exception ignored) {}
 
                 d.getEvent().getFinalSlot().set(ItemStack.builder().itemType(ItemTypes.AIR).build());
-                Utils.dropItem(d.getPlayer(), itemStack, time);
+                Utils.dropItem(d.getPlayer().getLocation(), itemStack, time);
                 d.getPlayer().sendMessage(Text.of(TextColors.YELLOW, "Watch out, ", TextColors.GOLD, TextStyles.BOLD, "BUTTERFINGERS!"));
             }
         }

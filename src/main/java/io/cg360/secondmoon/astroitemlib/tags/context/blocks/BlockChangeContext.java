@@ -84,6 +84,9 @@ public class BlockChangeContext extends ExecutionContext {
     private static String generateBlockID(BlockSnapshot blockSnapshot){ Vector3i pos = blockSnapshot.getPosition(); return String.format("%s_%s_%s", pos.getX(), pos.getY(), pos.getZ()); }
     /** @return a <i>clone</i>  of the block changes list.*/
     public HashMap<String, BlockChange> getBlockChanges() { return new HashMap<>(blockChanges); };
+
+    public Optional<BlockChange> getBlockChange(String id){ return Optional.ofNullable(blockChanges.get(id)); }
+
     public boolean areAllChangesCancelled() { return cancelAllChanges; }
     public void setCancelAllChanges(boolean cancelAllChanges) { this.cancelAllChanges = cancelAllChanges; }
     // ------------ Change Stuff

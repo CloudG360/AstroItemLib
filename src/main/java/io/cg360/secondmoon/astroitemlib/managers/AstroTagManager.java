@@ -15,6 +15,8 @@ import io.cg360.secondmoon.astroitemlib.tags.context.item.*;
 import io.cg360.secondmoon.astroitemlib.tasks.RunnableManageContinousTags;
 import io.cg360.secondmoon.astroitemlib.tasks.interfaces.IAstroTask;
 import io.cg360.secondmoon.astroitemlib.utilities.Utils;
+import me.ryanhamshire.griefprevention.api.GriefPreventionApi;
+import me.ryanhamshire.griefprevention.api.claim.Claim;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
@@ -39,6 +41,7 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.world.BlockChangeFlags;
+import org.spongepowered.api.world.World;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -428,35 +431,46 @@ public class AstroTagManager {
                 if(blockChange.isCancelled()) { t.get().setValid(false); }
                 if(blockChange.isModified()){
                     t.get().setValid(false);
-                    if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){
-                        digBlock(blockChange, istack, player);
-                        player.getWorld().placeBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState(), blockChange.getDirection(), player.getProfile());
-                    } else {
-                        digBlock(blockChange, istack, player);
-                    } //Skip original changes as really no change should be made here as this shouldn't happen.
+                    digBlock(player.getWorld(), blockChange, istack, player);
+                    if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){ placeBlock(player.getWorld(), blockChange, player); }
                 }
             } else {
                 if(blockChange.isCancelled()) continue;
-                digBlock(blockChange, istack, player);
+                digBlock(player.getWorld(), blockChange, istack, player);
                 if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){
-                    player.getWorld().placeBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState(), blockChange.getDirection(), player.getProfile());
+                    placeBlock(player.getWorld(), blockChange, player);
                 }
             }
         }
     }
 
-    private static void digBlock(BlockChangeContext.BlockChange blockChange, ItemStackSnapshot istack, Player player){
+    private static void placeBlock(World world, BlockChangeContext.BlockChange blockChange, Player player){
+        if(AstroItemLib.getGriefPrevention().isPresent()){
+            GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
+            Claim claim = api.getClaimManager(world).getClaimAt(blockChange.getBlock().getLocation().get());
+            Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
+            AstroItemLib.getLogger().info(Utils.dataToMap(placeperms));
+        }
+        world.placeBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState(), blockChange.getDirection(), player.getProfile());
+    }
+    private static void digBlock(World world, BlockChangeContext.BlockChange blockChange, ItemStackSnapshot istack, Player player){
+        if(AstroItemLib.getGriefPrevention().isPresent()){
+            GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
+            Claim claim = api.getClaimManager(world).getClaimAt(blockChange.getBlock().getLocation().get());
+            Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
+            AstroItemLib.getLogger().info(Utils.dataToMap(placeperms));
+        }
         if(blockChange.getDrops().size() == 0) {
-            player.getWorld().digBlockWith(blockChange.getBlock().getPosition(), istack.createStack(), player.getProfile());
+            world.digBlockWith(blockChange.getBlock().getPosition(), istack.createStack(), player.getProfile());
         } else {
-            player.spawnParticles(ParticleEffect.builder()
+            world.spawnParticles(ParticleEffect.builder()
                     .velocity(new Vector3d(0, 0.1, 0))
                     .offset(new Vector3d(0.5, 0.5, 0.5))
                     .type(ParticleTypes.BREAK_BLOCK)
                     .option(ParticleOptions.BLOCK_STATE, blockChange.getBlock().getState())
                     .build(), blockChange.getBlock().getPosition().toDouble());
-            player.getWorld().setBlock(blockChange.getBlock().getPosition(), BlockState.builder().blockType(BlockTypes.AIR).build(), BlockChangeFlags.ALL);
-            for(ItemStackSnapshot item:blockChange.getDrops()){ Utils.dropItem(player, item, 15); }
+            world.setBlock(blockChange.getBlock().getPosition(), BlockState.builder().blockType(BlockTypes.AIR).build(), BlockChangeFlags.ALL);
+            for(ItemStackSnapshot item:blockChange.getDrops()){ Utils.dropItem(blockChange.getBlock().getLocation().get(), item, 15); }
         }
     }
     /*
