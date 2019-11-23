@@ -6,9 +6,8 @@ import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;
 import io.cg360.secondmoon.astroitemlib.tags.ClickType;
 import io.cg360.secondmoon.astroitemlib.tags.ExecutionTypes;
 import io.cg360.secondmoon.astroitemlib.tags.InventoryChangeStates;
-import io.cg360.secondmoon.astroitemlib.tags.context.blocks.BlockBreakContext;
+import io.cg360.secondmoon.astroitemlib.tags.context.blocks.BlockChangeContext;
 import io.cg360.secondmoon.astroitemlib.tags.context.blocks.BlockInteractContext;
-import io.cg360.secondmoon.astroitemlib.tags.context.blocks.BlockPlaceContext;
 import io.cg360.secondmoon.astroitemlib.tags.context.entities.EntityHitContext;
 import io.cg360.secondmoon.astroitemlib.tags.context.entities.EntityInteractContext;
 import io.cg360.secondmoon.astroitemlib.tags.context.item.*;
@@ -141,28 +140,17 @@ public class AstroTagManager {
 
             String[] otags = orderedTags(tags.toArray(new String[0]));
 
+            UsedContext usedContext = new UsedContext(player, type, ClickType.LEFT);
+
             for(String tag: otags){
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
                     boolean result = true;
-                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, type, ClickType.RIGHT)); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
                     if(!result) return;
                 }
             }
-            /*Task a_task = Task.builder()
-                    .execute(runnable -> {
-                        for(String tag: otags){
-                            boolean result;
-                            Task sync = Task.builder().execute(s_task -> {
-                                getTag(tag).ifPresent(prs ->{
-                                    prs.run(tag, istack, context);
-                                });}
-                            ).name("TagSync#"+tag).submit(AstroItemLib.get());
-                        }
-                    }).async().name("TagProcessor - InteractItem.Primary").submit(AstroItemLib.get());
-
-             */
-
+            if(usedContext.isCancelled()) event.setCancelled(true);
         }
     }
 
@@ -180,14 +168,18 @@ public class AstroTagManager {
 
             String[] otags = orderedTags(tags.toArray(new String[0]));
 
+            UsedContext usedContext = new UsedContext(player, type, ClickType.RIGHT);
+
             for(String tag: otags){
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
                     boolean result = true;
-                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, type, ClickType.RIGHT)); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
                     if(!result) return;
                 }
             }
+
+            if(usedContext.isCancelled()) event.setCancelled(true);
 
         }
     }
@@ -264,9 +256,12 @@ public class AstroTagManager {
                         case PICKUP:
                             if (t.getType() == ExecutionTypes.ITEM_PICKUP) { result = t.run(ExecutionTypes.ITEM_PICKUP, tag, istack, new PickupContext(player, (ClickInventoryEvent.Pickup) event)); }
                             break;
+                        /*
+                        Should be managed by the event above
                         case HOLD:
                             if (t.getType() == ExecutionTypes.ITEM_HOLD) { result = t.run(ExecutionTypes.ITEM_HOLD, tag, istack, new HoldContext(player, (ClickInventoryEvent.Held) event)); }
                             break;
+                         */
                     }
                     if(!result) return;
                 }
@@ -295,16 +290,19 @@ public class AstroTagManager {
         HandType handType = HandTypes.OFF_HAND;
         if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
 
+        UsedContext usedContext = new UsedContext(player, handType, ClickType.LEFT);
 
         for(String tag: otags){
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
                 if(t.getType() == ExecutionTypes.ENTITY_HIT) { result = t.run(ExecutionTypes.ENTITY_HIT, tag, istack, new EntityHitContext(player, event)); }
-                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
                 if(!result) return;
             }
         }
+
+        if(usedContext.isCancelled()) event.setCancelled(true);
     }
 
     @Listener(beforeModifications = true, order = Order.DEFAULT)
@@ -324,15 +322,19 @@ public class AstroTagManager {
         HandType handType = HandTypes.OFF_HAND;
         if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
 
+        UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT);
+
         for(String tag: otags){
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
                 if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, istack, new EntityInteractContext(player, event)); }
-                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
                 if(!result) return;
             }
         }
+
+        if(usedContext.isCancelled()) event.setCancelled(true);
     }
 
     @Listener(beforeModifications = true, order = Order.DEFAULT)
@@ -352,20 +354,60 @@ public class AstroTagManager {
         HandType handType = HandTypes.OFF_HAND;
         if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
 
+        UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT);
 
         for(String tag: otags){
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
                 boolean result = true;
                 if(t.getType() == ExecutionTypes.BLOCK_INTERACT) { result = t.run(ExecutionTypes.BLOCK_INTERACT, tag, istack, new BlockInteractContext(player, event)); }
-                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, new UsedContext(player, handType, ClickType.RIGHT)); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
                 if(!result) return;
             }
         }
+
+        if (usedContext.isCancelled()) event.setCancelled(true);
     }
 
     //TODO: Add the ability to modify block transactions. Cancel changes on the original list if conflicted.
 
+    @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) { onBlockEditCommon(event, player); }
+
+    @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) { onBlockEditCommon(event, player); }
+
+    // Should not have @Listener
+    private void onBlockEditCommon(ChangeBlockEvent event, Player player) {
+        //TODO: Do regular stuff but store the context in a var. Use the context and determine what needs breaking.
+        //TODO: Add a "Last action" list for each player so a hammer like item could be added.
+        Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
+        if(!s.isPresent()) return;
+        ItemStackSnapshot istack = s.get();
+
+        Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
+        if(!tgs.isPresent()) return;
+        List<String> tags = tgs.get();
+
+        String[] otags = orderedTags(tags.toArray(new String[0]));
+
+        overrideRightClick = true;
+
+        HandType handType = HandTypes.OFF_HAND;
+        if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
+
+        BlockChangeContext changecontext = new BlockChangeContext(player, event.getTransactions());
+        UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT);
+
+        for(String tag: otags){
+            if(getTag(tag).isPresent()){
+                AbstractTag t = getTag(tag).get();
+                boolean result = true;
+                if(t.getType() == ExecutionTypes.BLOCK_CHANGE) { result = t.run(ExecutionTypes.BLOCK_CHANGE, tag, istack, changecontext); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
+                if(!result) return;
+            }
+        }
+    }
+    /*
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player){
         Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
@@ -393,7 +435,9 @@ public class AstroTagManager {
             }
         }
     }
+     */
 
+    /*
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player){
         Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
@@ -421,5 +465,6 @@ public class AstroTagManager {
             }
         }
     }
+     */
 
 }
