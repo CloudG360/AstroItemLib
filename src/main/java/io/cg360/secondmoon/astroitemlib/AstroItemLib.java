@@ -181,6 +181,7 @@ public class AstroItemLib {
                 .registerTag(new TagUnplaceable("unplaceable", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
                 .registerTag(new TagStopBreakBlock("stopbreakblock", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
                 .registerTag(new TagSmelting("smelting", TagPriority.LOW, ExecutionTypes.BLOCK_CHANGE))
+                //TODO: Add a doubler tag. Requires some forge bridge stuff.
 
                 .registerTag(new TagButterfingers("butterfingers", TagPriority.HIGHEST, ExecutionTypes.ITEM_HOLD))
                 .registerTag(new TagUndroppable("undroppable", TagPriority.HIGH, ExecutionTypes.ITEM_DROPPED));
