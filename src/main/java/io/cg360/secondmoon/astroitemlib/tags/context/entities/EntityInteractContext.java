@@ -1,17 +1,25 @@
 package io.cg360.secondmoon.astroitemlib.tags.context.entities;
 
+import io.cg360.secondmoon.astroitemlib.tags.ClickType;
 import io.cg360.secondmoon.astroitemlib.tags.context.ExecutionContext;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.entity.InteractEntityEvent;
 
 public class EntityInteractContext extends ExecutionContext {
 
-    private InteractEntityEvent event;
+    private ClickType clickType;
+    private Entity targetEntity;
 
-    public EntityInteractContext(Player player, InteractEntityEvent event) {
+    private boolean isCancelled;
+
+    public EntityInteractContext(Player player, ClickType clickType, Entity target) {
         super(player);
-        this.event = event;
+        this.clickType = clickType;
     }
 
-    public InteractEntityEvent getEvent() { return event; }
+    public void setCancelled(boolean cancelled) { isCancelled = cancelled; }
+
+    public ClickType getClickType() { return clickType; }
+    public Entity getTargetEntity() { return targetEntity; }
+    public boolean isCancelled() { return isCancelled; }
 }
