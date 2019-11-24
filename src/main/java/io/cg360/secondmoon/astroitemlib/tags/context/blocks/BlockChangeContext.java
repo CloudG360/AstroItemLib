@@ -22,10 +22,15 @@ public class BlockChangeContext extends ExecutionContext {
     private boolean cancelAllChanges;
     private HashMap<String, BlockChange> blockChanges;
 
-    public BlockChangeContext(Player player, List<Transaction<BlockSnapshot>> transactions) {
+    private BlockSnapshot blockHit;
+    private Direction blockSide;
+
+    public BlockChangeContext(Player player, List<Transaction<BlockSnapshot>> transactions, BlockSnapshot blockHit, Direction blockSide) {
         super(player);
         this.cancelAllChanges = false;
         this.blockChanges = new HashMap<>();
+        this.blockHit = blockHit;
+        this.blockSide = blockSide;
         for(Transaction<BlockSnapshot> transaction: transactions){
             BlockSnapshot o = transaction.getOriginal();
             BlockSnapshot f = transaction.getFinal();
@@ -84,8 +89,9 @@ public class BlockChangeContext extends ExecutionContext {
     private static String generateBlockID(BlockSnapshot blockSnapshot){ Vector3i pos = blockSnapshot.getPosition(); return String.format("%s_%s_%s", pos.getX(), pos.getY(), pos.getZ()); }
     /** @return a <i>clone</i>  of the block changes list.*/
     public HashMap<String, BlockChange> getBlockChanges() { return new HashMap<>(blockChanges); };
-
     public Optional<BlockChange> getBlockChange(String id){ return Optional.ofNullable(blockChanges.get(id)); }
+    public BlockSnapshot getOrigin() { return blockHit; }
+    public Direction getOriginSide() { return blockSide; }
 
     public boolean areAllChangesCancelled() { return cancelAllChanges; }
     public void setCancelAllChanges(boolean cancelAllChanges) { this.cancelAllChanges = cancelAllChanges; }
