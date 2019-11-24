@@ -19,16 +19,19 @@ import io.cg360.secondmoon.astroitemlib.tasks.interfaces.IAstroTask;
 import io.cg360.secondmoon.astroitemlib.utilities.Utils;
 import me.ryanhamshire.griefprevention.api.GriefPreventionApi;
 import me.ryanhamshire.griefprevention.api.claim.Claim;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.data.manipulator.mutable.block.DirectionalData;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOptions;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
@@ -43,7 +46,11 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.util.blockray.BlockRay;
+import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.BlockChangeFlags;
+import org.spongepowered.api.world.World;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -140,7 +147,115 @@ public class AstroTagManager {
 
     // -----------------------------------------------------------------------------
 
+    //TODO: Pipeline 3.0, put all events through this.
+    @Listener(beforeModifications = true, order = Order.DEFAULT)
+    public void onGameEvent(Event e, @First Player player){
+        if(e instanceof ChangeBlockEvent) return;
+        // -- COMMON (Stuff which all levels should use)
+        Optional<ItemStackSnapshot> i = e.getContext().get(EventContextKeys.USED_ITEM);
+        if(!i.isPresent()) return;
+        ItemStackSnapshot istack = i.get();
+        Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
+        if(!tgs.isPresent()) return;
+        List<String> tags = tgs.get();
+        String[] otags = orderedTags(tags.toArray(new String[0]));
 
+        // -- ITEM INTERACTS Level 3 (The top of the foodchain)
+
+        if(e instanceof DamageEntityEvent){
+            DamageEntityEvent event = (DamageEntityEvent) e;
+            HandType handType = HandTypes.OFF_HAND;
+            if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
+            UsedContext usedContext = new UsedContext(player, handType, ClickType.LEFT);
+            EntityInteractContext interactContext = new EntityInteractContext(player, ClickType.LEFT, event.getTargetEntity(), event.isCancelled());
+            for(String tag: otags){
+                if(getTag(tag).isPresent()){
+                    AbstractTag t = getTag(tag).get();
+                    boolean result = true;
+                    if(t.getType() == ExecutionTypes.ENTITY_HIT) { result = t.run(ExecutionTypes.ENTITY_HIT, tag, istack, new EntityHitContext(player, event)); }
+                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, istack, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
+                    if(!result) return;
+                }
+            }
+            if(usedContext.isCancelled()) event.setCancelled(true);
+            if(interactContext.isCancelled()) event.setCancelled(true);
+            return;
+        }
+
+        // -- ITEM INTERACTS Level 2 (Stuff which are interacts but still encompass other events)
+
+        if(e instanceof InteractEntityEvent){
+            InteractEntityEvent event = (InteractEntityEvent) e;
+            ClickType clickType = e instanceof InteractEntityEvent.Primary ? ClickType.LEFT : ClickType.RIGHT; // Does not anticipate it being neither.
+
+            HandType handType = HandTypes.OFF_HAND;
+            if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
+
+            UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT);
+            EntityInteractContext interactContext = new EntityInteractContext(player, clickType, event.getTargetEntity(), event.isCancelled());
+
+            for(String tag: otags){
+                if(getTag(tag).isPresent()){
+                    AbstractTag t = getTag(tag).get();
+                    boolean result = true;
+                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, istack, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
+                    if(!result) return;
+                }
+            }
+
+            if(interactContext.isCancelled()) event.setCancelled(true);
+            if(usedContext.isCancelled()) event.setCancelled(true);
+            return;
+        }
+
+        if(e instanceof InteractBlockEvent){
+            InteractBlockEvent event = (InteractBlockEvent) e;
+            HandType handType = HandTypes.OFF_HAND;
+            if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
+
+            UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT);
+            BlockInteractContext interactContext = new BlockInteractContext(player, event.getTargetBlock(), event.getTargetSide(), event.isCancelled());
+
+            for(String tag: otags){
+                if(getTag(tag).isPresent()){
+                    AbstractTag t = getTag(tag).get();
+                    boolean result = true;
+                    if(t.getType() == ExecutionTypes.BLOCK_INTERACT) { result = t.run(ExecutionTypes.BLOCK_INTERACT, tag, istack, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
+                    if(!result) return;
+                }
+            }
+
+            if (usedContext.isCancelled()) event.setCancelled(true);
+            if (interactContext.isCancelled()) event.setCancelled(true);
+        }
+
+        // -- ITEM INTERACTS Level 1 (Covers all interactions which aren't caught by higher layers)
+        if(e instanceof InteractItemEvent) {
+            InteractItemEvent event = (InteractItemEvent) e;
+            HandType type = e instanceof InteractItemEvent.Primary ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND; // Doesn't anticipate it not being either Primary or Secondary. Potential issue.
+            UsedContext usedContext = new UsedContext(player, type, ClickType.LEFT);
+            for (String tag : otags) {
+                if (getTag(tag).isPresent()) {
+                    AbstractTag t = getTag(tag).get();
+                    boolean result = true;
+                    if (t.getType() == ExecutionTypes.ITEM_USED) {
+                        result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext);
+                    }
+                    if (!result) return;
+                }
+            }
+            if (usedContext.isCancelled()) event.setCancelled(true);
+            return;
+        }
+
+    }
+
+    // -----------------------------------------------------------------------------
+
+    /* --- OLD (Pipeline 2.0) Item Use detectors ---
     @Listener(beforeModifications = true, order = Order.BEFORE_POST)
     public void onUseLeft(InteractItemEvent.Primary event, @First Player player){
         if(overrideLeftClick) {
@@ -199,6 +314,16 @@ public class AstroTagManager {
         }
     }
 
+     */
+
+    /**
+     * <h3>Item Hold (OnSelect) Events</h3>
+     * Handles the single time trigger called when an item is
+     * selected in the hotbar.
+     *
+     * @param event Internal Sponge supplier of event.
+     * @param player Internal Sponge supplier of player.
+     */
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onInventorySingleHold(ClickInventoryEvent.Held event, @First Player player){
         Optional<ItemStack> s = event.getFinalSlot().peek();
@@ -221,12 +346,21 @@ public class AstroTagManager {
         }
     }
 
-    // Inventory Click Events
 
+    /**
+     * <h3>Item Click Events</h3>
+     * Handles tags which are trigger-able by an InventoryClickEvent
+     * or other related events. Does not include support for drop (Above
+     * in class)
+     *
+     * @param event Internal Sponge supplier of event.
+     * @param player Internal Sponge supplier of player.
+     */
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onInventoryClick(ClickInventoryEvent event, @First Player player){
         if(event instanceof ClickInventoryEvent.Open) return;
         if(event instanceof ClickInventoryEvent.Close) return;
+        if(event instanceof ClickInventoryEvent.Held) return;
 
         event.getTransactions().forEach(transaction -> {
             ItemStackSnapshot istack = transaction.getOriginal();
@@ -251,7 +385,6 @@ public class AstroTagManager {
 
             if(event instanceof ClickInventoryEvent.Drop){ state = InventoryChangeStates.DROP; }
             if(event instanceof ClickInventoryEvent.Pickup){ state = InventoryChangeStates.PICKUP; }
-            if(event instanceof ClickInventoryEvent.Held){ state = InventoryChangeStates.HOLD; }
 
             if(clickType == ClickType.UNKNOWN && state == InventoryChangeStates.NOTHING) return;
 
@@ -284,10 +417,9 @@ public class AstroTagManager {
         });
     }
 
-
     // -----
 
-
+/*
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onEntityHit(DamageEntityEvent event, @First Player player){
         Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
@@ -319,7 +451,9 @@ public class AstroTagManager {
 
         if(usedContext.isCancelled()) event.setCancelled(true);
     }
+ */
 
+/*
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onEntityInteract(InteractEntityEvent event, @First Player player){
         if(event instanceof InteractEntityEvent.Primary){ return; }
@@ -352,6 +486,9 @@ public class AstroTagManager {
         if(usedContext.isCancelled()) event.setCancelled(true);
     }
 
+ */
+
+/*
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onBlockInteract(InteractBlockEvent event, @First Player player){
         Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
@@ -384,6 +521,7 @@ public class AstroTagManager {
 
         if (usedContext.isCancelled()) event.setCancelled(true);
     }
+ */
 
     //TODO: Add the ability to modify block transactions. Cancel changes on the original list if conflicted.
 
@@ -393,24 +531,32 @@ public class AstroTagManager {
 
     // Should not have @Listener
     private void onBlockEditCommon(ChangeBlockEvent event, Player player) {
-        //TODO: Do regular stuff but store the context in a var. Use the context and determine what needs breaking.
-        //TODO: Add a "Last action" list for each player so a hammer like item could be added.
         Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
         if(!s.isPresent()) return;
         ItemStackSnapshot istack = s.get();
-
         Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
         if(!tgs.isPresent()) return;
         List<String> tags = tgs.get();
-
         String[] otags = orderedTags(tags.toArray(new String[0]));
-
         HandType handType = HandTypes.OFF_HAND;
         if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
         ItemStack tool = player.getItemInHand(HandTypes.MAIN_HAND).orElse(ItemStack.builder().itemType(ItemTypes.AIR).quantity(1).build());
 
-        BlockChangeContext changecontext = new BlockChangeContext(player, event.getTransactions());
-        UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT);
+        Optional<BlockRayHit<World>> bRay = BlockRay.from(player).distanceLimit(100).skipFilter( lastHit -> {
+                    return lastHit.getLocation().getBlock().getType().equals(BlockTypes.AIR) ||
+                            lastHit.getLocation().getBlock().getType().equals(BlockTypes.WATER) ||
+                            lastHit.getLocation().getBlock().getType().equals(BlockTypes.LAVA);
+        }).stopFilter(BlockRay.allFilter()).end();
+        Direction direction = Direction.NONE;
+        BlockSnapshot blockHit = event.getTransactions().get(0).getOriginal();
+        if(bRay.isPresent()){
+            BlockRayHit<World> blockRay = bRay.get();
+            direction = blockRay.getFaces()[0];
+            blockHit = blockRay.getLocation().getBlock().snapshotFor(blockRay.getLocation());
+        }
+        ClickType type = event instanceof ChangeBlockEvent.Place ? ClickType.RIGHT : ClickType.LEFT;
+        BlockChangeContext changecontext = new BlockChangeContext(player, event.getTransactions(), blockHit, direction);
+        UsedContext usedContext = new UsedContext(player, handType, type);
 
         for(String tag: otags){
             if(getTag(tag).isPresent()){
@@ -424,10 +570,8 @@ public class AstroTagManager {
 
         if(usedContext.isCancelled()) { event.setCancelled(true); return; }
         if(changecontext.areAllChangesCancelled()) { event.setCancelled(true); return; }
-
         ArrayList<Transaction<BlockSnapshot>> originalBlockChanges = new ArrayList<>(event.getTransactions());
         AstroItemLib.getLogger().info(Arrays.toString(originalBlockChanges.toArray()));
-
         for(BlockChangeContext.BlockChange blockChange : changecontext.getBlockChanges().values()){
             if(blockChange.isOriginalTransaction()){
                 Optional<Transaction<BlockSnapshot>> t = originalBlockChanges.stream().filter(change -> change.getOriginal().getPosition() == blockChange.getOriginalBlock().getPosition()).findFirst();
@@ -441,14 +585,10 @@ public class AstroTagManager {
             } else {
                 if(blockChange.isCancelled()) continue;
                 digBlock(blockChange, tool, player);
-                if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){
-                    placeBlock(blockChange, player);
-                }
+                if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){ placeBlock(blockChange, player); }
             }
         }
     }
-
-    //TODO: Add forge
 
     private static void placeBlock(BlockChangeContext.BlockChange blockChange, Player player){
         if(AstroItemLib.getGriefPrevention().isPresent()){
@@ -456,10 +596,10 @@ public class AstroTagManager {
             Claim claim = api.getClaimManager(player.getLocation().getExtent()).getClaimAt(blockChange.getBlock().getLocation().get());
             Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
             AstroItemLib.getLogger().info(Utils.dataToMap(placeperms));
-        } else {
-            AstroItemLib.getLogger().info("There's no GriefPrevention!");
         }
-        player.getLocation().getExtent().placeBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState(), blockChange.getDirection(), player.getProfile());
+        DirectionalData data = Sponge.getDataManager().getManipulatorBuilder(DirectionalData.class).get().create();
+        data.direction().set(blockChange.getDirection());
+        player.getLocation().getExtent().setBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState().with(data.asImmutable()).get());
     }
     private static void digBlock(BlockChangeContext.BlockChange blockChange, ItemStack istack, Player player){
         if(AstroItemLib.getGriefPrevention().isPresent()){
@@ -467,8 +607,6 @@ public class AstroTagManager {
             Claim claim = api.getClaimManager(player.getWorld()).getClaimAt(blockChange.getBlock().getLocation().get());
             Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
             AstroItemLib.getLogger().info(Arrays.toString(placeperms.keySet().toArray(new String[0])));
-        } else {
-            AstroItemLib.getLogger().info("There's no GriefPrevention!");
         }
         if(blockChange.getDrops().size() == 0) {
             //player.getLocation().getExtent().digBlock(blockChange.getBlock().getPosition(), player.getProfile());
