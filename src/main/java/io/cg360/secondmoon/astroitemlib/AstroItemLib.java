@@ -66,7 +66,8 @@ import java.util.Optional;
                 "CloudGamer360"
         },
         dependencies = {
-                @Dependency(id = "griefprevention", version = "4.0.3", optional = true)
+                @Dependency(id = "griefprevention", version = "4.0.3", optional = true),
+                @Dependency(id = "astrofb", version = "2019.2-1.3.1", optional = false)
         }
 )
 public class AstroItemLib {

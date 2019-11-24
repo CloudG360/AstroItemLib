@@ -1,6 +1,8 @@
 package io.cg360.secondmoon.astroitemlib.managers;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
+import fun.mooncraftgames.luna.astroforgebridge.AstroForgeBridge;
 import io.cg360.secondmoon.astroitemlib.AstroItemLib;
 import io.cg360.secondmoon.astroitemlib.data.AstroKeys;
 import io.cg360.secondmoon.astroitemlib.tags.AbstractTag;
@@ -38,10 +40,10 @@ import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.world.BlockChangeFlags;
-import org.spongepowered.api.world.World;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -404,6 +406,7 @@ public class AstroTagManager {
 
         HandType handType = HandTypes.OFF_HAND;
         if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
+        ItemStack tool = player.getItemInHand(HandTypes.MAIN_HAND).orElse(ItemStack.builder().itemType(ItemTypes.AIR).quantity(1).build());
 
         BlockChangeContext changecontext = new BlockChangeContext(player, event.getTransactions());
         UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT);
@@ -422,54 +425,62 @@ public class AstroTagManager {
         if(changecontext.areAllChangesCancelled()) { event.setCancelled(true); return; }
 
         ArrayList<Transaction<BlockSnapshot>> originalBlockChanges = new ArrayList<>(event.getTransactions());
-        ArrayList<BlockSnapshot> finalblocks = new ArrayList<>();
+        AstroItemLib.getLogger().info(Arrays.toString(originalBlockChanges.toArray()));
 
         for(BlockChangeContext.BlockChange blockChange : changecontext.getBlockChanges().values()){
             if(blockChange.isOriginalTransaction()){
-                Optional<Transaction<BlockSnapshot>> t = originalBlockChanges.stream().filter(change -> change.getOriginal().getLocation() == blockChange.getOriginalBlock().getLocation()).findFirst();
-                if(!t.isPresent()){ AstroItemLib.getLogger().warn("Uh oh? A block change is missing? Someone messed up somehow. Skipping..."); finalblocks.add(blockChange.getBlock()); continue; }
+                Optional<Transaction<BlockSnapshot>> t = originalBlockChanges.stream().filter(change -> change.getOriginal().getPosition() == blockChange.getOriginalBlock().getPosition()).findFirst();
+                if(!t.isPresent()){ AstroItemLib.getLogger().warn("Uh oh? A block change is missing? Someone messed up somehow. Skipping..."); continue; }
                 if(blockChange.isCancelled()) { t.get().setValid(false); }
                 if(blockChange.isModified()){
                     t.get().setValid(false);
-                    digBlock(player.getWorld(), blockChange, istack, player);
-                    if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){ placeBlock(player.getWorld(), blockChange, player); }
+                    digBlock(blockChange, tool, player);
+                    if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){ placeBlock(blockChange, player); }
                 }
             } else {
                 if(blockChange.isCancelled()) continue;
-                digBlock(player.getWorld(), blockChange, istack, player);
+                digBlock(blockChange, tool, player);
                 if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){
-                    placeBlock(player.getWorld(), blockChange, player);
+                    placeBlock(blockChange, player);
                 }
             }
         }
     }
 
-    private static void placeBlock(World world, BlockChangeContext.BlockChange blockChange, Player player){
+    //TODO: Add forge
+
+    private static void placeBlock(BlockChangeContext.BlockChange blockChange, Player player){
         if(AstroItemLib.getGriefPrevention().isPresent()){
             GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
-            Claim claim = api.getClaimManager(world).getClaimAt(blockChange.getBlock().getLocation().get());
+            Claim claim = api.getClaimManager(player.getLocation().getExtent()).getClaimAt(blockChange.getBlock().getLocation().get());
             Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
             AstroItemLib.getLogger().info(Utils.dataToMap(placeperms));
+        } else {
+            AstroItemLib.getLogger().info("There's no GriefPrevention!");
         }
-        world.placeBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState(), blockChange.getDirection(), player.getProfile());
+        player.getLocation().getExtent().placeBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState(), blockChange.getDirection(), player.getProfile());
     }
-    private static void digBlock(World world, BlockChangeContext.BlockChange blockChange, ItemStackSnapshot istack, Player player){
+    private static void digBlock(BlockChangeContext.BlockChange blockChange, ItemStack istack, Player player){
         if(AstroItemLib.getGriefPrevention().isPresent()){
             GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
-            Claim claim = api.getClaimManager(world).getClaimAt(blockChange.getBlock().getLocation().get());
+            Claim claim = api.getClaimManager(player.getWorld()).getClaimAt(blockChange.getBlock().getLocation().get());
             Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
             AstroItemLib.getLogger().info(Utils.dataToMap(placeperms));
+        } else {
+            AstroItemLib.getLogger().info("There's no GriefPrevention!");
         }
         if(blockChange.getDrops().size() == 0) {
-            world.digBlockWith(blockChange.getBlock().getPosition(), istack.createStack(), player.getProfile());
+            //player.getLocation().getExtent().digBlock(blockChange.getBlock().getPosition(), player.getProfile());
+            Vector3i loc = blockChange.getBlock().getPosition();
+            AstroForgeBridge.digBlock(player, istack, loc.getX(), loc.getY(), loc.getZ());
         } else {
-            world.spawnParticles(ParticleEffect.builder()
+            player.getLocation().getExtent().spawnParticles(ParticleEffect.builder()
                     .velocity(new Vector3d(0, 0.1, 0))
                     .offset(new Vector3d(0.5, 0.5, 0.5))
                     .type(ParticleTypes.BREAK_BLOCK)
                     .option(ParticleOptions.BLOCK_STATE, blockChange.getBlock().getState())
                     .build(), blockChange.getBlock().getPosition().toDouble());
-            world.setBlock(blockChange.getBlock().getPosition(), BlockState.builder().blockType(BlockTypes.AIR).build(), BlockChangeFlags.ALL);
+            player.getLocation().getExtent().setBlock(blockChange.getBlock().getPosition(), BlockState.builder().blockType(BlockTypes.AIR).build(), BlockChangeFlags.ALL);
             for(ItemStackSnapshot item:blockChange.getDrops()){ Utils.dropItem(blockChange.getBlock().getLocation().get(), item, 15); }
         }
     }

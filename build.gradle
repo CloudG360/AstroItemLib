@@ -22,6 +22,7 @@ repositories {
 
 dependencies {
     compileOnly fileTree(dir: 'libs', include: '*jar')
+    compileOnly 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     compile('me.ryanhamshire:griefprevention:1.10.2-4.0.1.451:api')
     compileOnly 'org.spongepowered:spongeapi:7.1.0'
     annotationProcessor 'org.spongepowered:spongeapi:7.1.0'
