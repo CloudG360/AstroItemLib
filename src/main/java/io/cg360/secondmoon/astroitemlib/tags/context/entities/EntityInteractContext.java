@@ -12,9 +12,11 @@ public class EntityInteractContext extends ExecutionContext {
 
     private boolean isCancelled;
 
-    public EntityInteractContext(Player player, ClickType clickType, Entity target) {
+    public EntityInteractContext(Player player, ClickType clickType, Entity target, boolean isCancelled) {
         super(player);
         this.clickType = clickType;
+        this.targetEntity = target;
+        this.isCancelled = isCancelled;
     }
 
     public void setCancelled(boolean cancelled) { isCancelled = cancelled; }
