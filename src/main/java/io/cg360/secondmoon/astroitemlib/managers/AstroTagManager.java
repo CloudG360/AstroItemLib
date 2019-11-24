@@ -322,6 +322,8 @@ public class AstroTagManager {
 
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onEntityInteract(InteractEntityEvent event, @First Player player){
+        if(event instanceof InteractEntityEvent.Primary){ return; }
+        if(event instanceof InteractEntityEvent.Secondary){ overrideRightClick = true; }
         Optional<ItemStackSnapshot> s = event.getContext().get(EventContextKeys.USED_ITEM);
         if(!s.isPresent()) return;
         ItemStackSnapshot istack = s.get();
@@ -331,8 +333,6 @@ public class AstroTagManager {
         List<String> tags = tgs.get();
 
         String[] otags = orderedTags(tags.toArray(new String[0]));
-
-        overrideRightClick = true;
 
         HandType handType = HandTypes.OFF_HAND;
         if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
@@ -358,13 +358,14 @@ public class AstroTagManager {
         if(!s.isPresent()) return;
         ItemStackSnapshot istack = s.get();
 
+        if(event instanceof InteractBlockEvent.Primary){ overrideLeftClick = true; }
+        if(event instanceof InteractBlockEvent.Secondary){ overrideRightClick = true; }
+
         Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
         if(!tgs.isPresent()) return;
         List<String> tags = tgs.get();
 
         String[] otags = orderedTags(tags.toArray(new String[0]));
-
-        overrideRightClick = true;
 
         HandType handType = HandTypes.OFF_HAND;
         if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
@@ -465,7 +466,7 @@ public class AstroTagManager {
             GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
             Claim claim = api.getClaimManager(player.getWorld()).getClaimAt(blockChange.getBlock().getLocation().get());
             Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
-            AstroItemLib.getLogger().info(Utils.dataToMap(placeperms));
+            AstroItemLib.getLogger().info(Arrays.toString(placeperms.keySet().toArray(new String[0])));
         } else {
             AstroItemLib.getLogger().info("There's no GriefPrevention!");
         }
