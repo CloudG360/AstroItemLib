@@ -31,6 +31,7 @@ import io.cg360.secondmoon.astroitemlib.tags.impl.devtest.TagDevTestInventory;
 import io.cg360.secondmoon.astroitemlib.tags.impl.devtest.TagDevTracking;
 import io.cg360.secondmoon.astroitemlib.tags.impl.item.TagButterfingers;
 import io.cg360.secondmoon.astroitemlib.tags.impl.item.TagUndroppable;
+import io.cg360.secondmoon.astroitemlib.tags.impl.world.TagSmelting;
 import io.cg360.secondmoon.astroitemlib.tags.impl.world.TagStopBreakBlock;
 import io.cg360.secondmoon.astroitemlib.tags.impl.world.TagUnplaceable;
 import me.ryanhamshire.griefprevention.GriefPrevention;
@@ -179,6 +180,7 @@ public class AstroItemLib {
                 //TODO: Add ability to ignore tag-blocking statements for stuff which should be ran last. "Append Tags" or something
                 .registerTag(new TagUnplaceable("unplaceable", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
                 .registerTag(new TagStopBreakBlock("stopbreakblock", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
+                .registerTag(new TagSmelting("smelting", TagPriority.LOW, ExecutionTypes.BLOCK_CHANGE))
 
                 .registerTag(new TagButterfingers("butterfingers", TagPriority.HIGHEST, ExecutionTypes.ITEM_HOLD))
                 .registerTag(new TagUndroppable("undroppable", TagPriority.HIGH, ExecutionTypes.ITEM_DROPPED));
