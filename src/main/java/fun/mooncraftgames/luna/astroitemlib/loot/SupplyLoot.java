@@ -32,7 +32,7 @@ public class SupplyLoot {
     private Integer minrolls;
     private Integer maxrolls;
 
-    private transient ItemStack[] lastInventory;
+    private transient ItemStack[] lastRoll;
 
     public ItemStack[] rollLootPool(int result_size){
         verifyIntergirty();
@@ -99,7 +99,7 @@ public class SupplyLoot {
         }
         Collections.shuffle(items);
         ItemStack[] itemSt = items.toArray(new ItemStack[0]);
-        lastInventory = itemSt;
+        lastRoll = itemSt;
         return itemSt;
     }
 
@@ -146,12 +146,15 @@ public class SupplyLoot {
         return this;
     }
 
-    public ItemStack[] getLastInventory() { return lastInventory; }
+    public ItemStack[] getLastRoll() { return lastRoll; }
     public SupplyRoll[] getLootpool() { return lootpool; }
     public String getId() { return id; }
     public String getTitle() {
         if(title == null) title = "&7&lCrate";
         return title;
     }
+    public Integer getMinrolls() { return minrolls; }
+    public Integer getMaxrolls() { return maxrolls; }
+
     public Text getTitleText() { return Text.of(Utils.parseToSpongeString(getTitle())); }
 }
