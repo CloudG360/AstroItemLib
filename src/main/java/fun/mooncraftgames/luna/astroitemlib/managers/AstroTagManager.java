@@ -576,11 +576,15 @@ public class AstroTagManager {
                 if(blockChange.isCancelled()) { t.get().setValid(false); }
                 if(blockChange.isModified()){
                     t.get().setValid(false);
+                    Vector3i blockpos = blockChange.getBlock().getPosition();
+                    if(!AstroForgeBridge.canBreakBlock(player, blockpos.getX(), blockpos.getY(), blockpos.getZ())) continue;
                     digBlock(blockChange, tool, player);
                     if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){ placeBlock(blockChange, player); }
                 }
             } else {
                 if(blockChange.isCancelled()) continue;
+                Vector3i blockpos = blockChange.getBlock().getPosition();
+                if(!AstroForgeBridge.canBreakBlock(player, blockpos.getX(), blockpos.getY(), blockpos.getZ())) continue;
                 digBlock(blockChange, tool, player);
                 if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){ placeBlock(blockChange, player); }
             }
