@@ -68,7 +68,7 @@ import java.util.Optional;
         },
         dependencies = {
                 @Dependency(id = "griefprevention", version = "4.0.3", optional = true),
-                @Dependency(id = "astrofb", version = "2019.2-1.3.1", optional = false)
+                @Dependency(id = "astrofb", version = "1.0.0", optional = false)
         }
 )
 public class AstroItemLib {
