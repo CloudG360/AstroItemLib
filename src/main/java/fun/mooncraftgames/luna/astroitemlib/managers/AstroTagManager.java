@@ -5,10 +5,7 @@ import com.flowpowered.math.vector.Vector3i;
 import fun.mooncraftgames.luna.astroforgebridge.AstroForgeBridge;
 import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
 import fun.mooncraftgames.luna.astroitemlib.data.AstroKeys;
-import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
-import fun.mooncraftgames.luna.astroitemlib.tags.ClickType;
-import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
-import fun.mooncraftgames.luna.astroitemlib.tags.InventoryChangeStates;
+import fun.mooncraftgames.luna.astroitemlib.tags.*;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockChangeContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockInteractContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.entities.EntityHitContext;
@@ -601,17 +598,17 @@ public class AstroTagManager {
         data.direction().set(blockChange.getDirection());
         player.getLocation().getExtent().setBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState().with(data.asImmutable()).get());
     }
-    private static void digBlock(BlockChangeContext.BlockChange blockChange, ItemStack istack, Player player){
+    private static void digBlock(BlockChangeContext.BlockChange blockChange, ItemStack tool, Player player){
         if(AstroItemLib.getGriefPrevention().isPresent()){
             GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
             Claim claim = api.getClaimManager(player.getWorld()).getClaimAt(blockChange.getBlock().getLocation().get());
             Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
             AstroItemLib.getLogger().info(Arrays.toString(placeperms.keySet().toArray(new String[0])));
         }
+        Vector3i loc = blockChange.getBlock().getPosition();
         if(blockChange.getDrops().size() == 0) {
             //player.getLocation().getExtent().digBlock(blockChange.getBlock().getPosition(), player.getProfile());
-            Vector3i loc = blockChange.getBlock().getPosition();
-            AstroForgeBridge.digBlock(player, istack, loc.getX(), loc.getY(), loc.getZ());
+            AstroForgeBridge.digBlock(player, tool, loc.getX(), loc.getY(), loc.getZ());
         } else {
             player.getLocation().getExtent().spawnParticles(ParticleEffect.builder()
                     .velocity(new Vector3d(0, 0.1, 0))
@@ -620,7 +617,24 @@ public class AstroTagManager {
                     .option(ParticleOptions.BLOCK_STATE, blockChange.getBlock().getState())
                     .build(), blockChange.getBlock().getPosition().toDouble());
             player.getLocation().getExtent().setBlock(blockChange.getBlock().getPosition(), BlockState.builder().blockType(BlockTypes.AIR).build(), BlockChangeFlags.ALL);
-            for(ItemStackSnapshot item:blockChange.getDrops()){ Utils.dropItem(blockChange.getBlock().getLocation().get(), item, 15); }
+            for(BlockDestroyLootEntry item:blockChange.getDrops()){
+                switch (item.getType()){
+                    case SUPPLYLOOT:
+                        item.getLootTable().ifPresent(loot -> {
+                            for(ItemStack stack : loot.rollLootPool(-1)){ Utils.dropItem(blockChange.getBlock().getLocation().get(), stack.createSnapshot(), 15); }
+                        });
+                        break;
+                    case VANILLADROPS:
+                        AstroForgeBridge.dropBlock(player, tool, loc.getX(), loc.getY(), loc.getZ());
+                        break;
+                    case ITEMSTACKSNAPSHOT:
+                        item.getItemStack().ifPresent(snapshot -> {
+                            Utils.dropItem(blockChange.getBlock().getLocation().get(), snapshot, 15);
+                        });
+                        break;
+                }
+                //Utils.dropItem(blockChange.getBlock().getLocation().get(), item, 15);
+            }
         }
     }
     /*

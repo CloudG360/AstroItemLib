@@ -1,13 +1,13 @@
 package fun.mooncraftgames.luna.astroitemlib.tags.context.blocks;
 
 import com.flowpowered.math.vector.Vector3i;
+import fun.mooncraftgames.luna.astroitemlib.tags.BlockDestroyLootEntry;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -102,7 +102,7 @@ public class BlockChangeContext extends ExecutionContext {
         private boolean isOriginalTransaction;
         private boolean isCancelled;
         private boolean isModified;
-        private ArrayList<ItemStackSnapshot> itemDrops;
+        private ArrayList<BlockDestroyLootEntry> itemDrops;
         private BlockSnapshot block;
         private BlockChangeType blockChangeType;
         private Direction direction;
@@ -150,7 +150,7 @@ public class BlockChangeContext extends ExecutionContext {
         /** @param cancelled Sets the block change as cancelled.*/
         public void setCancelled(boolean cancelled) { this.isModified = true; this.isCancelled = cancelled; }
         /** @param itemDrops Sets what the change's block (If of type BREAK) will drop if it's destroyed. If empty, it drops the regular drops. */
-        public void setDrops(ArrayList<ItemStackSnapshot> itemDrops) { this.isModified = true;this.itemDrops = itemDrops; }
+        public void setDrops(ArrayList<BlockDestroyLootEntry> itemDrops) { this.isModified = true;this.itemDrops = itemDrops; }
         /** @return boolean indicating if the change came from the sponge event or not.*/
         public boolean isOriginalTransaction() { return isOriginalTransaction; }
         /** @return If the change has been cancelled.*/
@@ -158,7 +158,7 @@ public class BlockChangeContext extends ExecutionContext {
         /** @return boolean of if a block change has been modified (Or if it was added by a tag)*/
         public boolean isModified() { return isModified; }
         /** @return list of what a block (If set to be broken) will drop.*/
-        public ArrayList<ItemStackSnapshot> getDrops() { return itemDrops; }
+        public ArrayList<BlockDestroyLootEntry> getDrops() { return itemDrops; }
         /** @return BlockSnapshot of the block either being broke or being placed.*/
         public BlockSnapshot getBlock() { return block; }
         /** @return BlockChangeType of if it's a destroy action or a place.*/
