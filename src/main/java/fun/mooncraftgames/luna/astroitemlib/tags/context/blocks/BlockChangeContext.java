@@ -151,6 +151,19 @@ public class BlockChangeContext extends ExecutionContext {
         public void setCancelled(boolean cancelled) { this.isModified = true; this.isCancelled = cancelled; }
         /** @param itemDrops Sets what the change's block (If of type BREAK) will drop if it's destroyed. If empty, it drops the regular drops. */
         public void setDrops(ArrayList<BlockDestroyLootEntry> itemDrops) { this.isModified = true;this.itemDrops = itemDrops; }
+
+        public void setDropsAsVanilla() {
+            this.isModified = true;
+            this.itemDrops = new ArrayList<>();
+            this.itemDrops.add(new BlockDestroyLootEntry(false));
+        }
+        public void setDropsAsAir() {
+            this.isModified = true;
+            this.itemDrops = new ArrayList<>();
+            this.itemDrops.add(new BlockDestroyLootEntry(true));
+        }
+
+
         /** @return boolean indicating if the change came from the sponge event or not.*/
         public boolean isOriginalTransaction() { return isOriginalTransaction; }
         /** @return If the change has been cancelled.*/
