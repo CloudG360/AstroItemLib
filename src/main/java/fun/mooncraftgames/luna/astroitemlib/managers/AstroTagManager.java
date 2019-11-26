@@ -578,14 +578,14 @@ public class AstroTagManager {
                     t.get().setValid(false);
                     Vector3i blockpos = blockChange.getBlock().getPosition();
                     if(!AstroForgeBridge.canBreakBlock(player, blockpos.getX(), blockpos.getY(), blockpos.getZ())) continue;
-                    digBlock(blockChange, tool, player);
+                    if(!digBlock(blockChange, tool, player)) continue;
                     if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){ placeBlock(blockChange, player); }
                 }
             } else {
                 if(blockChange.isCancelled()) continue;
                 Vector3i blockpos = blockChange.getBlock().getPosition();
                 if(!AstroForgeBridge.canBreakBlock(player, blockpos.getX(), blockpos.getY(), blockpos.getZ())) continue;
-                digBlock(blockChange, tool, player);
+                if(!digBlock(blockChange, tool, player)) continue;
                 if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){ placeBlock(blockChange, player); }
             }
         }
@@ -602,7 +602,7 @@ public class AstroTagManager {
         data.direction().set(blockChange.getDirection());
         player.getLocation().getExtent().setBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState().with(data.asImmutable()).get());
     }
-    private static void digBlock(BlockChangeContext.BlockChange blockChange, ItemStack tool, Player player){
+    private static boolean digBlock(BlockChangeContext.BlockChange blockChange, ItemStack tool, Player player){
         if(AstroItemLib.getGriefPrevention().isPresent()){
             GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
             Claim claim = api.getClaimManager(player.getWorld()).getClaimAt(blockChange.getBlock().getLocation().get());
@@ -614,6 +614,7 @@ public class AstroTagManager {
             //player.getLocation().getExtent().digBlock(blockChange.getBlock().getPosition(), player.getProfile());
             AstroForgeBridge.digBlock(player, tool, loc.getX(), loc.getY(), loc.getZ());
         } else {
+            if(!(AstroForgeBridge.canBreakBlock(player, loc.getX(), loc.getY(), loc.getZ()))) return false;
             player.getLocation().getExtent().spawnParticles(ParticleEffect.builder()
                     .velocity(new Vector3d(0, 0.1, 0))
                     .offset(new Vector3d(0.5, 0.5, 0.5))
@@ -640,6 +641,7 @@ public class AstroTagManager {
                 //Utils.dropItem(blockChange.getBlock().getLocation().get(), item, 15);
             }
         }
+        return true;
     }
     /*
     @Listener(beforeModifications = true, order = Order.DEFAULT)
