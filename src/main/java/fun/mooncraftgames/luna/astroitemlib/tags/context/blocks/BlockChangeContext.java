@@ -102,7 +102,7 @@ public class BlockChangeContext extends ExecutionContext {
         private boolean isOriginalTransaction;
         private boolean isCancelled;
         private boolean isModified;
-        private ArrayList<BlockDestroyLootEntry> itemDrops;
+        private List<BlockDestroyLootEntry> itemDrops;
         private BlockSnapshot block;
         private BlockChangeType blockChangeType;
         private Direction direction;
@@ -150,7 +150,7 @@ public class BlockChangeContext extends ExecutionContext {
         /** @param cancelled Sets the block change as cancelled.*/
         public void setCancelled(boolean cancelled) { this.isModified = true; this.isCancelled = cancelled; }
         /** @param itemDrops Sets what the change's block (If of type BREAK) will drop if it's destroyed. If empty, it drops the regular drops. */
-        public void setDrops(ArrayList<BlockDestroyLootEntry> itemDrops) { this.isModified = true;this.itemDrops = itemDrops; }
+        public void setDrops(List<BlockDestroyLootEntry> itemDrops) { this.isModified = true;this.itemDrops = itemDrops; }
 
         public void setDropsAsVanilla() {
             this.isModified = true;
@@ -171,7 +171,7 @@ public class BlockChangeContext extends ExecutionContext {
         /** @return boolean of if a block change has been modified (Or if it was added by a tag)*/
         public boolean isModified() { return isModified; }
         /** @return list of what a block (If set to be broken) will drop.*/
-        public ArrayList<BlockDestroyLootEntry> getDrops() { return itemDrops; }
+        public List<BlockDestroyLootEntry> getDrops() { return itemDrops; }
         /** @return BlockSnapshot of the block either being broke or being placed.*/
         public BlockSnapshot getBlock() { return block; }
         /** @return BlockChangeType of if it's a destroy action or a place.*/
