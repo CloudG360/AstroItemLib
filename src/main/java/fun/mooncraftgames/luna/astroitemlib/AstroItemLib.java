@@ -30,6 +30,7 @@ import fun.mooncraftgames.luna.astroitemlib.tags.impl.devtest.TagDevCookie;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.devtest.TagDevTestInventory;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.devtest.TagDevTracking;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.item.TagButterfingers;
+import fun.mooncraftgames.luna.astroitemlib.tags.impl.item.TagDoubler;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.item.TagUndroppable;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.world.TagSmelting;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.world.TagStopBreakBlock;
@@ -184,6 +185,7 @@ public class AstroItemLib {
                 //TODO: Add a doubler tag. Requires some forge bridge stuff.
 
                 .registerTag(new TagButterfingers("butterfingers", TagPriority.HIGHEST, ExecutionTypes.ITEM_HOLD))
+                .registerTag(new TagDoubler("double_mine", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
                 .registerTag(new TagUndroppable("undroppable", TagPriority.HIGH, ExecutionTypes.ITEM_DROPPED));
 
         Sponge.getEventManager().registerListeners(this, astroTagManager);
