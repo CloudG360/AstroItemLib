@@ -1,6 +1,7 @@
 package fun.mooncraftgames.luna.astroitemlib.tags.impl.world;
 
 import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
+import fun.mooncraftgames.luna.astroitemlib.tags.BlockDestroyLootEntry;
 import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
 import fun.mooncraftgames.luna.astroitemlib.tags.TagPriority;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
@@ -21,17 +22,17 @@ import java.util.HashMap;
  */
 public class TagSmelting extends AbstractTag {
 
-    private static final HashMap<BlockType, ItemStackSnapshot[]> SMELT_ORES =
-            HashMapBuilder.builder(BlockType.class, ItemStackSnapshot[].class)
-                    .addField(BlockTypes.IRON_ORE, new ItemStackSnapshot[]{ ItemStack.builder().itemType(ItemTypes.IRON_INGOT).quantity(1).build().createSnapshot() })
-                    .addField(BlockTypes.GOLD_ORE, new ItemStackSnapshot[]{ ItemStack.builder().itemType(ItemTypes.GOLD_INGOT).quantity(1).build().createSnapshot() })
-                    .addField(BlockTypes.CLAY, new ItemStackSnapshot[]{ ItemStack.builder().itemType(ItemTypes.BRICK).quantity(3).build().createSnapshot() })
-                    .addField(BlockTypes.STONE, new ItemStackSnapshot[]{ ItemStack.builder().itemType(ItemTypes.STONE).quantity(1).build().createSnapshot() })
-                    .addField(BlockTypes.COBBLESTONE, new ItemStackSnapshot[]{ ItemStack.builder().itemType(ItemTypes.STONE).quantity(1).build().createSnapshot() })
-                    .addField(BlockTypes.SAND, new ItemStackSnapshot[]{ ItemStack.builder().itemType(ItemTypes.GLASS).quantity(1).build().createSnapshot() })
-                    .addField(BlockTypes.NETHERRACK, new ItemStackSnapshot[]{ ItemStack.builder().itemType(ItemTypes.NETHERBRICK).quantity(1).build().createSnapshot() })
-                    .addField(BlockTypes.LOG, new ItemStackSnapshot[]{ ItemStack.builder().itemType(ItemTypes.COAL_BLOCK).quantity(1).build().createSnapshot() })
-                    .addField(BlockTypes.LOG2, new ItemStackSnapshot[]{ ItemStack.builder().itemType(ItemTypes.COAL_BLOCK).quantity(1).build().createSnapshot() })
+    private static final HashMap<BlockType, BlockDestroyLootEntry[]> SMELT_ORES =
+            HashMapBuilder.builder(BlockType.class, BlockDestroyLootEntry[].class)
+                    .addField(BlockTypes.IRON_ORE, new BlockDestroyLootEntry[]{ new BlockDestroyLootEntry(ItemStack.builder().itemType(ItemTypes.IRON_INGOT).quantity(1).build().createSnapshot()) })
+                    .addField(BlockTypes.GOLD_ORE, new BlockDestroyLootEntry[]{ new BlockDestroyLootEntry(ItemStack.builder().itemType(ItemTypes.GOLD_INGOT).quantity(1).build().createSnapshot()) })
+                    .addField(BlockTypes.CLAY, new BlockDestroyLootEntry[]{ new BlockDestroyLootEntry(ItemStack.builder().itemType(ItemTypes.BRICK).quantity(3).build().createSnapshot()) })
+                    .addField(BlockTypes.STONE, new BlockDestroyLootEntry[]{ new BlockDestroyLootEntry(ItemStack.builder().itemType(ItemTypes.STONE).quantity(1).build().createSnapshot()) })
+                    .addField(BlockTypes.COBBLESTONE, new BlockDestroyLootEntry[]{ new BlockDestroyLootEntry(ItemStack.builder().itemType(ItemTypes.STONE).quantity(1).build().createSnapshot()) })
+                    .addField(BlockTypes.SAND, new BlockDestroyLootEntry[]{ new BlockDestroyLootEntry(ItemStack.builder().itemType(ItemTypes.GLASS).quantity(1).build().createSnapshot()) })
+                    .addField(BlockTypes.NETHERRACK, new BlockDestroyLootEntry[]{ new BlockDestroyLootEntry(ItemStack.builder().itemType(ItemTypes.NETHERBRICK).quantity(1).build().createSnapshot()) })
+                    .addField(BlockTypes.LOG, new BlockDestroyLootEntry[]{ new BlockDestroyLootEntry(ItemStack.builder().itemType(ItemTypes.COAL_BLOCK).quantity(1).build().createSnapshot()) })
+                    .addField(BlockTypes.LOG2, new BlockDestroyLootEntry[]{ new BlockDestroyLootEntry(ItemStack.builder().itemType(ItemTypes.COAL_BLOCK).quantity(1).build().createSnapshot()) })
             .build();
 
     public TagSmelting(String id, TagPriority priority, ExecutionTypes type) {
@@ -45,7 +46,7 @@ public class TagSmelting extends AbstractTag {
             for(String id:changeContext.getBlockChanges().keySet()){
                 if(changeContext.getBlockChange(id).get().getBlockChangeType() == BlockChangeContext.BlockChangeType.BREAK){
                     if(Arrays.asList(SMELT_ORES.keySet().toArray(new BlockType[0])).contains(changeContext.getBlockChange(id).get().getBlock().getState().getType())){
-                        changeContext.getBlockChange(id).get().setDrops((ArrayList<ItemStackSnapshot>) Arrays.asList(SMELT_ORES.get(changeContext.getBlockChange(id).get().getBlock().getState().getType())));
+                        changeContext.getBlockChange(id).get().setDrops((ArrayList<BlockDestroyLootEntry>) Arrays.asList(SMELT_ORES.get(changeContext.getBlockChange(id).get().getBlock().getState().getType())));
                     }
                 }
             }
