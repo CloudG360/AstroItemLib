@@ -9,6 +9,7 @@ import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockChangeConte
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Stops an item from breaking a block when used
@@ -26,7 +27,7 @@ public class TagDoubler extends AbstractTag {
             for(String id:changeContext.getBlockChanges().keySet()){
                 BlockChangeContext.BlockChange change = changeContext.getBlockChange(id).get();
                 if(change.getBlockChangeType() == BlockChangeContext.BlockChangeType.BREAK){
-                    ArrayList<BlockDestroyLootEntry> loot = change.getDrops();
+                    List<BlockDestroyLootEntry> loot = change.getDrops();
                     if(loot.size() == 0){ loot.add(new BlockDestroyLootEntry(false)); }
                     loot.addAll(new ArrayList<>(loot));
                 }
