@@ -1,6 +1,7 @@
 package fun.mooncraftgames.luna.astroitemlib.utilities;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
@@ -201,6 +202,9 @@ public class Utils {
 
     public static String generateLocationID(Location<World> loc){
         return String.format("%s:%f,%f,%f", loc.getExtent(), Math.floor(loc.getX()), Math.floor(loc.getY()), Math.floor(loc.getZ()));
+    }
+    public static String generateLocationIDV3i(Vector3i position){
+        return String.format("%s-%s-%s", position.getX(), position.getY(), position.getZ());
     }
 
     public static void fillInventory(Inventory inventory, ItemStack[] items){

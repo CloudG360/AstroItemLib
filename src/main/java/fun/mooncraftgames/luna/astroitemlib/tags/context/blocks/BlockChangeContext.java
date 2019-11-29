@@ -102,6 +102,7 @@ public class BlockChangeContext extends ExecutionContext {
         private boolean isOriginalTransaction;
         private boolean isCancelled;
         private boolean isModified;
+        private boolean isVanillaDropsCancelled;
         private ArrayList<BlockDestroyLootEntry> itemDrops;
         private BlockSnapshot block;
         private BlockChangeType blockChangeType;
@@ -133,8 +134,10 @@ public class BlockChangeContext extends ExecutionContext {
             this.isModified = true;
             BlockSnapshot b = blockin == null ? BlockSnapshot.builder().blockState(BlockState.builder().blockType(BlockTypes.AIR).build()).build() : blockin;
             if(b.getState().getType() == BlockTypes.AIR){
+                if(blockChangeType == BlockChangeType.PLACE) { return false; }
                 blockChangeType = BlockChangeType.BREAK; this.block = originalb;
             } else {
+                if(blockChangeType == BlockChangeType.BREAK) { return false; }
                 blockChangeType = BlockChangeType.PLACE; this.block = b;
             }
             return true;
@@ -151,6 +154,7 @@ public class BlockChangeContext extends ExecutionContext {
         public void setCancelled(boolean cancelled) { this.isModified = true; this.isCancelled = cancelled; }
         /** @param itemDrops Sets what the change's block (If of type BREAK) will drop if it's destroyed. If empty, it drops the regular drops. */
         public void setDrops(ArrayList<BlockDestroyLootEntry> itemDrops) { this.isModified = true;this.itemDrops = itemDrops; }
+        public void setVanillaDropsCancelled(boolean vanillaDropsCancelled) { isVanillaDropsCancelled = vanillaDropsCancelled; }
 
         public void setDropsAsVanilla() {
             this.isModified = true;
@@ -170,6 +174,11 @@ public class BlockChangeContext extends ExecutionContext {
         public boolean isCancelled() { return isCancelled; }
         /** @return boolean of if a block change has been modified (Or if it was added by a tag)*/
         public boolean isModified() { return isModified; }
+        /** @return if the vanilla drops of a block should be cancelled or not*/
+        public boolean isVanillaDropsCancelled() {
+            return isVanillaDropsCancelled;
+        }
+
         /** @return list of what a block (If set to be broken) will drop.*/
         public ArrayList<BlockDestroyLootEntry> getDrops() { return itemDrops; }
         /** @return BlockSnapshot of the block either being broke or being placed.*/

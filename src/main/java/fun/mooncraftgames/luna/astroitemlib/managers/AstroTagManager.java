@@ -4,7 +4,9 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import fun.mooncraftgames.luna.astroforgebridge.AstroForgeBridge;
 import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
+import fun.mooncraftgames.luna.astroitemlib.data.AstroItemData;
 import fun.mooncraftgames.luna.astroitemlib.data.AstroKeys;
+import fun.mooncraftgames.luna.astroitemlib.data.impl.AstroItemDataImpl;
 import fun.mooncraftgames.luna.astroitemlib.tags.*;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockChangeContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockInteractContext;
@@ -38,6 +40,7 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.ItemTypes;
@@ -58,15 +61,12 @@ public class AstroTagManager {
 
     private Map<String, AbstractTag> tagMap;
     private List<UUID> tagProcessors;
-
-    private boolean overrideLeftClick;
-    private boolean overrideRightClick;
+    private List<String> ignoreBlockDrops;
 
     public AstroTagManager(){
         this.tagMap = new HashMap<>();
         this.tagProcessors = new ArrayList<>();
-        overrideLeftClick = false;
-        overrideRightClick = false;
+        this.ignoreBlockDrops = new ArrayList<>();
     }
 
     public AstroTagManager registerTag(AbstractTag tag){
@@ -522,9 +522,17 @@ public class AstroTagManager {
 
     //TODO: Add the ability to modify block transactions. Cancel changes on the original list if conflicted.
 
-    @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) { overrideRightClick = true; onBlockEditCommon(event, player); }
+    @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) { onBlockEditCommon(event, player); }
 
-    @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) { overrideLeftClick = true; onBlockEditCommon(event, player); }
+    @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) { onBlockEditCommon(event, player); }
+
+    @Listener(beforeModifications = true, order = Order.LATE)
+    public void onBlockItemCatch(DropItemEvent.Destruct event, @First BlockSnapshot blockSnapshot){
+        if(ignoreBlockDrops.contains(Utils.generateLocationIDV3i(blockSnapshot.getPosition()))){
+            event.setCancelled(true);
+            ignoreBlockDrops.remove(Utils.generateLocationIDV3i(blockSnapshot.getPosition()));
+        }
+    }
 
     // Should not have @Listener
     private void onBlockEditCommon(ChangeBlockEvent event, Player player) {
@@ -561,25 +569,32 @@ public class AstroTagManager {
                 boolean result = true;
                 if(t.getType() == ExecutionTypes.BLOCK_CHANGE) { result = t.run(ExecutionTypes.BLOCK_CHANGE, tag, istack, changecontext); }
                 if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
-                if(!result) return;
+                if(!result) break;
             }
         }
 
         if(usedContext.isCancelled()) { event.setCancelled(true); return; }
         if(changecontext.areAllChangesCancelled()) { event.setCancelled(true); return; }
         ArrayList<Transaction<BlockSnapshot>> originalBlockChanges = new ArrayList<>(event.getTransactions());
-        AstroItemLib.getLogger().info(Arrays.toString(originalBlockChanges.toArray()));
         for(BlockChangeContext.BlockChange blockChange : changecontext.getBlockChanges().values()){
             if(blockChange.isOriginalTransaction()){
                 Optional<Transaction<BlockSnapshot>> t = originalBlockChanges.stream().filter(change -> change.getOriginal().getPosition() == blockChange.getOriginalBlock().getPosition()).findFirst();
                 if(!t.isPresent()){ AstroItemLib.getLogger().warn("Uh oh? A block change is missing? Someone messed up somehow. Skipping..."); continue; }
-                if(blockChange.isCancelled()) { t.get().setValid(false); }
+                if(blockChange.isCancelled()) { t.get().setValid(false); continue; }
                 if(blockChange.isModified()){
-                    t.get().setValid(false);
                     Vector3i blockpos = blockChange.getBlock().getPosition();
-                    if(!AstroForgeBridge.canBreakBlock(player, blockpos.getX(), blockpos.getY(), blockpos.getZ())) continue;
-                    if(!digBlock(blockChange, tool, player)) continue;
-                    if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){ placeBlock(blockChange, player); }
+                    if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.BREAK)){
+                        if(!AstroForgeBridge.canBreakBlock(player, blockpos.getX(), blockpos.getY(), blockpos.getZ())){ continue;}
+                        digBlock(blockChange, tool, player);
+                        //placeBlock(blockChange, player);
+                    } else {
+                        if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){
+
+                            if(!AstroForgeBridge.canBreakBlock(player, blockpos.getX(), blockpos.getY(), blockpos.getZ())){ continue;}
+                            if(!digBlock(blockChange, tool, player)){ continue;}
+                            placeBlock(blockChange, player);
+                        }
+                    }
                 }
             } else {
                 if(blockChange.isCancelled()) continue;
@@ -591,7 +606,7 @@ public class AstroTagManager {
         }
     }
 
-    private static void placeBlock(BlockChangeContext.BlockChange blockChange, Player player){
+    private boolean placeBlock(BlockChangeContext.BlockChange blockChange, Player player){
         if(AstroItemLib.getGriefPrevention().isPresent()){
             GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
             Claim claim = api.getClaimManager(player.getLocation().getExtent()).getClaimAt(blockChange.getBlock().getLocation().get());
@@ -600,24 +615,30 @@ public class AstroTagManager {
         }
         DirectionalData data = Sponge.getDataManager().getManipulatorBuilder(DirectionalData.class).get().create();
         data.direction().set(blockChange.getDirection());
-        player.getLocation().getExtent().setBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState().with(data.asImmutable()).get());
+        player.getLocation().getExtent().setBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState(), BlockChangeFlags.ALL);
+        return true;
     }
-    private static boolean digBlock(BlockChangeContext.BlockChange blockChange, ItemStack tool, Player player){
+    private boolean digBlock(BlockChangeContext.BlockChange blockChange, ItemStack t, Player player){
+        //TODO: Remove item data temporarily
         if(AstroItemLib.getGriefPrevention().isPresent()){
             GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
             Claim claim = api.getClaimManager(player.getWorld()).getClaimAt(blockChange.getBlock().getLocation().get());
             Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
             AstroItemLib.getLogger().info(Arrays.toString(placeperms.keySet().toArray(new String[0])));
         }
+        ItemStack tool = t.copy();
+        AstroItemData adat = tool.getOrCreate(AstroItemDataImpl.class).orElse(new AstroItemDataImpl());
+        tool.offer(adat);
+        tool.offer(AstroKeys.FUNCTION_TAGS, Collections.singletonList("internal.ignored"));
         Vector3i loc = blockChange.getBlock().getPosition();
         if(blockChange.getDrops().size() == 0) {
             //player.getLocation().getExtent().digBlock(blockChange.getBlock().getPosition(), player.getProfile());
             AstroForgeBridge.digBlock(player, tool, loc.getX(), loc.getY(), loc.getZ());
         } else {
+            ignoreBlockDrops.add(Utils.generateLocationIDV3i(blockChange.getBlock().getPosition()));
             if(!(AstroForgeBridge.canBreakBlock(player, loc.getX(), loc.getY(), loc.getZ()))) return false;
             player.getLocation().getExtent().spawnParticles(ParticleEffect.builder()
-                    .velocity(new Vector3d(0, 0.1, 0))
-                    .offset(new Vector3d(0.5, 0.5, 0.5))
+                    .velocity(new Vector3d(0, 0, 0))
                     .type(ParticleTypes.BREAK_BLOCK)
                     .option(ParticleOptions.BLOCK_STATE, blockChange.getBlock().getState())
                     .build(), blockChange.getBlock().getPosition().toDouble());
@@ -626,15 +647,15 @@ public class AstroTagManager {
                 switch (item.getType()){
                     case SUPPLYLOOT:
                         item.getLootTable().ifPresent(loot -> {
-                            for(ItemStack stack : loot.rollLootPool(-1)){ Utils.dropItem(blockChange.getBlock().getLocation().get(), stack.createSnapshot(), 15); }
+                            for(ItemStack stack : loot.rollLootPool(-1)){ Utils.dropItem(blockChange.getBlock().getLocation().get(), stack.createSnapshot(), 5); }
                         });
                         break;
                     case VANILLADROPS:
                         AstroForgeBridge.dropBlock(player, tool, loc.getX(), loc.getY(), loc.getZ());
                         break;
                     case ITEMSTACKSNAPSHOT:
-                        item.getItemStack().ifPresent(snapshot -> {
-                            Utils.dropItem(blockChange.getBlock().getLocation().get(), snapshot, 15);
+                        item.getItemStack().ifPresent(it -> {
+                            Utils.dropItem(blockChange.getBlock().getLocation().get(), it, 5);
                         });
                         break;
                 }

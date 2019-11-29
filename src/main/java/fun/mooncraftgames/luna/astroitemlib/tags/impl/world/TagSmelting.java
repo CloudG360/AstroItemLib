@@ -46,6 +46,7 @@ public class TagSmelting extends AbstractTag {
             for(String id:changeContext.getBlockChanges().keySet()){
                 if(changeContext.getBlockChange(id).get().getBlockChangeType() == BlockChangeContext.BlockChangeType.BREAK){
                     if(Arrays.asList(SMELT_ORES.keySet().toArray(new BlockType[0])).contains(changeContext.getBlockChange(id).get().getBlock().getState().getType())){
+                        changeContext.getBlockChange(id).get().setDropsAsAir();
                         changeContext.getBlockChange(id).get().setDrops(new ArrayList<>(Arrays.asList(SMELT_ORES.get(changeContext.getBlockChange(id).get().getBlock().getState().getType()))));
                     }
                 }

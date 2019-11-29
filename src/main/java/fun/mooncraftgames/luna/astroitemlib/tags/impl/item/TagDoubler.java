@@ -29,6 +29,7 @@ public class TagDoubler extends AbstractTag {
                     ArrayList<BlockDestroyLootEntry> loot = change.getDrops();
                     if(loot.size() == 0){ loot.add(new BlockDestroyLootEntry(false)); }
                     loot.addAll(new ArrayList<>(loot));
+                    change.setDrops(loot);
                 }
             }
         }
