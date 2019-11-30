@@ -44,6 +44,7 @@ public class BlockChangeContext extends ExecutionContext {
     /** @return String id. Empty if block change failed. */
     public Optional<String> registerBlockPlaceChange(Location<World> location, BlockState replacement) {
         if(replacement.getType() == BlockTypes.AIR) return Optional.empty();
+        if(location.getBlock().getType() != BlockTypes.AIR) return Optional.empty();
         BlockSnapshot o = location.getBlock().snapshotFor(location);
         BlockSnapshot f = replacement.snapshotFor(location);
         String id = generateBlockID(f);
@@ -153,20 +154,15 @@ public class BlockChangeContext extends ExecutionContext {
         /** @param cancelled Sets the block change as cancelled.*/
         public void setCancelled(boolean cancelled) { this.isModified = true; this.isCancelled = cancelled; }
         /** @param itemDrops Sets what the change's block (If of type BREAK) will drop if it's destroyed. If empty, it drops the regular drops. */
-        public void setDrops(ArrayList<BlockDestroyLootEntry> itemDrops) { this.isModified = true;this.itemDrops = itemDrops; }
+        public void setAdditionalDrops(ArrayList<BlockDestroyLootEntry> itemDrops) { this.isModified = true; this.itemDrops = itemDrops; }
+        /** @param vanillaDropsCancelled Sets if the vanilla drop should be cancelled or not. */
         public void setVanillaDropsCancelled(boolean vanillaDropsCancelled) { isVanillaDropsCancelled = vanillaDropsCancelled; }
 
-        public void setDropsAsVanilla() {
+        public void clearAdditionalDrops() {
             this.isModified = true;
             this.itemDrops = new ArrayList<>();
             this.itemDrops.add(new BlockDestroyLootEntry(false));
         }
-        public void setDropsAsAir() {
-            this.isModified = true;
-            this.itemDrops = new ArrayList<>();
-            this.itemDrops.add(new BlockDestroyLootEntry(true));
-        }
-
 
         /** @return boolean indicating if the change came from the sponge event or not.*/
         public boolean isOriginalTransaction() { return isOriginalTransaction; }
@@ -179,8 +175,8 @@ public class BlockChangeContext extends ExecutionContext {
             return isVanillaDropsCancelled;
         }
 
-        /** @return list of what a block (If set to be broken) will drop.*/
-        public ArrayList<BlockDestroyLootEntry> getDrops() { return itemDrops; }
+        /** @return list of what a block (If set to be broken) will drop as well as it's original drops.*/
+        public ArrayList<BlockDestroyLootEntry> getAdditionalDrops() { return itemDrops; }
         /** @return BlockSnapshot of the block either being broke or being placed.*/
         public BlockSnapshot getBlock() { return block; }
         /** @return BlockChangeType of if it's a destroy action or a place.*/
