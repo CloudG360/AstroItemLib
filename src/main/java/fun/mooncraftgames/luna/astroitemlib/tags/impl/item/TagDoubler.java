@@ -26,10 +26,10 @@ public class TagDoubler extends AbstractTag {
             for(String id:changeContext.getBlockChanges().keySet()){
                 BlockChangeContext.BlockChange change = changeContext.getBlockChange(id).get();
                 if(change.getBlockChangeType() == BlockChangeContext.BlockChangeType.BREAK){
-                    ArrayList<BlockDestroyLootEntry> loot = change.getDrops();
-                    if(loot.size() == 0){ loot.add(new BlockDestroyLootEntry(false)); }
-                    loot.addAll(new ArrayList<>(loot));
-                    change.setDrops(loot);
+                    ArrayList<BlockDestroyLootEntry> loot = change.getAdditionalDrops();
+                    if(loot.size() != 0) { loot.addAll(new ArrayList<>(loot)); }
+                    loot.add(new BlockDestroyLootEntry(false));
+                    change.setAdditionalDrops(loot);
                 }
             }
         }
