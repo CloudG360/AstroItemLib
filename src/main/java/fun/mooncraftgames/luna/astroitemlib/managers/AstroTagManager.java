@@ -1,13 +1,15 @@
 package fun.mooncraftgames.luna.astroitemlib.managers;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import fun.mooncraftgames.luna.astroforgebridge.AstroForgeBridge;
 import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
 import fun.mooncraftgames.luna.astroitemlib.data.AstroItemData;
 import fun.mooncraftgames.luna.astroitemlib.data.AstroKeys;
 import fun.mooncraftgames.luna.astroitemlib.data.impl.AstroItemDataImpl;
-import fun.mooncraftgames.luna.astroitemlib.tags.*;
+import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
+import fun.mooncraftgames.luna.astroitemlib.tags.ClickType;
+import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
+import fun.mooncraftgames.luna.astroitemlib.tags.InventoryChangeStates;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockChangeContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockInteractContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.entities.EntityHitContext;
@@ -18,17 +20,11 @@ import fun.mooncraftgames.luna.astroitemlib.tasks.interfaces.IAstroTask;
 import fun.mooncraftgames.luna.astroitemlib.utilities.Utils;
 import me.ryanhamshire.griefprevention.api.GriefPreventionApi;
 import me.ryanhamshire.griefprevention.api.claim.Claim;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
-import org.spongepowered.api.data.manipulator.mutable.block.DirectionalData;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.effect.particle.ParticleEffect;
-import org.spongepowered.api.effect.particle.ParticleOptions;
-import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
@@ -578,7 +574,34 @@ public class AstroTagManager {
         if(changecontext.areAllChangesCancelled()) { event.setCancelled(true); return; }
         ArrayList<Transaction<BlockSnapshot>> originalBlockChanges = new ArrayList<>(event.getTransactions());
         for(BlockChangeContext.BlockChange blockChange : changecontext.getBlockChanges().values()){
-
+            if(blockChange.isCancelled()){
+                if(blockChange.isOriginalTransaction()){
+                    Optional<Transaction<BlockSnapshot>> t = originalBlockChanges.stream().filter(change -> change.getOriginal().getPosition() == blockChange.getOriginalBlock().getPosition()).findFirst();
+                    if(!t.isPresent()){ AstroItemLib.getLogger().warn("Uh oh? An original block change is missing? Someone messed up somehow. Skipping..."); continue; }
+                    t.get().setValid(false);
+                } else { continue; }
+            }
+            if(blockChange.getBlockChangeType() == BlockChangeContext.BlockChangeType.BREAK){
+                //TODO: Do drop checks (Vanilla cancelled? - Add to list), then break block, then handle custom drops 1 tick later
+                //TODO: Update forge bridge
+                ItemStack placeholder = tool.copy();
+                AstroItemData adat = placeholder.getOrCreate(AstroItemDataImpl.class).orElse(new AstroItemDataImpl());
+                placeholder.offer(adat);
+                placeholder.offer(AstroKeys.FUNCTION_TAGS, Collections.singletonList("internal.ignored"));
+                Vector3i loc = blockChange.getBlock().getPosition();
+                if(blockChange.isVanillaDropsCancelled()) ignoreBlockDrops.add(Utils.generateLocationIDV3i(blockChange.getBlock().getPosition()));
+                boolean broken = true;
+                if(blockChange.isModified()){
+                    broken = digBlock(blockChange, placeholder, player);
+                    if(broken){
+                        dropBlock(blockChange, player, placeholder, loc);
+                    } else {
+                        if(blockChange.isVanillaDropsCancelled()) ignoreBlockDrops.remove(Utils.generateLocationIDV3i(blockChange.getBlock().getPosition()));
+                    }
+                }
+            } else { // Else it's placed
+                placeBlock(blockChange, player);
+            }
 
 
             /*if(blockChange.isOriginalTransaction()){
@@ -588,8 +611,6 @@ public class AstroTagManager {
                 if(blockChange.isModified()){
                     Vector3i blockpos = blockChange.getBlock().getPosition();
                     if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.BREAK)){
-                        //TODO: Do drop checks (Vanilla cancelled? - Add to list), then break block, then handle custom drops 1 tick later
-                        //TODO: Update forge bridge
                         if(!AstroForgeBridge.canBreakBlock(player, blockpos.getX(), blockpos.getY(), blockpos.getZ())){ continue;}
                         digBlock(blockChange, tool, player);
                         //placeBlock(blockChange, player);
@@ -613,8 +634,8 @@ public class AstroTagManager {
             Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
             AstroItemLib.getLogger().info(Utils.dataToMap(placeperms));
         }
-        DirectionalData data = Sponge.getDataManager().getManipulatorBuilder(DirectionalData.class).get().create();
-        data.direction().set(blockChange.getDirection());
+        //DirectionalData data = Sponge.getDataManager().getManipulatorBuilder(DirectionalData.class).get().create();
+        //data.direction().set(blockChange.getDirection());
         player.getLocation().getExtent().setBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState(), BlockChangeFlags.ALL);
         return true;
     }
@@ -631,39 +652,14 @@ public class AstroTagManager {
         tool.offer(adat);
         tool.offer(AstroKeys.FUNCTION_TAGS, Collections.singletonList("internal.ignored"));
         Vector3i loc = blockChange.getBlock().getPosition();
-        if(blockChange.getDrops().size() == 0) {
-            //player.getLocation().getExtent().digBlock(blockChange.getBlock().getPosition(), player.getProfile());
-            AstroForgeBridge.digBlock(player, tool, loc.getX(), loc.getY(), loc.getZ());
-        } else {
-            ignoreBlockDrops.add(Utils.generateLocationIDV3i(blockChange.getBlock().getPosition()));
-            if(!(AstroForgeBridge.canBreakBlock(player, loc.getX(), loc.getY(), loc.getZ()))) return false;
-            player.getLocation().getExtent().spawnParticles(ParticleEffect.builder()
-                    .velocity(new Vector3d(0, 0, 0))
-                    .type(ParticleTypes.BREAK_BLOCK)
-                    .option(ParticleOptions.BLOCK_STATE, blockChange.getBlock().getState())
-                    .build(), blockChange.getBlock().getPosition().toDouble());
-            player.getLocation().getExtent().setBlock(blockChange.getBlock().getPosition(), BlockState.builder().blockType(BlockTypes.AIR).build(), BlockChangeFlags.ALL);
-            for(BlockDestroyLootEntry item:blockChange.getDrops()){
-                switch (item.getType()){
-                    case SUPPLYLOOT:
-                        item.getLootTable().ifPresent(loot -> {
-                            for(ItemStack stack : loot.rollLootPool(-1)){ Utils.dropItem(blockChange.getBlock().getLocation().get(), stack.createSnapshot(), 5); }
-                        });
-                        break;
-                    case VANILLADROPS:
-                        AstroForgeBridge.dropBlock(player, tool, loc.getX(), loc.getY(), loc.getZ());
-                        break;
-                    case ITEMSTACKSNAPSHOT:
-                        item.getItemStack().ifPresent(it -> {
-                            Utils.dropItem(blockChange.getBlock().getLocation().get(), it, 5);
-                        });
-                        break;
-                }
-                //Utils.dropItem(blockChange.getBlock().getLocation().get(), item, 15);
-            }
-        }
-        return true;
+        //player.getLocation().getExtent().digBlock(blockChange.getBlock().getPosition(), player.getProfile());
+        return AstroForgeBridge.digBlock(player, tool, loc.getX(), loc.getY(), loc.getZ());
     }
+
+    private void dropBlock(BlockChangeContext.BlockChange blockChange, Player player, ItemStack tool, Vector3i loc){
+        AstroForgeBridge.dropBlock(player, tool, loc.getX(), loc.getY(), loc.getZ());
+    }
+
     /*
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player){
