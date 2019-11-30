@@ -542,6 +542,7 @@ public class AstroTagManager {
         Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
         if(!tgs.isPresent()) return;
         List<String> tags = tgs.get();
+        if(tags.size() == 1){ if(tgs.get().get(0).equals("internal.ignored")) return; } // Skip if it's an internal item for harvesting calculations
         String[] otags = orderedTags(tags.toArray(new String[0]));
         HandType handType = HandTypes.OFF_HAND;
         if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
@@ -577,13 +578,18 @@ public class AstroTagManager {
         if(changecontext.areAllChangesCancelled()) { event.setCancelled(true); return; }
         ArrayList<Transaction<BlockSnapshot>> originalBlockChanges = new ArrayList<>(event.getTransactions());
         for(BlockChangeContext.BlockChange blockChange : changecontext.getBlockChanges().values()){
-            if(blockChange.isOriginalTransaction()){
+
+
+
+            /*if(blockChange.isOriginalTransaction()){
                 Optional<Transaction<BlockSnapshot>> t = originalBlockChanges.stream().filter(change -> change.getOriginal().getPosition() == blockChange.getOriginalBlock().getPosition()).findFirst();
                 if(!t.isPresent()){ AstroItemLib.getLogger().warn("Uh oh? A block change is missing? Someone messed up somehow. Skipping..."); continue; }
                 if(blockChange.isCancelled()) { t.get().setValid(false); continue; }
                 if(blockChange.isModified()){
                     Vector3i blockpos = blockChange.getBlock().getPosition();
                     if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.BREAK)){
+                        //TODO: Do drop checks (Vanilla cancelled? - Add to list), then break block, then handle custom drops 1 tick later
+                        //TODO: Update forge bridge
                         if(!AstroForgeBridge.canBreakBlock(player, blockpos.getX(), blockpos.getY(), blockpos.getZ())){ continue;}
                         digBlock(blockChange, tool, player);
                         //placeBlock(blockChange, player);
@@ -596,13 +602,7 @@ public class AstroTagManager {
                         }
                     }
                 }
-            } else {
-                if(blockChange.isCancelled()) continue;
-                Vector3i blockpos = blockChange.getBlock().getPosition();
-                if(!AstroForgeBridge.canBreakBlock(player, blockpos.getX(), blockpos.getY(), blockpos.getZ())) continue;
-                if(!digBlock(blockChange, tool, player)) continue;
-                if(blockChange.getBlockChangeType().equals(BlockChangeContext.BlockChangeType.PLACE)){ placeBlock(blockChange, player); }
-            }
+            }*/
         }
     }
 
