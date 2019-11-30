@@ -176,7 +176,7 @@ public class BlockChangeContext extends ExecutionContext {
         }
 
         /** @return list of what a block (If set to be broken) will drop as well as it's original drops.*/
-        public ArrayList<BlockDestroyLootEntry> getAdditionalDrops() { return itemDrops; }
+        public ArrayList<BlockDestroyLootEntry> getAdditionalDrops() { return new ArrayList<>(itemDrops); }
         /** @return BlockSnapshot of the block either being broke or being placed.*/
         public BlockSnapshot getBlock() { return block; }
         /** @return BlockChangeType of if it's a destroy action or a place.*/
