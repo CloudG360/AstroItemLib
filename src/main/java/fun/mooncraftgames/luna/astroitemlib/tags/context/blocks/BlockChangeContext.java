@@ -149,12 +149,12 @@ public class BlockChangeContext extends ExecutionContext {
         /** Internal method used by registering. */
         private void setOriginalType(BlockChangeType originalType) { this.originalType = originalType; }
 
-        /** @param direction Sets the direction of a block change.*/
-        public void setDirection(Direction direction) { this.isModified = true; this.direction = direction; }
+        // /** @param direction Sets the direction of a block change.*/
+        // public void setDirection(Direction direction) { this.isModified = true; this.direction = direction; }
         /** @param cancelled Sets the block change as cancelled.*/
-        public void setCancelled(boolean cancelled) { this.isModified = true; this.isCancelled = cancelled; }
+        public void setCancelled(boolean cancelled) { this.isCancelled = cancelled; }
         /** @param itemDrops Sets what the change's block (If of type BREAK) will drop if it's destroyed. If empty, it drops the regular drops. */
-        public void setAdditionalDrops(ArrayList<BlockDestroyLootEntry> itemDrops) { this.isModified = true; this.itemDrops = itemDrops; }
+        public void setAdditionalDrops(ArrayList<BlockDestroyLootEntry> itemDrops) { this.itemDrops = itemDrops; }
         /** @param vanillaDropsCancelled Sets if the vanilla drop should be cancelled or not. */
         public void setVanillaDropsCancelled(boolean vanillaDropsCancelled) { isVanillaDropsCancelled = vanillaDropsCancelled; }
 
