@@ -149,6 +149,9 @@ public class SupplyLoot {
         return this;
     }
 
+    public void setMinrolls(Integer minrolls) { this.minrolls = minrolls; }
+    public void setMaxrolls(Integer maxrolls) { this.maxrolls = maxrolls; }
+
     public ItemStack[] getLastRoll() { return lastRoll; }
     public SupplyRoll[] getLootpool() { return lootpool; }
     public String getId() { return id; }
