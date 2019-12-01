@@ -6,8 +6,6 @@ import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.effect.particle.ParticleEffect;
-import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
@@ -124,14 +122,6 @@ public class Utils {
      *
      */
     public static void dropItem (Location<World> loc, ItemStackSnapshot snapshot, int delay){
-
-        //double yaw = player.getHeadRotation().getY();
-        //Vector3d view = convertYawToWorld(yaw, distance);
-
-        //Vector3d velocity = new Vector3d(0.2, 0.05, 0.2).mul(view);
-
-        //AstroItemLib.getLogger().info(String.format("Yaw: %s, View: %s, Velocity: %s", yaw, view, velocity));
-
         Entity e = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
         e.offer(Keys.REPRESENTED_ITEM, snapshot);
         e.offer(Keys.PICKUP_DELAY, delay);
@@ -139,13 +129,6 @@ public class Utils {
             frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
             loc.getExtent().spawnEntity(e);
         }
-        loc.getExtent().spawnParticles(
-                ParticleEffect.builder()
-                        .type(ParticleTypes.BARRIER)
-                        .build(),
-                loc.getPosition()
-        );
-        //e.setVelocity(new Vector3d(0.2, 0.2, 0.2).mul(d));
     }
 
     public static void givePlayerItem(UUID uuid, ItemStackSnapshot snapshot){
