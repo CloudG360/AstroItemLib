@@ -25,6 +25,9 @@ import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -165,39 +168,18 @@ public class Utils {
 
     }
 
-    public static void messageToWorld(World world, Text text){
-        for(Player player:world.getPlayers()){
-            player.sendMessage(text);
-        }
-    }
+    public static void messageToWorld(World world, Text text){ for(Player player:world.getPlayers()){ player.sendMessage(text); } }
+    public static void messageToServer(Text text){ for(Player player: Sponge.getServer().getOnlinePlayers()){ player.sendMessage(text); } }
+    public static void soundToWorld(World world, SoundType type, double volume){ for(Player player:world.getPlayers()){ player.playSound(type, player.getPosition(), volume); } }
 
-    public static void messageToServer(Text text){
-        for(Player player: Sponge.getServer().getOnlinePlayers()){
-            player.sendMessage(text);
-        }
-    }
-
-    public static void soundToWorld(World world, SoundType type, double volume){
-        for(Player player:world.getPlayers()){
-            player.playSound(type, player.getPosition(), volume);
-        }
-    }
-
-    public static String generateLocationID(Location<World> loc){
-        return String.format("%s:%f,%f,%f", loc.getExtent(), Math.floor(loc.getX()), Math.floor(loc.getY()), Math.floor(loc.getZ()));
-    }
-    public static String generateLocationIDV3i(Vector3i position){
-        return String.format("%s-%s-%s", position.getX(), position.getY(), position.getZ());
-    }
+    public static String generateLocationID(Location<World> loc){ return String.format("%s:%f,%f,%f", loc.getExtent(), Math.floor(loc.getX()), Math.floor(loc.getY()), Math.floor(loc.getZ())); }
+    public static String generateLocationIDV3i(Vector3i position){ return String.format("%s-%s-%s", position.getX(), position.getY(), position.getZ()); }
 
     public static void fillInventory(Inventory inventory, ItemStack[] items){
         Iterator<Inventory> in = inventory.slots().iterator();
         int iterate = 0;
-
         for(ItemStack is:items) {
-            if(in.hasNext()){
-                InventoryTransactionResult t = in.next().set(is);
-            }
+            if(in.hasNext()){ InventoryTransactionResult t = in.next().set(is); }
         }
     }
 
@@ -310,5 +292,41 @@ public class Utils {
         return objs.toArray();
     }
 
+    public static String compareDateTimes(LocalDateTime early, LocalDateTime late){
+        Duration d = Duration.between(early, late);
+        String build = "";
+
+        long sec = d.get(ChronoUnit.SECONDS)+1;
+        long last = 0;
+
+        long days = 0;
+        last = sec;
+        sec = sec % (60 * 60 * 24);
+        if(last != sec) days = (last - sec) / (60 * 60 * 24);
+
+        long hours = 0;
+        last = sec;
+        sec = sec % (60 * 60);
+        if(last != sec) hours = (last - sec) / (60 * 60);
+
+        long minutes = 0;
+        last = sec;
+        sec = sec % 60;
+        if(last != sec) minutes = (last - sec) / 60;
+
+        long seconds = sec;
+
+        if(days > 0) build = build.concat(days + (days == 1 ? " day, " : " days, "));
+        if(hours > 0) build = build.concat(hours +  (hours == 1 ? " hour," : " hours, "));
+        if(minutes > 0) build = build.concat(minutes +  (minutes == 1 ? " minute," : " minutes, "));
+        if(seconds > 0) build = build.concat(seconds +  (seconds == 1 ? " second, " : " seconds, "));
+
+        if(build.length() < 4){
+            return " a very short time ";
+        }
+        else {
+            return build.substring(0, build.length()-2);
+        }
+    }
 
 }
