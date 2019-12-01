@@ -6,10 +6,8 @@ import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
 import fun.mooncraftgames.luna.astroitemlib.data.AstroItemData;
 import fun.mooncraftgames.luna.astroitemlib.data.AstroKeys;
 import fun.mooncraftgames.luna.astroitemlib.data.impl.AstroItemDataImpl;
-import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
-import fun.mooncraftgames.luna.astroitemlib.tags.ClickType;
-import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
-import fun.mooncraftgames.luna.astroitemlib.tags.InventoryChangeStates;
+import fun.mooncraftgames.luna.astroitemlib.loot.SupplyLoot;
+import fun.mooncraftgames.luna.astroitemlib.tags.*;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockChangeContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockInteractContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.entities.EntityHitContext;
@@ -42,6 +40,7 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
@@ -593,12 +592,33 @@ public class AstroTagManager {
                 boolean broken = true;
                 if(blockChange.isModified()){
                     broken = digBlock(blockChange, placeholder, player);
-                    if(broken){
-                        dropBlock(blockChange, player, placeholder, loc);
-                    } else {
+                    if(!broken) {
                         if(blockChange.isVanillaDropsCancelled()) ignoreBlockDrops.remove(Utils.generateLocationIDV3i(blockChange.getBlock().getPosition()));
                     }
                 }
+                Task drop = Task.builder().execute(r -> {
+                    for(BlockDestroyLootEntry entry: blockChange.getAdditionalDrops()){
+                        switch (entry.getType()){
+                            case SUPPLYLOOT:
+                                for(ItemStack lootentry: entry.getLootTable().orElse(new SupplyLoot().setToDefault()).rollLootPool(-1)){
+                                    Utils.dropItem(blockChange.getBlock().getLocation().get(), lootentry.createSnapshot(), 5);
+                                }
+                                break;
+                            case VANILLADROPS:
+                                dropBlock(blockChange, player, placeholder, blockChange.getBlock().getPosition());
+                                break;
+                            case ITEMSTACKSNAPSHOT:
+                                Utils.dropItem(
+                                        blockChange.getBlock().getLocation().get(),
+                                        entry.getItemStack().orElse(ItemStack.builder()
+                                                .itemType(ItemTypes.POISONOUS_POTATO)
+                                                .quantity(1)
+                                                .build().createSnapshot()),
+                                        5);
+                                break;
+                        }
+                    }
+                }).name("Drop Handler").delayTicks(2).submit(AstroItemLib.get());
             } else { // Else it's placed
                 placeBlock(blockChange, player);
             }
