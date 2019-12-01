@@ -143,6 +143,9 @@ public class SupplyLoot {
         dr.add(new SupplyRoll().setConfig( 1, 1, 1, true, 20,
                 new ItemTemplate().setConfig(null,"minecraft:web", null, null, new SerializableItemKeys().setConfig(null, true, false), new SerializableItemEnchantment[]{new SerializableItemEnchantment().setConfig("minecraft:fire_aspect", 7)})));
         this.lootpool = dr.toArray(new SupplyRoll[0]);
+        this.minrolls = 1;
+        this.maxrolls = 5;
+        this.verifyIntergirty();
         return this;
     }
 
