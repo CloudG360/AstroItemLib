@@ -125,6 +125,7 @@ public class BlockChangeContext extends ExecutionContext {
 
             this.block = blockChangeType == BlockChangeType.BREAK ? originalb : finalb;
             this.itemDrops = new ArrayList<>();
+            this.isVanillaDropsCancelled = false;
         }
 
         /**
