@@ -116,7 +116,9 @@ public class AstroTagManager {
         String processed = raw_tag.replace( "\\:", "{feature.colon}");
         processed = processed.replace( "\\,", "{feature.comma}");
 
-        String[] split = processed.split(Pattern.quote(":"));
+        String[] chunks = processed.split(Pattern.quote(":"));
+        if(chunks.length < 2){ return new String[0]; }
+        String[] split = chunks[1].split(Pattern.quote(","));
         String[] finalSplit = new String[split.length];
 
         for(int i = 0; i < split.length; i++){
@@ -154,7 +156,6 @@ public class AstroTagManager {
 
     // -----------------------------------------------------------------------------
 
-    //TODO: Pipeline 3.0, put all events through this.
     @Listener(beforeModifications = true, order = Order.DEFAULT)
     public void onGameEvent(Event e, @First Player player){
         if(e instanceof ChangeBlockEvent) return;
