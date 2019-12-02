@@ -23,7 +23,7 @@ public class TagDevTracking extends AbstractTag {
     }
 
     @Override
-    public boolean run(ExecutionTypes type, String tag, ItemStackSnapshot itemStack, ExecutionContext context) {
+    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context) {
         if(type == ExecutionTypes.ITEM_HOLDING){
             context.getPlayer().sendTitle(Title.builder()
                     .actionBar(Text.of(

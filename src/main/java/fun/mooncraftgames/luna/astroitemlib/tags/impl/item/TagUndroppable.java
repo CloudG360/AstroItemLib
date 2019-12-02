@@ -14,7 +14,7 @@ public class TagUndroppable extends AbstractTag {
     }
 
     @Override
-    public boolean run(ExecutionTypes type, String tag, ItemStackSnapshot itemStack, ExecutionContext context) {
+    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context) {
         if(type == ExecutionTypes.ITEM_DROPPED){
             DroppedContext d = (DroppedContext) context;
             d.getEvent().setCancelled(true);

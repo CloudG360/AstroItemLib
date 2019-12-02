@@ -21,7 +21,7 @@ public class TagDevCookie extends AbstractTag {
     }
 
     @Override
-    public boolean run(ExecutionTypes type, String tag, ItemStackSnapshot itemStack, ExecutionContext context) {
+    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context) {
         if(getType() == ExecutionTypes.ITEM_USED){
             context.getPlayer().getInventory().offer(ItemStack.builder().itemType(ItemTypes.COOKIE).build());
         }

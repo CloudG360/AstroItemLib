@@ -17,7 +17,7 @@ public class TagStopBreakBlock extends AbstractTag {
     }
 
     @Override
-    public boolean run(ExecutionTypes type, String tag, ItemStackSnapshot itemStack, ExecutionContext context) {
+    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context) {
         if(type == ExecutionTypes.BLOCK_CHANGE){
             BlockChangeContext changeContext = ((BlockChangeContext) context);
             for(String id:changeContext.getBlockChanges().keySet()){
