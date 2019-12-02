@@ -20,6 +20,7 @@ import fun.mooncraftgames.luna.astroitemlib.data.impl.ImmutableAstroItemDataImpl
 import fun.mooncraftgames.luna.astroitemlib.exceptions.MalformedLootPoolException;
 import fun.mooncraftgames.luna.astroitemlib.items.ItemTemplate;
 import fun.mooncraftgames.luna.astroitemlib.loot.SupplyLoot;
+import fun.mooncraftgames.luna.astroitemlib.managers.AstroCooldownManager;
 import fun.mooncraftgames.luna.astroitemlib.managers.AstroItemManager;
 import fun.mooncraftgames.luna.astroitemlib.managers.AstroTagManager;
 import fun.mooncraftgames.luna.astroitemlib.managers.TaskManager;
@@ -35,6 +36,7 @@ import fun.mooncraftgames.luna.astroitemlib.tags.impl.item.TagUndroppable;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.world.TagSmelting;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.world.TagStopBreakBlock;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.world.TagUnplaceable;
+import fun.mooncraftgames.luna.astroitemlib.tasks.CooldownGCTask;
 import me.ryanhamshire.griefprevention.GriefPrevention;
 import me.ryanhamshire.griefprevention.api.GriefPreventionApi;
 import org.slf4j.Logger;
@@ -84,6 +86,7 @@ public class AstroItemLib {
 
     private AstroItemManager astroItemManager;
     private AstroTagManager astroTagManager;
+    private AstroCooldownManager astroCooldownManager;
     private TaskManager taskManager;
 
     private GriefPreventionApi griefPrevention;
@@ -158,6 +161,7 @@ public class AstroItemLib {
         plg = this;
         astroItemManager = new AstroItemManager();
         astroTagManager = new AstroTagManager();
+        astroCooldownManager = new AstroCooldownManager();
         taskManager = new TaskManager();
 
         taskManager.startTaskManager();
@@ -170,7 +174,6 @@ public class AstroItemLib {
         } catch (Exception err){
             this.griefPrevention = null;
         }
-
         // -- TAG REGISTERING --
 
         getAstroTagManager()
@@ -190,6 +193,8 @@ public class AstroItemLib {
                 .registerTag(new TagUndroppable("undroppable", TagPriority.HIGH, ExecutionTypes.ITEM_DROPPED));
 
         Sponge.getEventManager().registerListeners(this, astroTagManager);
+
+        taskManager.registerTask(new CooldownGCTask());
     }
 
     @Listener
@@ -333,6 +338,7 @@ public class AstroItemLib {
     public static PluginContainer getContainer() { return plg.getPlgContainer(); }
     public static AstroItemManager getAstroManager() { return plg.getAstroItemManager(); }
     public static AstroTagManager getTagManager() { return plg.getAstroTagManager(); }
+    public static AstroCooldownManager getCooldownManager() { return plg.getAstroCooldownManager(); }
     public static TaskManager getTaskManager() { return plg.getAstroTaskManager(); }
     public static Optional<GriefPreventionApi> getGriefPrevention() { return plg.getGriefPreventionApi(); }
 
@@ -340,6 +346,7 @@ public class AstroItemLib {
     public PluginContainer getPlgContainer() { return pluginContainer; }
     public AstroItemManager getAstroItemManager() { return astroItemManager; }
     public AstroTagManager getAstroTagManager() { return astroTagManager; }
+    public AstroCooldownManager getAstroCooldownManager() { return astroCooldownManager; }
     public TaskManager getAstroTaskManager() { return taskManager; }
     public Optional<GriefPreventionApi> getGriefPreventionApi() { return Optional.ofNullable(griefPrevention); }
 }
