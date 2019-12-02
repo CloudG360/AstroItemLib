@@ -2,6 +2,7 @@ package fun.mooncraftgames.luna.astroitemlib.tasks;
 
 import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
 import fun.mooncraftgames.luna.astroitemlib.data.AstroKeys;
+import fun.mooncraftgames.luna.astroitemlib.managers.AstroTagManager;
 import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
 import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.item.HoldingContext;
@@ -60,9 +61,10 @@ public class RunnableManageContinousTags implements IAstroTask {
                         for (String tag : otags) {
                             if (AstroItemLib.getTagManager().getTag(tag).isPresent()) {
                                 AbstractTag t = AstroItemLib.getTagManager().getTag(tag).get();
+                                String[] arguments = AstroTagManager.getTagArguments(tag);
                                 boolean result = true;
                                 if (t.getType() == ExecutionTypes.ITEM_HOLDING) {
-                                    result = t.run(ExecutionTypes.ITEM_HOLDING, tag, istack, new HoldingContext(player, HandTypes.MAIN_HAND));
+                                    result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, new HoldingContext(player, HandTypes.MAIN_HAND));
                                 }
                                 if (!result) return;
                             }
@@ -83,9 +85,10 @@ public class RunnableManageContinousTags implements IAstroTask {
                         for (String tag : otags) {
                             if (AstroItemLib.getTagManager().getTag(tag).isPresent()) {
                                 AbstractTag t = AstroItemLib.getTagManager().getTag(tag).get();
+                                String[] arguments = AstroTagManager.getTagArguments(tag);
                                 boolean result = true;
                                 if (t.getType() == ExecutionTypes.ITEM_HOLDING) {
-                                    result = t.run(ExecutionTypes.ITEM_HOLDING, tag, istack, new HoldingContext(player, HandTypes.OFF_HAND));
+                                    result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, new HoldingContext(player, HandTypes.OFF_HAND));
                                 }
                                 if (!result) return;
                             }

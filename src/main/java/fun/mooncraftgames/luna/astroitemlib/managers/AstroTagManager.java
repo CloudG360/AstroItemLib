@@ -112,7 +112,7 @@ public class AstroTagManager {
         return tags.toArray(new String[0]);
     }
 
-    public String[] getTagArguments(String raw_tag){
+    public static String[] getTagArguments(String raw_tag){
         String processed = raw_tag.replace( "\\:", "{feature.colon}");
         processed = processed.replace( "\\,", "{feature.comma}");
 
