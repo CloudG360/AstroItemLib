@@ -112,7 +112,22 @@ public class AstroTagManager {
         return tags.toArray(new String[0]);
     }
 
+    public String[] getTagArguments(String raw_tag){
+        String processed = raw_tag.replace( "\\:", "{feature.colon}");
+        processed = processed.replace( "\\,", "{feature.comma}");
 
+        String[] split = processed.split(Pattern.quote(":"));
+        String[] finalSplit = new String[split.length];
+
+        for(int i = 0; i < split.length; i++){
+            String splitStr = split[i];
+            String edit = splitStr.replace( "{feature.colon}", ":");
+            edit = edit.replace( "{feature.comma}", ",");
+            finalSplit[i] = edit;
+        }
+
+        return finalSplit;
+    }
 
     // -----------------------------------------------------------------------------
 
@@ -163,10 +178,11 @@ public class AstroTagManager {
             for(String tag: otags){
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
+                    String[] arguments = getTagArguments(tag);
                     boolean result = true;
-                    if(t.getType() == ExecutionTypes.ENTITY_HIT) { result = t.run(ExecutionTypes.ENTITY_HIT, tag, istack, new EntityHitContext(player, event)); }
-                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, istack, interactContext); }
-                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
+                    if(t.getType() == ExecutionTypes.ENTITY_HIT) { result = t.run(ExecutionTypes.ENTITY_HIT, tag, arguments, istack, new EntityHitContext(player, event)); }
+                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, arguments, istack, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, usedContext); }
                     if(!result) return;
                 }
             }
@@ -190,9 +206,10 @@ public class AstroTagManager {
             for(String tag: otags){
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
+                    String[] arguments = getTagArguments(tag);
                     boolean result = true;
-                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, istack, interactContext); }
-                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
+                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, arguments, istack, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, usedContext); }
                     if(!result) return;
                 }
             }
@@ -213,9 +230,10 @@ public class AstroTagManager {
             for(String tag: otags){
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
+                    String[] arguments = getTagArguments(tag);
                     boolean result = true;
-                    if(t.getType() == ExecutionTypes.BLOCK_INTERACT) { result = t.run(ExecutionTypes.BLOCK_INTERACT, tag, istack, interactContext); }
-                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
+                    if(t.getType() == ExecutionTypes.BLOCK_INTERACT) { result = t.run(ExecutionTypes.BLOCK_INTERACT, tag, arguments, istack, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, usedContext); }
                     if(!result) return;
                 }
             }
@@ -232,10 +250,9 @@ public class AstroTagManager {
             for (String tag : otags) {
                 if (getTag(tag).isPresent()) {
                     AbstractTag t = getTag(tag).get();
+                    String[] arguments = getTagArguments(tag);
                     boolean result = true;
-                    if (t.getType() == ExecutionTypes.ITEM_USED) {
-                        result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext);
-                    }
+                    if (t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, usedContext); }
                     if (!result) return;
                 }
             }
@@ -331,8 +348,9 @@ public class AstroTagManager {
         for(String tag: otags){
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
+                String[] arguments = getTagArguments(tag);
                 boolean result = true;
-                if(t.getType() == ExecutionTypes.ITEM_HOLD) { result = t.run(ExecutionTypes.ITEM_HOLD, tag, istack, new HoldContext(player, event)); }
+                if(t.getType() == ExecutionTypes.ITEM_HOLD) { result = t.run(ExecutionTypes.ITEM_HOLD, tag, arguments, istack, new HoldContext(player, event)); }
                 if(!result) return;
             }
         }
@@ -385,16 +403,17 @@ public class AstroTagManager {
             for(String tag: otags){
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
+                    String[] arguments = getTagArguments(tag);
                     boolean result = true;
                     switch (state) {
                         case NOTHING:
-                            if (t.getType() == ExecutionTypes.ITEM_CLICKED) { result = t.run(ExecutionTypes.ITEM_CLICKED, tag, istack, new ClickedContext(player, event, clickType, isShift)); }
+                            if (t.getType() == ExecutionTypes.ITEM_CLICKED) { result = t.run(ExecutionTypes.ITEM_CLICKED, tag, arguments, istack, new ClickedContext(player, event, clickType, isShift)); }
                             break;
                         case DROP:
-                            if (t.getType() == ExecutionTypes.ITEM_DROPPED) { result = t.run(ExecutionTypes.ITEM_DROPPED, tag, istack, new DroppedContext(player, (ClickInventoryEvent.Drop) event)); }
+                            if (t.getType() == ExecutionTypes.ITEM_DROPPED) { result = t.run(ExecutionTypes.ITEM_DROPPED, tag, arguments, istack, new DroppedContext(player, (ClickInventoryEvent.Drop) event)); }
                             break;
                         case PICKUP:
-                            if (t.getType() == ExecutionTypes.ITEM_PICKUP) { result = t.run(ExecutionTypes.ITEM_PICKUP, tag, istack, new PickupContext(player, (ClickInventoryEvent.Pickup) event)); }
+                            if (t.getType() == ExecutionTypes.ITEM_PICKUP) { result = t.run(ExecutionTypes.ITEM_PICKUP, tag, arguments, istack, new PickupContext(player, (ClickInventoryEvent.Pickup) event)); }
                             break;
                         /*
                         Should be managed by the event above
@@ -562,9 +581,10 @@ public class AstroTagManager {
         for(String tag: otags){
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
+                String[] arguments = getTagArguments(tag);
                 boolean result = true;
-                if(t.getType() == ExecutionTypes.BLOCK_CHANGE) { result = t.run(ExecutionTypes.BLOCK_CHANGE, tag, istack, changecontext); }
-                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, istack, usedContext); }
+                if(t.getType() == ExecutionTypes.BLOCK_CHANGE) { result = t.run(ExecutionTypes.BLOCK_CHANGE, tag, arguments, istack, changecontext); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, usedContext); }
                 if(!result) break;
             }
         }

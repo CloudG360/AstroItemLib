@@ -23,13 +23,14 @@ public abstract class AbstractTag {
      * Handles execution for a tag's functions. Designed to
      * be run by the AstroTagManager's listener events.
      *
-     * @param tag An unprocessed tag raw from an item.
+     * @param fullTag An unprocessed tag raw from an item.
+     * @param args Processed arguments of a tag.
      * @param itemStack the stack which possesses the tag.
      * @param context Provides ExecutionType dependant data.
      *
      * @return Returning False will cancel any later schedules tags (Like a cooldown cancelling all further tags)
      */
-    public abstract boolean run(ExecutionTypes type, String tag, ItemStackSnapshot itemStack, ExecutionContext context);
+    public abstract boolean run(ExecutionTypes type, String fullTag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context);
 
     /**
      * For continuous ExecutionTypes. Sets how many ticks
