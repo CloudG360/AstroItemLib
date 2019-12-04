@@ -26,6 +26,7 @@ import fun.mooncraftgames.luna.astroitemlib.managers.AstroTagManager;
 import fun.mooncraftgames.luna.astroitemlib.managers.TaskManager;
 import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
 import fun.mooncraftgames.luna.astroitemlib.tags.TagPriority;
+import fun.mooncraftgames.luna.astroitemlib.tags.impl.TagItemUseCooldown;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.devtest.TagDevCatapult;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.devtest.TagDevCookie;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.devtest.TagDevTestInventory;
@@ -190,7 +191,9 @@ public class AstroItemLib {
 
                 .registerTag(new TagButterfingers("butterfingers", TagPriority.HIGHEST, ExecutionTypes.ITEM_HOLD))
                 .registerTag(new TagDoubler("double_mine", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
-                .registerTag(new TagUndroppable("undroppable", TagPriority.HIGH, ExecutionTypes.ITEM_DROPPED));
+                .registerTag(new TagUndroppable("undroppable", TagPriority.HIGH, ExecutionTypes.ITEM_DROPPED))
+
+                .registerTag(new TagItemUseCooldown("iu_cooldown", TagPriority.COOLDOWN, ExecutionTypes.ITEM_USED));
 
         Sponge.getEventManager().registerListeners(this, astroTagManager);
 

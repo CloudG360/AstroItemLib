@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-public class ItemUseCooldown extends AbstractTag {
-    public ItemUseCooldown(String id, TagPriority priority, ExecutionTypes type) { super(id, priority, type); }
+public class TagItemUseCooldown extends AbstractTag {
+    public TagItemUseCooldown(String id, TagPriority priority, ExecutionTypes type) { super(id, priority, type); }
 
     @Override
     public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context) {
