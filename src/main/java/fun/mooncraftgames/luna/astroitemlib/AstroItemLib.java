@@ -66,7 +66,7 @@ import java.util.Optional;
 @Plugin(
         id = "astroitemlib",
         name = "AstroItemLib",
-        version = "Pipeline V4.1",
+        version = "Pipeline V4.2",
         description = "Implements Custom Item Tags, Templates, and Loot Pools (Loottables for Sponge)",
         authors = {
                 "CloudGamer360"
