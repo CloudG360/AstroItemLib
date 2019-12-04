@@ -174,7 +174,7 @@ public class AstroTagManager {
             DamageEntityEvent event = (DamageEntityEvent) e;
             HandType handType = HandTypes.OFF_HAND;
             if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
-            UsedContext usedContext = new UsedContext(player, handType, ClickType.LEFT);
+            UsedContext usedContext = new UsedContext(player, handType, ClickType.LEFT, event.getTargetEntity().getLocation().getPosition());
             EntityInteractContext interactContext = new EntityInteractContext(player, ClickType.LEFT, event.getTargetEntity(), event.isCancelled());
             for(String tag: otags){
                 if(getTag(tag).isPresent()){
@@ -201,7 +201,7 @@ public class AstroTagManager {
             HandType handType = HandTypes.OFF_HAND;
             if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
 
-            UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT);
+            UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT, event.getInteractionPoint().orElse(event.getTargetEntity().getLocation().getPosition()));
             EntityInteractContext interactContext = new EntityInteractContext(player, clickType, event.getTargetEntity(), event.isCancelled());
 
             for(String tag: otags){
@@ -225,7 +225,7 @@ public class AstroTagManager {
             HandType handType = HandTypes.OFF_HAND;
             if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
 
-            UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT);
+            UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT, event.getInteractionPoint().orElse(event.getTargetBlock().getPosition().toDouble().add(0.5d, 0.5d, 0.5d)));
             BlockInteractContext interactContext = new BlockInteractContext(player, event.getTargetBlock(), event.getTargetSide(), event.isCancelled());
 
             for(String tag: otags){
@@ -247,7 +247,7 @@ public class AstroTagManager {
         if(e instanceof InteractItemEvent) {
             InteractItemEvent event = (InteractItemEvent) e;
             HandType type = e instanceof InteractItemEvent.Primary ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND; // Doesn't anticipate it not being either Primary or Secondary. Potential issue.
-            UsedContext usedContext = new UsedContext(player, type, ClickType.LEFT);
+            UsedContext usedContext = new UsedContext(player, type, ClickType.LEFT, event.getInteractionPoint().orElse(null));
             for (String tag : otags) {
                 if (getTag(tag).isPresent()) {
                     AbstractTag t = getTag(tag).get();
@@ -577,7 +577,7 @@ public class AstroTagManager {
         }
         ClickType type = event instanceof ChangeBlockEvent.Place ? ClickType.RIGHT : ClickType.LEFT;
         BlockChangeContext changecontext = new BlockChangeContext(player, event.getTransactions(), blockHit, direction);
-        UsedContext usedContext = new UsedContext(player, handType, type);
+        UsedContext usedContext = new UsedContext(player, handType, type, event.getTransactions().get(0).getOriginal().getPosition().toDouble().add(0.5d, 0.5d, 0.5d));
 
         for(String tag: otags){
             if(getTag(tag).isPresent()){

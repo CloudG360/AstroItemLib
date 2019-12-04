@@ -1,14 +1,19 @@
 package fun.mooncraftgames.luna.astroitemlib.tags.context.item;
 
+import com.flowpowered.math.vector.Vector3d;
 import fun.mooncraftgames.luna.astroitemlib.tags.ClickType;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.living.player.Player;
 
+import java.util.Optional;
+
 public class UsedContext extends ExecutionContext {
 
     private HandType handType;
     private ClickType clickType;
+
+    private Vector3d clickPos;
 
     private boolean cancelled;
 
@@ -16,13 +21,17 @@ public class UsedContext extends ExecutionContext {
      *
      * @param player The player using the item.
      * @param handType The hand the item is held in.
-     * @param clickType was the use action a punch or a place?
+     * @param clickType Was the use action a punch or a place?
+     * @param clickPos The position of an interaction. Precision depends on event
      */
-    public UsedContext(Player player, HandType handType, ClickType clickType) {
+    public UsedContext(Player player, HandType handType, ClickType clickType, Vector3d clickPos) {
         super(player);
 
         this.handType = handType;
         this.clickType = clickType;
+
+        this.clickPos = clickPos;
+
         this.cancelled = false;
     }
 
@@ -32,4 +41,5 @@ public class UsedContext extends ExecutionContext {
     public boolean isCancelled() { return cancelled; }
     public HandType getHandType() { return handType; }
     public ClickType getClickType() { return clickType; }
+    public Optional<Vector3d> getClickPos() { return Optional.ofNullable(clickPos); }
 }
