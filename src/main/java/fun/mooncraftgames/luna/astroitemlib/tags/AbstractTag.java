@@ -28,9 +28,9 @@ public abstract class AbstractTag {
      * @param itemStack the stack which possesses the tag.
      * @param context Provides ExecutionType dependant data.
      *
-     * @return Returning False will cancel any later schedules tags (Like a cooldown cancelling all further tags)
+     * @return Use a TagResult.builder()
      */
-    public abstract boolean run(ExecutionTypes type, String fullTag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context);
+    public abstract TagResult run(ExecutionTypes type, String fullTag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context);
 
     /**
      * For continuous ExecutionTypes. Sets how many ticks

@@ -8,8 +8,8 @@ public class BlockPlaceContext extends ExecutionContext {
 
     private ChangeBlockEvent.Place event;
 
-    public BlockPlaceContext(Player player, ChangeBlockEvent.Place event) {
-        super(player);
+    public BlockPlaceContext(Player player, boolean isAppended, ChangeBlockEvent.Place event) {
+        super(player, isAppended);
         this.event = event;
     }
 

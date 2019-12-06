@@ -4,13 +4,11 @@ import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import org.spongepowered.api.entity.living.player.Player;
 
 public class EquippedContext extends ExecutionContext {
-
-    //TODO: Slot
     private SlotType slotType;
 
     public enum SlotType { HELM, CHEST, LEGS, BOOTS }
-    public EquippedContext(Player player, SlotType slotType) {
-        super(player);
+    public EquippedContext(Player player, boolean isAppended, SlotType slotType) {
+        super(player, isAppended);
         this.slotType = slotType;
     }
 

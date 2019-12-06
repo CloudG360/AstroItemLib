@@ -8,8 +8,8 @@ public class HoldContext extends ExecutionContext {
 
     private ClickInventoryEvent.Held event;
 
-    public HoldContext(Player player, ClickInventoryEvent.Held event) {
-        super(player);
+    public HoldContext(Player player, boolean isAppended, ClickInventoryEvent.Held event) {
+        super(player, isAppended);
         this.event = event;
     }
 

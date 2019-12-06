@@ -12,8 +12,8 @@ public class BlockInteractContext extends ExecutionContext {
 
     private boolean isCancelled;
 
-    public BlockInteractContext(Player player, BlockSnapshot targetBlock, Direction targetSide, boolean isCancelled) {
-        super(player);
+    public BlockInteractContext(Player player,  boolean isAppended, BlockSnapshot targetBlock, Direction targetSide, boolean isCancelled) {
+        super(player, isAppended);
         this.isCancelled = isCancelled;
 
         this.targetBlock = targetBlock;
