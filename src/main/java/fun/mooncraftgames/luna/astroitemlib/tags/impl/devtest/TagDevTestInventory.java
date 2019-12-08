@@ -23,7 +23,7 @@ public class TagDevTestInventory extends AbstractTag {
     }
 
     @Override
-    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context) {
+    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
         if(getType() == ExecutionTypes.ITEM_CLICKED){
             ClickedContext c = (ClickedContext) context;
             c.getPlayer().sendMessage(Text.of(TextColors.DARK_AQUA, TextStyles.BOLD, "UI ", TextStyles.RESET, TextColors.AQUA, String.format("Click Type: %s, IsShift: %s", c.getClickType().toString(), c.isShiftUsed())));

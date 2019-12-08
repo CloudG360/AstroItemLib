@@ -18,7 +18,7 @@ public class TagDevCatapult extends AbstractTag {
     }
 
     @Override
-    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context) {
+    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
         if(getType() == ExecutionTypes.ENTITY_HIT) {
             EntityHitContext entityHitContext = (EntityHitContext) context;
             entityHitContext.getEvent().setCancelled(true);

@@ -27,7 +27,7 @@ public class TagButterfingers extends AbstractTag {
     }
 
     @Override
-    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context) {
+    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
         if(type == ExecutionTypes.ITEM_HOLD){
             AstroItemLib.getLogger().info("BUTTERFINGERS");
             HoldContext d = (HoldContext) context;
