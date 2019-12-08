@@ -6,6 +6,7 @@ import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.living.player.Player;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 public class UsedContext extends ExecutionContext {
@@ -24,8 +25,8 @@ public class UsedContext extends ExecutionContext {
      * @param clickType Was the use action a punch or a place?
      * @param clickPos The position of an interaction. Precision depends on event
      */
-    public UsedContext(Player player, HandType handType, ClickType clickType, Vector3d clickPos) {
-        super(player);
+    public UsedContext(Player player, HashMap<String, String> sharedData, HandType handType, ClickType clickType, Vector3d clickPos) {
+        super(player, sharedData);
 
         this.handType = handType;
         this.clickType = clickType;

@@ -5,6 +5,8 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Direction;
 
+import java.util.HashMap;
+
 public class BlockInteractContext extends ExecutionContext {
 
     private BlockSnapshot targetBlock;
@@ -12,8 +14,8 @@ public class BlockInteractContext extends ExecutionContext {
 
     private boolean isCancelled;
 
-    public BlockInteractContext(Player player, BlockSnapshot targetBlock, Direction targetSide, boolean isCancelled) {
-        super(player);
+    public BlockInteractContext(Player player, HashMap<String, String> sharedData, BlockSnapshot targetBlock, Direction targetSide, boolean isCancelled) {
+        super(player, sharedData);
         this.isCancelled = isCancelled;
 
         this.targetBlock = targetBlock;

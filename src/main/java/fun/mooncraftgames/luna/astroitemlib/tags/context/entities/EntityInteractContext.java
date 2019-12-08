@@ -5,6 +5,8 @@ import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 
+import java.util.HashMap;
+
 public class EntityInteractContext extends ExecutionContext {
 
     private ClickType clickType;
@@ -12,8 +14,8 @@ public class EntityInteractContext extends ExecutionContext {
 
     private boolean isCancelled;
 
-    public EntityInteractContext(Player player, ClickType clickType, Entity target, boolean isCancelled) {
-        super(player);
+    public EntityInteractContext(Player player, HashMap<String, String> sharedData, ClickType clickType, Entity target, boolean isCancelled) {
+        super(player, sharedData);
         this.clickType = clickType;
         this.targetEntity = target;
         this.isCancelled = isCancelled;

@@ -25,8 +25,8 @@ public class BlockChangeContext extends ExecutionContext {
     private BlockSnapshot blockHit;
     private Direction blockSide;
 
-    public BlockChangeContext(Player player, List<Transaction<BlockSnapshot>> transactions, BlockSnapshot blockHit, Direction blockSide) {
-        super(player);
+    public BlockChangeContext(Player player, HashMap<String, String> sharedData, List<Transaction<BlockSnapshot>> transactions, BlockSnapshot blockHit, Direction blockSide) {
+        super(player, sharedData);
         this.cancelAllChanges = false;
         this.blockChanges = new HashMap<>();
         this.blockHit = blockHit;
