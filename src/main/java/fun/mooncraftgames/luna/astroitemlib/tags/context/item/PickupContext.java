@@ -8,8 +8,8 @@ public class PickupContext extends ExecutionContext {
 
     private ClickInventoryEvent.Pickup event;
 
-    public PickupContext(Player player, boolean isAppended, ClickInventoryEvent.Pickup event) {
-        super(player, isAppended);
+    public PickupContext(Player player, ClickInventoryEvent.Pickup event) {
+        super(player);
         this.event = event;
     }
 

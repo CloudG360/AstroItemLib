@@ -12,8 +12,8 @@ public class EntityInteractContext extends ExecutionContext {
 
     private boolean isCancelled;
 
-    public EntityInteractContext(Player player, boolean isAppended, ClickType clickType, Entity target, boolean isCancelled) {
-        super(player, isAppended);
+    public EntityInteractContext(Player player, ClickType clickType, Entity target, boolean isCancelled) {
+        super(player);
         this.clickType = clickType;
         this.targetEntity = target;
         this.isCancelled = isCancelled;

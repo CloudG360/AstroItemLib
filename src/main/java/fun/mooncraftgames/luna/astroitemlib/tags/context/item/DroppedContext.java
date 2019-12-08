@@ -8,8 +8,8 @@ public class DroppedContext extends ExecutionContext {
 
     private ClickInventoryEvent.Drop event;
 
-    public DroppedContext(Player player, boolean isAppended, ClickInventoryEvent.Drop event) {
-        super(player, isAppended);
+    public DroppedContext(Player player, ClickInventoryEvent.Drop event) {
+        super(player);
         this.event = event;
     }
 

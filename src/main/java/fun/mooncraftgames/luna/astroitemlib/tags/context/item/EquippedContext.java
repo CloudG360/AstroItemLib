@@ -7,8 +7,8 @@ public class EquippedContext extends ExecutionContext {
     private SlotType slotType;
 
     public enum SlotType { HELM, CHEST, LEGS, BOOTS }
-    public EquippedContext(Player player, boolean isAppended, SlotType slotType) {
-        super(player, isAppended);
+    public EquippedContext(Player player, SlotType slotType) {
+        super(player);
         this.slotType = slotType;
     }
 

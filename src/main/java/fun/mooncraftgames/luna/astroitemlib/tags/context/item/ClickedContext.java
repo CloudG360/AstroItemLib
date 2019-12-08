@@ -11,8 +11,8 @@ public class ClickedContext extends ExecutionContext {
     private ClickType clickType;
     private boolean shiftUsed;
 
-    public ClickedContext(Player player, boolean isAppended, ClickInventoryEvent event, ClickType clickType, boolean shiftUsed) {
-        super(player, isAppended);
+    public ClickedContext(Player player, ClickInventoryEvent event, ClickType clickType, boolean shiftUsed) {
+        super(player);
         this.event = event;
         this.clickType = clickType;
         this.shiftUsed = shiftUsed;

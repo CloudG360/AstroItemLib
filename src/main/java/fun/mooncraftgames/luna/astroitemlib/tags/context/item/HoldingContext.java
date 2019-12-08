@@ -8,8 +8,8 @@ public class HoldingContext extends ExecutionContext {
 
     private HandType handType;
 
-    public HoldingContext(Player player, boolean isAppended, HandType handType) {
-        super(player, isAppended);
+    public HoldingContext(Player player, HandType handType) {
+        super(player);
         this.handType = handType;
     }
 

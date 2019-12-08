@@ -8,8 +8,8 @@ public class EntityHitContext extends ExecutionContext {
 
     private DamageEntityEvent event;
 
-    public EntityHitContext(Player player, boolean isAppended, DamageEntityEvent event) {
-        super(player, isAppended);
+    public EntityHitContext(Player player, DamageEntityEvent event) {
+        super(player);
         this.event = event;
     }
 

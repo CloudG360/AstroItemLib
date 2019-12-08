@@ -8,8 +8,8 @@ public class BlockBreakContext extends ExecutionContext {
 
     private ChangeBlockEvent.Break event;
 
-    public BlockBreakContext(Player player, boolean isAppended, ChangeBlockEvent.Break event) {
-        super(player, isAppended);
+    public BlockBreakContext(Player player, ChangeBlockEvent.Break event) {
+        super(player);
         this.event = event;
     }
 

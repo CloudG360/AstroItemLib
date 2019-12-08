@@ -20,13 +20,12 @@ public class UsedContext extends ExecutionContext {
     /**
      *
      * @param player The player using the item.
-     * @param isAppended Internal use: If the tag is ran after normal tags.
      * @param handType The hand the item is held in.
      * @param clickType Was the use action a punch or a place?
      * @param clickPos The position of an interaction. Precision depends on event
      */
-    public UsedContext(Player player, boolean isAppended, HandType handType, ClickType clickType, Vector3d clickPos) {
-        super(player, isAppended);
+    public UsedContext(Player player, HandType handType, ClickType clickType, Vector3d clickPos) {
+        super(player);
 
         this.handType = handType;
         this.clickType = clickType;

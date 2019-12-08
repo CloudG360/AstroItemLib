@@ -5,13 +5,11 @@ import org.spongepowered.api.entity.living.player.Player;
 /**
  * Provides ExecutionType specific data for Tag Processing.
  */
-public class ExecutionContext {
+public abstract class ExecutionContext {
 
     private Player player;
-    private boolean isAppended;
 
-    public ExecutionContext(Player player, boolean isAppended) { this.player = player; this.isAppended = isAppended; }
+    public ExecutionContext(Player player) { this.player = player; }
 
     public Player getPlayer() { return player; }
-    public boolean isAppended() { return isAppended; }
 }
