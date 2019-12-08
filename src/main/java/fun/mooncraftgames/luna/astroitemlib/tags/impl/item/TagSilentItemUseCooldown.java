@@ -34,7 +34,7 @@ public class TagSilentItemUseCooldown extends AbstractTag {
             String milliseconds = "0.5";
             if(args.length > 0){ milliseconds = args[0]; }
             return TagResult.builder().addPostTags(Pair.of(
-                    new Post("cooldown_post", TagPriority.COOLDOWN, ExecutionTypes.ITEM_USED), String.format("cooldown_post:%s", milliseconds))
+                    new Post("s_cooldown_post", TagPriority.COOLDOWN, ExecutionTypes.ITEM_USED), String.format("s_cooldown_post:%s", milliseconds))
             ).build();
         }
         return TagResult.builder().build();

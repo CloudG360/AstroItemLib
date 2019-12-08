@@ -30,10 +30,7 @@ import fun.mooncraftgames.luna.astroitemlib.tags.impl.devtest.TagDevCatapult;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.devtest.TagDevCookie;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.devtest.TagDevTestInventory;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.devtest.TagDevTracking;
-import fun.mooncraftgames.luna.astroitemlib.tags.impl.item.TagButterfingers;
-import fun.mooncraftgames.luna.astroitemlib.tags.impl.item.TagDoubler;
-import fun.mooncraftgames.luna.astroitemlib.tags.impl.item.TagItemUseCooldown;
-import fun.mooncraftgames.luna.astroitemlib.tags.impl.item.TagUndroppable;
+import fun.mooncraftgames.luna.astroitemlib.tags.impl.item.*;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.world.TagSmelting;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.world.TagStopBreakBlock;
 import fun.mooncraftgames.luna.astroitemlib.tags.impl.world.TagUnplaceable;
@@ -193,7 +190,8 @@ public class AstroItemLib {
                 .registerTag(new TagDoubler("double_mine", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
                 .registerTag(new TagUndroppable("undroppable", TagPriority.HIGH, ExecutionTypes.ITEM_DROPPED))
 
-                .registerTag(new TagItemUseCooldown("iu_cooldown", TagPriority.COOLDOWN, ExecutionTypes.ITEM_USED));
+                .registerTag(new TagItemUseCooldown("iu_cooldown", TagPriority.COOLDOWN, ExecutionTypes.ITEM_USED))
+                .registerTag(new TagSilentItemUseCooldown("iu_s_cooldown", TagPriority.COOLDOWN, ExecutionTypes.ITEM_USED));
 
         Sponge.getEventManager().registerListeners(this, astroTagManager);
 
