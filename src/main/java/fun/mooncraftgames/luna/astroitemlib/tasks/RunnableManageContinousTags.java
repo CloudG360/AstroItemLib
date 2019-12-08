@@ -5,6 +5,8 @@ import fun.mooncraftgames.luna.astroitemlib.data.AstroKeys;
 import fun.mooncraftgames.luna.astroitemlib.managers.AstroTagManager;
 import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
 import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
+import fun.mooncraftgames.luna.astroitemlib.tags.TagResult;
+import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.item.HoldingContext;
 import fun.mooncraftgames.luna.astroitemlib.tasks.interfaces.IAstroTask;
 import fun.mooncraftgames.luna.astroitemlib.utilities.HashMapBuilder;
@@ -58,18 +60,33 @@ public class RunnableManageContinousTags implements IAstroTask {
 
                         String[] otags = AstroItemLib.getTagManager().orderedTags(tags.toArray(new String[0]));
 
+                        HashMap<String, String> sharedData = new HashMap<>();
+
+                        boolean postCancelled = false;
+                        HashMap<AbstractTag, String> postTags = new HashMap<>();
                         for (String tag : otags) {
                             if (AstroItemLib.getTagManager().getTag(tag).isPresent()) {
                                 AbstractTag t = AstroItemLib.getTagManager().getTag(tag).get();
                                 String[] arguments = AstroTagManager.getTagArguments(tag);
-                                boolean result = true;
-                                if (t.getType() == ExecutionTypes.ITEM_HOLDING) {
-                                    result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, new HoldingContext(player, HandTypes.MAIN_HAND));
-                                }
-                                if (!result) return;
+                                TagResult result = TagResult.builder().build();
+                                if (t.getType() == ExecutionTypes.ITEM_HOLDING) { result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, false, new HoldingContext(player, sharedData, HandTypes.MAIN_HAND)); }
+                                postTags = AstroTagManager.removePostTags(postTags, result.getQueueRemoveTags());
+                                postTags.putAll(result.getPostTags());
+                                if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
+                                if(result.shouldCancelTags()) break;
                             }
                         }
-
+                        if(!postCancelled){
+                            for (Map.Entry<AbstractTag, String> pair:postTags.entrySet()){
+                                String tag = pair.getValue();
+                                AbstractTag t = pair.getKey();
+                                String[] arguments = AstroTagManager.getTagArguments(tag);
+                                TagResult result = TagResult.builder().build();
+                                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, true, new HoldingContext(player, sharedData, HandTypes.MAIN_HAND)); }
+                                if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
+                                if(result.shouldCancelPostTags().orElse(false)){ break; }
+                            }
+                        }
                     }
                 }
 
@@ -82,18 +99,33 @@ public class RunnableManageContinousTags implements IAstroTask {
 
                         String[] otags = AstroItemLib.getTagManager().orderedTags(tags.toArray(new String[0]));
 
+                        HashMap<String, String> sharedData = new HashMap<>();
+
+                        boolean postCancelled = false;
+                        HashMap<AbstractTag, String> postTags = new HashMap<>();
                         for (String tag : otags) {
                             if (AstroItemLib.getTagManager().getTag(tag).isPresent()) {
                                 AbstractTag t = AstroItemLib.getTagManager().getTag(tag).get();
                                 String[] arguments = AstroTagManager.getTagArguments(tag);
-                                boolean result = true;
-                                if (t.getType() == ExecutionTypes.ITEM_HOLDING) {
-                                    result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, new HoldingContext(player, HandTypes.OFF_HAND));
-                                }
-                                if (!result) return;
+                                TagResult result = TagResult.builder().build();
+                                if (t.getType() == ExecutionTypes.ITEM_HOLDING) { result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, false, new HoldingContext(player, sharedData, HandTypes.OFF_HAND)); }
+                                postTags = AstroTagManager.removePostTags(postTags, result.getQueueRemoveTags());
+                                postTags.putAll(result.getPostTags());
+                                if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
+                                if(result.shouldCancelTags()) break;
                             }
                         }
-
+                        if(!postCancelled){
+                            for (Map.Entry<AbstractTag, String> pair:postTags.entrySet()){
+                                String tag = pair.getValue();
+                                AbstractTag t = pair.getKey();
+                                String[] arguments = AstroTagManager.getTagArguments(tag);
+                                TagResult result = TagResult.builder().build();
+                                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, true, new HoldingContext(player, sharedData, HandTypes.OFF_HAND)); }
+                                if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
+                                if(result.shouldCancelPostTags().orElse(false)){ break; }
+                            }
+                        }
                     }
                 }
 
