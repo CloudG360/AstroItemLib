@@ -72,6 +72,7 @@ public class RunnableManageContinousTags implements IAstroTask {
                                 if (t.getType() == ExecutionTypes.ITEM_HOLDING) { result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, false, new HoldingContext(player, sharedData, HandTypes.MAIN_HAND)); }
                                 postTags = AstroTagManager.removePostTags(postTags, result.getQueueRemoveTags());
                                 postTags.putAll(result.getPostTags());
+                                sharedData.putAll(result.getSharedDataSubmission());
                                 if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
                                 if(result.shouldCancelTags()) break;
                             }
@@ -84,6 +85,7 @@ public class RunnableManageContinousTags implements IAstroTask {
                                 TagResult result = TagResult.builder().build();
                                 if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, true, new HoldingContext(player, sharedData, HandTypes.MAIN_HAND)); }
                                 if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
+                                sharedData.putAll(result.getSharedDataSubmission());
                                 if(result.shouldCancelPostTags().orElse(false)){ break; }
                             }
                         }
@@ -111,6 +113,7 @@ public class RunnableManageContinousTags implements IAstroTask {
                                 if (t.getType() == ExecutionTypes.ITEM_HOLDING) { result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, false, new HoldingContext(player, sharedData, HandTypes.OFF_HAND)); }
                                 postTags = AstroTagManager.removePostTags(postTags, result.getQueueRemoveTags());
                                 postTags.putAll(result.getPostTags());
+                                sharedData.putAll(result.getSharedDataSubmission());
                                 if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
                                 if(result.shouldCancelTags()) break;
                             }
@@ -123,6 +126,7 @@ public class RunnableManageContinousTags implements IAstroTask {
                                 TagResult result = TagResult.builder().build();
                                 if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_HOLDING, tag, arguments, istack, true, new HoldingContext(player, sharedData, HandTypes.OFF_HAND)); }
                                 if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
+                                sharedData.putAll(result.getSharedDataSubmission());
                                 if(result.shouldCancelPostTags().orElse(false)){ break; }
                             }
                         }

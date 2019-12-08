@@ -192,6 +192,7 @@ public class AstroTagManager {
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, false, usedContext); }
                     postTags = removePostTags(postTags, result.getQueueRemoveTags());
                     postTags.putAll(result.getPostTags());
+                    sharedData.putAll(result.getSharedDataSubmission());
                     if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
                     if(result.shouldCancelTags()) break;
                 }
@@ -206,6 +207,7 @@ public class AstroTagManager {
                     if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, arguments, istack, true, interactContext); }
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
                     if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
+                    sharedData.putAll(result.getSharedDataSubmission());
                     if(result.shouldCancelPostTags().orElse(false)){ break; }
                 }
             }
@@ -238,6 +240,7 @@ public class AstroTagManager {
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, false, usedContext); }
                     postTags = removePostTags(postTags, result.getQueueRemoveTags());
                     postTags.putAll(result.getPostTags());
+                    sharedData.putAll(result.getSharedDataSubmission());
                     if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
                     if(result.shouldCancelTags()) break;
                 }
@@ -251,6 +254,7 @@ public class AstroTagManager {
                     if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, arguments, istack, true, interactContext); }
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
                     if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
+                    sharedData.putAll(result.getSharedDataSubmission());
                     if(result.shouldCancelPostTags().orElse(false)){ break; }
                 }
             }
@@ -280,6 +284,7 @@ public class AstroTagManager {
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, false, usedContext); }
                     postTags = removePostTags(postTags, result.getQueueRemoveTags());
                     postTags.putAll(result.getPostTags());
+                    sharedData.putAll(result.getSharedDataSubmission());
                     if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
                     if(result.shouldCancelTags()) break;
                 }
@@ -293,6 +298,7 @@ public class AstroTagManager {
                     if(t.getType() == ExecutionTypes.BLOCK_INTERACT) { result = t.run(ExecutionTypes.BLOCK_INTERACT, tag, arguments, istack, true, interactContext); }
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
                     if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
+                    sharedData.putAll(result.getSharedDataSubmission());
                     if(result.shouldCancelPostTags().orElse(false)){ break; }
                 }
             }
@@ -319,6 +325,7 @@ public class AstroTagManager {
                     if (t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, false, usedContext); }
                     postTags = removePostTags(postTags, result.getQueueRemoveTags());
                     postTags.putAll(result.getPostTags());
+                    sharedData.putAll(result.getSharedDataSubmission());
                     if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
                     if(result.shouldCancelTags()) break;
                 }
@@ -331,6 +338,7 @@ public class AstroTagManager {
                     TagResult result = TagResult.builder().build();
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
                     if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
+                    sharedData.putAll(result.getSharedDataSubmission());
                     if(result.shouldCancelPostTags().orElse(false)){ break; }
                 }
             }
@@ -372,6 +380,7 @@ public class AstroTagManager {
                 if(t.getType() == ExecutionTypes.ITEM_HOLD) { result = t.run(ExecutionTypes.ITEM_HOLD, tag, arguments, istack, false, new HoldContext(player, sharedData, event)); }
                 postTags = removePostTags(postTags, result.getQueueRemoveTags());
                 postTags.putAll(result.getPostTags());
+                sharedData.putAll(result.getSharedDataSubmission());
                 if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
                 if(result.shouldCancelTags()) break;
             }
@@ -384,6 +393,7 @@ public class AstroTagManager {
                 TagResult result = TagResult.builder().build();
                 if(t.getType() == ExecutionTypes.ITEM_HOLD) { result = t.run(ExecutionTypes.ITEM_HOLD, tag, arguments, istack, true, new HoldContext(player, sharedData, event)); }
                 if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
+                sharedData.putAll(result.getSharedDataSubmission());
                 if(result.shouldCancelPostTags().orElse(false)){ break; }
             }
         }
@@ -455,6 +465,7 @@ public class AstroTagManager {
                     }
                     postTags = removePostTags(postTags, result.getQueueRemoveTags());
                     postTags.putAll(result.getPostTags());
+                    sharedData.putAll(result.getSharedDataSubmission());
                     if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
                     if(result.shouldCancelTags()) break;
                 }
@@ -477,6 +488,7 @@ public class AstroTagManager {
                             break;
                     }
                     if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
+                    sharedData.putAll(result.getSharedDataSubmission());
                     if(result.shouldCancelPostTags().orElse(false)){ break; }
                 }
             }
@@ -535,6 +547,7 @@ public class AstroTagManager {
                 if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, false, usedContext); }
                 postTags = removePostTags(postTags, result.getQueueRemoveTags());
                 postTags.putAll(result.getPostTags());
+                sharedData.putAll(result.getSharedDataSubmission());
                 if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
                 if(result.shouldCancelTags()) break;
             }
@@ -548,6 +561,7 @@ public class AstroTagManager {
                 if(t.getType() == ExecutionTypes.BLOCK_CHANGE) { result = t.run(ExecutionTypes.BLOCK_CHANGE, tag, arguments, istack, true, changecontext); }
                 if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
                 if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
+                sharedData.putAll(result.getSharedDataSubmission());
                 if(result.shouldCancelPostTags().orElse(false)){ break; }
             }
         }
