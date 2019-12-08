@@ -1,9 +1,6 @@
 package fun.mooncraftgames.luna.astroitemlib.tags.impl.item;
 
-import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
-import fun.mooncraftgames.luna.astroitemlib.tags.BlockDestroyLootEntry;
-import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
-import fun.mooncraftgames.luna.astroitemlib.tags.TagPriority;
+import fun.mooncraftgames.luna.astroitemlib.tags.*;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockChangeContext;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -20,7 +17,7 @@ public class TagDoubler extends AbstractTag {
     }
 
     @Override
-    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
+    public TagResult run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
         if(type == ExecutionTypes.BLOCK_CHANGE){
             BlockChangeContext changeContext = ((BlockChangeContext) context);
             for(String id:changeContext.getBlockChanges().keySet()){
@@ -33,6 +30,6 @@ public class TagDoubler extends AbstractTag {
                 }
             }
         }
-        return true;
+        return TagResult.builder().build();
     }
 }

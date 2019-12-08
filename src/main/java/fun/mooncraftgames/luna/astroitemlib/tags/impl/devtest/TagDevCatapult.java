@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3d;
 import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
 import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
 import fun.mooncraftgames.luna.astroitemlib.tags.TagPriority;
+import fun.mooncraftgames.luna.astroitemlib.tags.TagResult;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.entities.EntityHitContext;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -18,7 +19,7 @@ public class TagDevCatapult extends AbstractTag {
     }
 
     @Override
-    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
+    public TagResult run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
         if(getType() == ExecutionTypes.ENTITY_HIT) {
             EntityHitContext entityHitContext = (EntityHitContext) context;
             entityHitContext.getEvent().setCancelled(true);
@@ -28,8 +29,8 @@ public class TagDevCatapult extends AbstractTag {
             entityHitContext.getEvent().getTargetEntity().getLocation().getExtent()
                     .spawnParticles(e, entityHitContext.getEvent().getTargetEntity().getLocation().getPosition());
 
-            return false;
+            return TagResult.builder().setShouldCancelTags(true).build();
         }
-        return true;
+        return TagResult.builder().build();
     }
 }

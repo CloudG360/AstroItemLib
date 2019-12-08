@@ -3,6 +3,7 @@ package fun.mooncraftgames.luna.astroitemlib.tags.impl.devtest;
 import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
 import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
 import fun.mooncraftgames.luna.astroitemlib.tags.TagPriority;
+import fun.mooncraftgames.luna.astroitemlib.tags.TagResult;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -21,10 +22,10 @@ public class TagDevCookie extends AbstractTag {
     }
 
     @Override
-    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
+    public TagResult run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
         if(getType() == ExecutionTypes.ITEM_USED){
             context.getPlayer().getInventory().offer(ItemStack.builder().itemType(ItemTypes.COOKIE).build());
         }
-        return true;
+        return TagResult.builder().build();
     }
 }

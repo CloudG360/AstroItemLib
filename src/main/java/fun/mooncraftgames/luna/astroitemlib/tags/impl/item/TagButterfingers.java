@@ -4,6 +4,7 @@ import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
 import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
 import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
 import fun.mooncraftgames.luna.astroitemlib.tags.TagPriority;
+import fun.mooncraftgames.luna.astroitemlib.tags.TagResult;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.item.HoldContext;
 import fun.mooncraftgames.luna.astroitemlib.utilities.Utils;
@@ -27,7 +28,7 @@ public class TagButterfingers extends AbstractTag {
     }
 
     @Override
-    public boolean run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
+    public TagResult run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
         if(type == ExecutionTypes.ITEM_HOLD){
             AstroItemLib.getLogger().info("BUTTERFINGERS");
             HoldContext d = (HoldContext) context;
@@ -47,6 +48,6 @@ public class TagButterfingers extends AbstractTag {
                 d.getPlayer().sendMessage(Text.of(TextColors.YELLOW, "Watch out, ", TextColors.GOLD, TextStyles.BOLD, "BUTTERFINGERS!"));
             }
         }
-        return true;
+        return TagResult.builder().build();
     }
 }
