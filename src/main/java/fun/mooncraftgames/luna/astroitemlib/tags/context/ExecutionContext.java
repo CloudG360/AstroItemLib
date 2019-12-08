@@ -17,6 +17,6 @@ public abstract class ExecutionContext {
     public Player getPlayer() { return player; }
 
     public static class Generic extends ExecutionContext{
-        public Generic(Player player) { super(player, sharedData); }
+        public Generic(Player player, HashMap<String, String> sharedData) { super(player, sharedData); }
     }
 }
