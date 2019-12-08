@@ -628,7 +628,9 @@ public class AstroTagManager {
         return AstroForgeBridge.digBlock(player, tool, loc.getX(), loc.getY(), loc.getZ());
     }
     private void dropBlock(BlockChangeContext.BlockChange blockChange, Player player, ItemStack tool, Vector3i loc){ AstroForgeBridge.dropBlock(player, tool, loc.getX(), loc.getY(), loc.getZ()); }
-    private static HashMap<AbstractTag, String> removePostTags(HashMap<AbstractTag, String> postTags, ArrayList<String> tags){
+
+
+    public static HashMap<AbstractTag, String> removePostTags(HashMap<AbstractTag, String> postTags, ArrayList<String> tags){
         HashMap<AbstractTag, String> clone = new HashMap<>(postTags);
         clone.keySet().removeIf(t -> tags.contains(t.getId().toLowerCase()));
         return clone;
