@@ -66,7 +66,8 @@ public abstract class TagResult {
             return this;
         }
 
-        public Builder addPostTags(Pair<AbstractTag, String>... tags) { for(Pair<AbstractTag, String> pair : tags){ postTags.put(pair.getKey(), pair.getValue()); } return this; }
+        @SafeVarargs
+        public final Builder addPostTags(Pair<AbstractTag, String>... tags) { for(Pair<AbstractTag, String> pair : tags){ postTags.put(pair.getKey(), pair.getValue()); } return this; }
         public Builder removePostTags(String... tags) {
             List<String> tgs = Arrays.asList(tags);
             postTags.keySet().removeIf(t -> tgs.contains(t.getId().toLowerCase()));
