@@ -1,4 +1,4 @@
-package fun.mooncraftgames.luna.astroitemlib.tags.impl;
+package fun.mooncraftgames.luna.astroitemlib.tags.impl.item;
 
 import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
 import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
@@ -6,6 +6,7 @@ import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
 import fun.mooncraftgames.luna.astroitemlib.tags.TagPriority;
 import fun.mooncraftgames.luna.astroitemlib.tags.TagResult;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
+import fun.mooncraftgames.luna.astroitemlib.tags.context.item.UsedContext;
 import fun.mooncraftgames.luna.astroitemlib.utilities.Utils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.effect.sound.SoundTypes;
@@ -35,6 +36,7 @@ public class TagItemUseCooldown extends AbstractTag {
                             .actionBar(Text.of(TextColors.DARK_RED, TextStyles.BOLD, "COOLDOWN ", TextStyles.RESET, TextColors.RED, "You must wait", Utils.compareDateTimes(now, t.get())))
                             .build());
                     context.getPlayer().playSound(SoundTypes.ENTITY_WITHER_SPAWN, context.getPlayer().getPosition(), 1d, 0.7d, 0.7d);
+                    ((UsedContext) context).setCancelled(true);
                     return TagResult.builder().setShouldCancelTags(true).setShouldCancelPostTags(true).build();
                 } else {
                     AstroItemLib.getCooldownManager().removeItemCooldown(itemStack);
