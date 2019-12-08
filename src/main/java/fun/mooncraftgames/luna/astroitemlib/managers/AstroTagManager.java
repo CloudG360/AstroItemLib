@@ -8,6 +8,7 @@ import fun.mooncraftgames.luna.astroitemlib.data.AstroKeys;
 import fun.mooncraftgames.luna.astroitemlib.data.impl.AstroItemDataImpl;
 import fun.mooncraftgames.luna.astroitemlib.loot.SupplyLoot;
 import fun.mooncraftgames.luna.astroitemlib.tags.*;
+import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockChangeContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockInteractContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.entities.EntityHitContext;
@@ -174,17 +175,35 @@ public class AstroTagManager {
             DamageEntityEvent event = (DamageEntityEvent) e;
             HandType handType = HandTypes.OFF_HAND;
             if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
-            UsedContext usedContext = new UsedContext(player, false, handType, ClickType.LEFT, event.getTargetEntity().getLocation().getPosition());
-            EntityInteractContext interactContext = new EntityInteractContext(player, false, ClickType.LEFT, event.getTargetEntity(), event.isCancelled());
+            UsedContext usedContext = new UsedContext(player, handType, ClickType.LEFT, event.getTargetEntity().getLocation().getPosition());
+            EntityInteractContext interactContext = new EntityInteractContext(player, ClickType.LEFT, event.getTargetEntity(), event.isCancelled());
+            boolean postCancelled = false;
+            HashMap<AbstractTag, String> postTags = new HashMap<>(); //TODO: Add Post Tags, remove unneeded ones, and run them after. Add tagData as well.
             for(String tag: otags){
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
                     String[] arguments = getTagArguments(tag);
                     TagResult result = TagResult.builder().build();
-                    if(t.getType() == ExecutionTypes.ENTITY_HIT) { result = t.run(ExecutionTypes.ENTITY_HIT, tag, arguments, istack, new EntityHitContext(player, false, event)); }
-                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, arguments, istack, interactContext); }
-                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, usedContext); }
-                    if(result.shouldCancelTags()) return;
+                    if(t.getType() == ExecutionTypes.ENTITY_HIT) { result = t.run(ExecutionTypes.ENTITY_HIT, tag, arguments, istack, false, new EntityHitContext(player, event)); }
+                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, arguments, istack, false, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, false, usedContext); }
+                    postTags = removePostTags(postTags, result.getQueueRemoveTags());
+                    postTags.putAll(result.getPostTags());
+                    if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
+                    if(result.shouldCancelTags()) break;
+                }
+            }
+            if(!postCancelled){
+                for (Map.Entry<AbstractTag, String> pair:postTags.entrySet()){
+                    String tag = pair.getValue();
+                    AbstractTag t = pair.getKey();
+                    String[] arguments = getTagArguments(tag);
+                    TagResult result = TagResult.builder().build();
+                    if(t.getType() == ExecutionTypes.ENTITY_HIT) { result = t.run(ExecutionTypes.ENTITY_HIT, tag, arguments, istack, true, new EntityHitContext(player, event)); }
+                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, arguments, istack, true, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
+                    if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player)); }
+                    if(result.shouldCancelPostTags().orElse(false)){ break; }
                 }
             }
             if(usedContext.isCancelled()) event.setCancelled(true);
@@ -201,17 +220,34 @@ public class AstroTagManager {
             HandType handType = HandTypes.OFF_HAND;
             if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
 
-            UsedContext usedContext = new UsedContext(player, false, handType, ClickType.RIGHT, event.getInteractionPoint().orElse(event.getTargetEntity().getLocation().getPosition()));
-            EntityInteractContext interactContext = new EntityInteractContext(player, false, clickType, event.getTargetEntity(), event.isCancelled());
+            UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT, event.getInteractionPoint().orElse(event.getTargetEntity().getLocation().getPosition()));
+            EntityInteractContext interactContext = new EntityInteractContext(player, clickType, event.getTargetEntity(), event.isCancelled());
 
+            boolean postCancelled = false;
+            HashMap<AbstractTag, String> postTags = new HashMap<>();
             for(String tag: otags){
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
                     String[] arguments = getTagArguments(tag);
                     TagResult result = TagResult.builder().build();
-                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, arguments, istack, interactContext); }
-                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, usedContext); }
-                    if(result.shouldCancelTags()) return;
+                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, arguments, istack, false, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, false, usedContext); }
+                    postTags = removePostTags(postTags, result.getQueueRemoveTags());
+                    postTags.putAll(result.getPostTags());
+                    if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
+                    if(result.shouldCancelTags()) break;
+                }
+            }
+            if(!postCancelled){
+                for (Map.Entry<AbstractTag, String> pair:postTags.entrySet()){
+                    String tag = pair.getValue();
+                    AbstractTag t = pair.getKey();
+                    String[] arguments = getTagArguments(tag);
+                    TagResult result = TagResult.builder().build();
+                    if(t.getType() == ExecutionTypes.ENTITY_INTERACT) { result = t.run(ExecutionTypes.ENTITY_INTERACT, tag, arguments, istack, true, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
+                    if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player)); }
+                    if(result.shouldCancelPostTags().orElse(false)){ break; }
                 }
             }
 
@@ -225,17 +261,34 @@ public class AstroTagManager {
             HandType handType = HandTypes.OFF_HAND;
             if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) handType = player.getItemInHand(HandTypes.MAIN_HAND).get().equalTo(istack.createStack()) ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
 
-            UsedContext usedContext = new UsedContext(player, false, handType, ClickType.RIGHT, event.getInteractionPoint().orElse(event.getTargetBlock().getPosition().toDouble().add(0.5d, 0.5d, 0.5d)));
-            BlockInteractContext interactContext = new BlockInteractContext(player, false, event.getTargetBlock(), event.getTargetSide(), event.isCancelled());
+            UsedContext usedContext = new UsedContext(player, handType, ClickType.RIGHT, event.getInteractionPoint().orElse(event.getTargetBlock().getPosition().toDouble().add(0.5d, 0.5d, 0.5d)));
+            BlockInteractContext interactContext = new BlockInteractContext(player, event.getTargetBlock(), event.getTargetSide(), event.isCancelled());
 
+            boolean postCancelled = false;
+            HashMap<AbstractTag, String> postTags = new HashMap<>();
             for(String tag: otags){
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
                     String[] arguments = getTagArguments(tag);
                     TagResult result = TagResult.builder().build();
-                    if(t.getType() == ExecutionTypes.BLOCK_INTERACT) { result = t.run(ExecutionTypes.BLOCK_INTERACT, tag, arguments, istack, interactContext); }
-                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, usedContext); }
-                    if(result.shouldCancelTags()) return;
+                    if(t.getType() == ExecutionTypes.BLOCK_INTERACT) { result = t.run(ExecutionTypes.BLOCK_INTERACT, tag, arguments, istack, false, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, false, usedContext); }
+                    postTags = removePostTags(postTags, result.getQueueRemoveTags());
+                    postTags.putAll(result.getPostTags());
+                    if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
+                    if(result.shouldCancelTags()) break;
+                }
+            }
+            if(!postCancelled){
+                for (Map.Entry<AbstractTag, String> pair:postTags.entrySet()){
+                    String tag = pair.getValue();
+                    AbstractTag t = pair.getKey();
+                    String[] arguments = getTagArguments(tag);
+                    TagResult result = TagResult.builder().build();
+                    if(t.getType() == ExecutionTypes.BLOCK_INTERACT) { result = t.run(ExecutionTypes.BLOCK_INTERACT, tag, arguments, istack, true, interactContext); }
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
+                    if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player)); }
+                    if(result.shouldCancelPostTags().orElse(false)){ break; }
                 }
             }
 
@@ -247,14 +300,31 @@ public class AstroTagManager {
         if(e instanceof InteractItemEvent) {
             InteractItemEvent event = (InteractItemEvent) e;
             HandType type = e instanceof InteractItemEvent.Primary ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND; // Doesn't anticipate it not being either Primary or Secondary. Potential issue.
-            UsedContext usedContext = new UsedContext(player, false, type, ClickType.LEFT, event.getInteractionPoint().orElse(null));
+            UsedContext usedContext = new UsedContext(player, type, ClickType.LEFT, event.getInteractionPoint().orElse(null));
+
+            boolean postCancelled = false;
+            HashMap<AbstractTag, String> postTags = new HashMap<>();
             for (String tag : otags) {
                 if (getTag(tag).isPresent()) {
                     AbstractTag t = getTag(tag).get();
                     String[] arguments = getTagArguments(tag);
                     TagResult result = TagResult.builder().build();
-                    if (t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, usedContext); }
-                    if (result.shouldCancelTags()) return;
+                    if (t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, false, usedContext); }
+                    postTags = removePostTags(postTags, result.getQueueRemoveTags());
+                    postTags.putAll(result.getPostTags());
+                    if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
+                    if(result.shouldCancelTags()) break;
+                }
+            }
+            if(!postCancelled){
+                for (Map.Entry<AbstractTag, String> pair:postTags.entrySet()){
+                    String tag = pair.getValue();
+                    AbstractTag t = pair.getKey();
+                    String[] arguments = getTagArguments(tag);
+                    TagResult result = TagResult.builder().build();
+                    if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
+                    if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player)); }
+                    if(result.shouldCancelPostTags().orElse(false)){ break; }
                 }
             }
             if (usedContext.isCancelled()) event.setCancelled(true);
@@ -283,13 +353,29 @@ public class AstroTagManager {
 
         String[] otags = orderedTags(tags.toArray(new String[0]));
 
+        boolean postCancelled = false;
+        HashMap<AbstractTag, String> postTags = new HashMap<>();
         for(String tag: otags){
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
                 String[] arguments = getTagArguments(tag);
                 TagResult result = TagResult.builder().build();
-                if(t.getType() == ExecutionTypes.ITEM_HOLD) { result = t.run(ExecutionTypes.ITEM_HOLD, tag, arguments, istack, new HoldContext(player, false, event)); }
-                if(result.shouldCancelTags()) return;
+                if(t.getType() == ExecutionTypes.ITEM_HOLD) { result = t.run(ExecutionTypes.ITEM_HOLD, tag, arguments, istack, false, new HoldContext(player, event)); }
+                postTags = removePostTags(postTags, result.getQueueRemoveTags());
+                postTags.putAll(result.getPostTags());
+                if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
+                if(result.shouldCancelTags()) break;
+            }
+        }
+        if(!postCancelled){
+            for (Map.Entry<AbstractTag, String> pair:postTags.entrySet()){
+                String tag = pair.getValue();
+                AbstractTag t = pair.getKey();
+                String[] arguments = getTagArguments(tag);
+                TagResult result = TagResult.builder().build();
+                if(t.getType() == ExecutionTypes.ITEM_HOLD) { result = t.run(ExecutionTypes.ITEM_HOLD, tag, arguments, istack, true, new HoldContext(player, event)); }
+                if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player)); }
+                if(result.shouldCancelPostTags().orElse(false)){ break; }
             }
         }
     }
@@ -321,6 +407,8 @@ public class AstroTagManager {
             InventoryChangeStates state = InventoryChangeStates.NOTHING;
             boolean isShift = false;
 
+            boolean postCancelled = false;
+            HashMap<AbstractTag, String> postTags = new HashMap<>();
             if(event instanceof ClickInventoryEvent.Primary) clickType = ClickType.LEFT;
             if(event instanceof ClickInventoryEvent.Secondary) clickType = ClickType.RIGHT;
             if(event instanceof ClickInventoryEvent.Middle) clickType = ClickType.MIDDLE;
@@ -345,16 +433,40 @@ public class AstroTagManager {
                     TagResult result = TagResult.builder().build();
                     switch (state) {
                         case NOTHING:
-                            if (t.getType() == ExecutionTypes.ITEM_CLICKED) { result = t.run(ExecutionTypes.ITEM_CLICKED, tag, arguments, istack, new ClickedContext(player, false, event, clickType, isShift)); }
+                            if (t.getType() == ExecutionTypes.ITEM_CLICKED) { result = t.run(ExecutionTypes.ITEM_CLICKED, tag, arguments, istack, false, new ClickedContext(player, event, clickType, isShift)); }
                             break;
                         case DROP:
-                            if (t.getType() == ExecutionTypes.ITEM_DROPPED) { result = t.run(ExecutionTypes.ITEM_DROPPED, tag, arguments, istack, new DroppedContext(player, false, (ClickInventoryEvent.Drop) event)); }
+                            if (t.getType() == ExecutionTypes.ITEM_DROPPED) { result = t.run(ExecutionTypes.ITEM_DROPPED, tag, arguments, istack, false, new DroppedContext(player, (ClickInventoryEvent.Drop) event)); }
                             break;
                         case PICKUP:
-                            if (t.getType() == ExecutionTypes.ITEM_PICKUP) { result = t.run(ExecutionTypes.ITEM_PICKUP, tag, arguments, istack, new PickupContext(player, false, (ClickInventoryEvent.Pickup) event)); }
+                            if (t.getType() == ExecutionTypes.ITEM_PICKUP) { result = t.run(ExecutionTypes.ITEM_PICKUP, tag, arguments, istack, false, new PickupContext(player, (ClickInventoryEvent.Pickup) event)); }
                             break;
                     }
-                    if(result.shouldCancelTags()) return;
+                    postTags = removePostTags(postTags, result.getQueueRemoveTags());
+                    postTags.putAll(result.getPostTags());
+                    if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
+                    if(result.shouldCancelTags()) break;
+                }
+            }
+            if(!postCancelled){
+                for (Map.Entry<AbstractTag, String> pair:postTags.entrySet()){
+                    String tag = pair.getValue();
+                    AbstractTag t = pair.getKey();
+                    String[] arguments = getTagArguments(tag);
+                    TagResult result = TagResult.builder().build();
+                    switch (state) {
+                        case NOTHING:
+                            if (t.getType() == ExecutionTypes.ITEM_CLICKED) { result = t.run(ExecutionTypes.ITEM_CLICKED, tag, arguments, istack, true, new ClickedContext(player, event, clickType, isShift)); }
+                            break;
+                        case DROP:
+                            if (t.getType() == ExecutionTypes.ITEM_DROPPED) { result = t.run(ExecutionTypes.ITEM_DROPPED, tag, arguments, istack, true, new DroppedContext(player, (ClickInventoryEvent.Drop) event)); }
+                            break;
+                        case PICKUP:
+                            if (t.getType() == ExecutionTypes.ITEM_PICKUP) { result = t.run(ExecutionTypes.ITEM_PICKUP, tag, arguments, istack, true, new PickupContext(player, (ClickInventoryEvent.Pickup) event)); }
+                            break;
+                    }
+                    if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player)); }
+                    if(result.shouldCancelPostTags().orElse(false)){ break; }
                 }
             }
         });
@@ -396,18 +508,37 @@ public class AstroTagManager {
             blockHit = blockRay.getLocation().getBlock().snapshotFor(blockRay.getLocation());
         }
         ClickType type = event instanceof ChangeBlockEvent.Place ? ClickType.RIGHT : ClickType.LEFT;
-        BlockChangeContext changecontext = new BlockChangeContext(player, false, event.getTransactions(), blockHit, direction);
-        UsedContext usedContext = new UsedContext(player, false, handType, type, event.getTransactions().get(0).getOriginal().getPosition().toDouble().add(0.5d, 0.5d, 0.5d));
+        BlockChangeContext changecontext = new BlockChangeContext(player, event.getTransactions(), blockHit, direction);
+        UsedContext usedContext = new UsedContext(player, handType, type, event.getTransactions().get(0).getOriginal().getPosition().toDouble().add(0.5d, 0.5d, 0.5d));
+
+        boolean postCancelled = false;
+        HashMap<AbstractTag, String> postTags = new HashMap<>();
         for(String tag: otags){
             if(getTag(tag).isPresent()){
                 AbstractTag t = getTag(tag).get();
                 String[] arguments = getTagArguments(tag);
                 TagResult result = TagResult.builder().build();
-                if(t.getType() == ExecutionTypes.BLOCK_CHANGE) { result = t.run(ExecutionTypes.BLOCK_CHANGE, tag, arguments, istack, changecontext); }
-                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, usedContext); }
+                if(t.getType() == ExecutionTypes.BLOCK_CHANGE) { result = t.run(ExecutionTypes.BLOCK_CHANGE, tag, arguments, istack, false, changecontext); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, false, usedContext); }
+                postTags = removePostTags(postTags, result.getQueueRemoveTags());
+                postTags.putAll(result.getPostTags());
+                if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
                 if(result.shouldCancelTags()) break;
             }
         }
+        if(!postCancelled){
+            for (Map.Entry<AbstractTag, String> pair:postTags.entrySet()){
+                String tag = pair.getValue();
+                AbstractTag t = pair.getKey();
+                String[] arguments = getTagArguments(tag);
+                TagResult result = TagResult.builder().build();
+                if(t.getType() == ExecutionTypes.BLOCK_CHANGE) { result = t.run(ExecutionTypes.BLOCK_CHANGE, tag, arguments, istack, true, changecontext); }
+                if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
+                if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player)); }
+                if(result.shouldCancelPostTags().orElse(false)){ break; }
+            }
+        }
+
         if(usedContext.isCancelled()) { event.setCancelled(true); return; }
         if(changecontext.areAllChangesCancelled()) { event.setCancelled(true); return; }
         ArrayList<Transaction<BlockSnapshot>> originalBlockChanges = new ArrayList<>(event.getTransactions());
@@ -484,4 +615,9 @@ public class AstroTagManager {
         return AstroForgeBridge.digBlock(player, tool, loc.getX(), loc.getY(), loc.getZ());
     }
     private void dropBlock(BlockChangeContext.BlockChange blockChange, Player player, ItemStack tool, Vector3i loc){ AstroForgeBridge.dropBlock(player, tool, loc.getX(), loc.getY(), loc.getZ()); }
+    private HashMap<AbstractTag, String> removePostTags(HashMap<AbstractTag, String> postTags, ArrayList<String> tags){
+        HashMap<AbstractTag, String> clone = new HashMap<>(postTags);
+        clone.keySet().removeIf(t -> tags.contains(t.getId().toLowerCase()));
+        return clone;
+    }
 }

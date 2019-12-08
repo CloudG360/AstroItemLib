@@ -30,7 +30,7 @@ public abstract class AbstractTag {
      *
      * @return Use a TagResult.builder()
      */
-    public abstract TagResult run(ExecutionTypes type, String fullTag, String[] args, ItemStackSnapshot itemStack, ExecutionContext context);
+    public abstract TagResult run(ExecutionTypes type, String fullTag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context);
 
     /**
      * For continuous ExecutionTypes. Sets how many ticks

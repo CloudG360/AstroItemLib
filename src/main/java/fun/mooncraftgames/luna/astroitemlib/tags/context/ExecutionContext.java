@@ -12,4 +12,8 @@ public abstract class ExecutionContext {
     public ExecutionContext(Player player) { this.player = player; }
 
     public Player getPlayer() { return player; }
+
+    public static class Generic extends ExecutionContext{
+        public Generic(Player player) { super(player); }
+    }
 }

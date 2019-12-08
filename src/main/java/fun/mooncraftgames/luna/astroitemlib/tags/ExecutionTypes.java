@@ -61,6 +61,12 @@ public enum ExecutionTypes {
     /** Single Execution, supports cooldowns.
      *
      */
-    BLOCK_CHANGE
+    BLOCK_CHANGE,
+
+    /**
+     * If all the tag needs is the player and it's being called in post, use
+     * POST_PROCESSING as it has widespread tag event support.
+     */
+    POST_PROCESSING
 
 }

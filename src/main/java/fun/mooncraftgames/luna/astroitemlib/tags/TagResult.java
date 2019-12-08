@@ -1,19 +1,18 @@
 package fun.mooncraftgames.luna.astroitemlib.tags;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.*;
 
 public abstract class TagResult {
 
-    private boolean shouldCancelTags;
-    private boolean shouldCancelPostTags;
+    private Boolean shouldCancelTags;
+    private Boolean shouldCancelPostTags;
 
-    private ArrayList<AbstractTag> postTags;
+    private HashMap<AbstractTag, String> postTags;
     private ArrayList<String> removeAbstractTags;
 
-    private TagResult(boolean shouldCancelTags, boolean shouldCancelPostTags, ArrayList<AbstractTag> postTags, ArrayList<String> removeAbstractTags) {
+    private TagResult(boolean shouldCancelTags, boolean shouldCancelPostTags, HashMap<AbstractTag, String> postTags, ArrayList<String> removeAbstractTags) {
         this.shouldCancelTags = shouldCancelTags;
         this.shouldCancelPostTags = shouldCancelPostTags;
         this.postTags = postTags;
@@ -21,8 +20,9 @@ public abstract class TagResult {
     }
 
     public boolean shouldCancelTags() { return shouldCancelTags; }
-    public boolean shouldCancelPostTags() { return shouldCancelPostTags; }
-    public ArrayList<AbstractTag> getPostTags() { return postTags; }
+
+    public Optional<Boolean> shouldCancelPostTags() { return Optional.ofNullable(shouldCancelPostTags); }
+    public HashMap<AbstractTag, String> getPostTags() { return postTags; }
     public ArrayList<String> getQueueRemoveTags() { return removeAbstractTags; }
 
     public static Builder builder(){
@@ -33,44 +33,39 @@ public abstract class TagResult {
         private Boolean shouldCancelTags;
         private Boolean shouldCancelPostTags;
 
-        private ArrayList<AbstractTag> postTags;
+        private HashMap<AbstractTag, String> postTags;
         private ArrayList<String> removeAbstractTags;
 
         private Builder(){
             this.shouldCancelTags = false;
-            this.shouldCancelPostTags = false;
-            this.postTags = new ArrayList<>();
+
+            this.postTags = new HashMap<>();
             this.removeAbstractTags = new ArrayList<>();
         }
 
         private void validate(){
             if(this.shouldCancelTags == null) this.shouldCancelTags = false;
-            if(this.shouldCancelPostTags == null) this.shouldCancelPostTags = false;
-            if(this.postTags == null) this.postTags = new ArrayList<>();
+
+            if(this.postTags == null) this.postTags = new HashMap<>();
             if(this.removeAbstractTags == null) this.removeAbstractTags = new ArrayList<>();
         }
 
         public Builder setShouldCancelPostTags(Boolean shouldCancelPostTags) { this.shouldCancelPostTags = shouldCancelPostTags; return this; }
         public Builder setShouldCancelTags(Boolean shouldCancelTags) { this.shouldCancelTags = shouldCancelTags; return this; }
 
-        public Builder addPostTags(AbstractTag... tags) { this.postTags.addAll(Arrays.asList(tags)); return this; }
+        public Builder addPostTags(Pair<AbstractTag, String>... tags) {
+            for(Pair<AbstractTag, String> pair : tags){
+                postTags.put(pair.getKey(), pair.getValue());
+            }
+            return this;
+        }
         public Builder removePostTags(String... tags) {
             List<String> tgs = Arrays.asList(tags);
-            ArrayList<AbstractTag> clone = new ArrayList<>(postTags);
-            for(int i = 0; i < postTags.size(); i++) {
-                int li = tgs.lastIndexOf(postTags.get(i).getId());
-                if(li == -1){ // Not found, escalate to full list.
-                    removeAbstractTags.add(tgs.get(li));
-                } else {
-                    clone.set(i, null);
-                }
-            }
-            clone.removeIf(Objects::isNull);
-            postTags = clone;
+            postTags.keySet().removeIf(t -> tgs.contains(t.getId().toLowerCase()));
             return this;
         }
 
-        public Builder setPostTags(ArrayList<AbstractTag> postTags) { this.postTags = postTags; return this; }
+        public Builder setPostTags(HashMap<AbstractTag, String> postTags) { this.postTags = postTags; return this; }
         public Builder clearRemovalQueue() { this.removeAbstractTags = new ArrayList<>(); return this; }
 
         public TagResult build(){
