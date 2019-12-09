@@ -306,6 +306,7 @@ public class AstroTagManager {
 
             if (usedContext.isCancelled()) event.setCancelled(true);
             if (interactContext.isCancelled()) event.setCancelled(true);
+            return;
         }
 
         // -- ITEM INTERACTS Level 1 (Covers all interactions which aren't caught by higher layers)
