@@ -24,7 +24,6 @@ public class TagItemUseCooldown extends AbstractTag {
     public TagItemUseCooldown(String id, TagPriority priority, ExecutionTypes type) { super(id, priority, type); }
 
     @Override
-    @SuppressWarnings("unchecked")
     public TagResult run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
         if(type == ExecutionTypes.ITEM_USED) {
             Optional<LocalDateTime> t = AstroItemLib.getCooldownManager().getItemCooldown(itemStack);

@@ -91,6 +91,12 @@ public class AstroItemLib {
 
     @Listener
     public void preServerInit(GamePreInitializationEvent event){
+        plg = this;
+        astroItemManager = new AstroItemManager();
+        astroTagManager = new AstroTagManager();
+        astroCooldownManager = new AstroCooldownManager();
+        taskManager = new TaskManager();
+
         // -- COMMAND REGISTERING --
 
         // Admin
@@ -156,11 +162,6 @@ public class AstroItemLib {
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
-        plg = this;
-        astroItemManager = new AstroItemManager();
-        astroTagManager = new AstroTagManager();
-        astroCooldownManager = new AstroCooldownManager();
-        taskManager = new TaskManager();
 
         taskManager.startTaskManager();
 

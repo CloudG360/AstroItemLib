@@ -101,7 +101,8 @@ public class AstroTagManager {
             } else {
                 boolean added = false;
                 for(int i = 0; i < tags.size(); i++){
-                    if(tagMap.get(shorttag).getPriority().getIntegerPriority() > tagMap.get(tags.get(i)).getPriority().getIntegerPriority()){
+                    String shortother = tags.get(i).toLowerCase().split(Pattern.quote(":"))[0];
+                    if(tagMap.get(shorttag).getPriority().getIntegerPriority() > tagMap.get(shortother).getPriority().getIntegerPriority()){
                         tags.add(i, t);
                         added = true;
                         break;
