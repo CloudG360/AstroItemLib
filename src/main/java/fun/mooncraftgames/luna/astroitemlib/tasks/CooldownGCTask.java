@@ -3,7 +3,6 @@ package fun.mooncraftgames.luna.astroitemlib.tasks;
 import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
 import fun.mooncraftgames.luna.astroitemlib.tasks.interfaces.IAstroTask;
 import fun.mooncraftgames.luna.astroitemlib.utilities.HashMapBuilder;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.HashMap;
 
@@ -19,7 +18,7 @@ public class CooldownGCTask implements IAstroTask {
     @Override
     public void run() {
         cycles++;
-        for(ItemStackSnapshot stack: AstroItemLib.getCooldownManager().getCooldowns().keySet()){
+        for(String stack: AstroItemLib.getCooldownManager().getCooldowns().keySet()){
 
         }
     }

@@ -3,6 +3,7 @@ package fun.mooncraftgames.luna.astroitemlib.utilities;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
+import fun.mooncraftgames.luna.astroitemlib.data.AstroKeys;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
@@ -323,10 +324,28 @@ public class Utils {
 
         if(build.length() < 4){
             return " a very short time ";
-        }
-        else {
+        } else {
             return build.substring(0, build.length()-2);
         }
     }
 
+    /**
+     * Generates a more insensitive name ID system. Ignores:
+     *  - Quantity
+     *  - Enchantments
+     *  - Data other than tags
+     * @param player
+     * @param stackSnapshot
+     * @return ID
+     */
+    public static String generateItemID(Player player, ItemStackSnapshot stackSnapshot){
+        String tlist = "";
+        Optional<List<String>> tags = stackSnapshot.get(AstroKeys.FUNCTION_TAGS);
+        if(tags.isPresent()){
+            for(String t:tags.get() ){ tlist = tlist.concat(t); }
+        }
+        String rtn = player.getName()+stackSnapshot.getType().getId()+tlist;
+        AstroItemLib.getLogger().info("ID: "+rtn);
+        return rtn;
+    }
 }
