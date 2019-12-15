@@ -43,6 +43,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.BlockChangeFlags;
@@ -194,8 +195,8 @@ public class AstroTagManager {
                     postTags = removePostTags(postTags, result.getQueueRemoveTags());
                     postTags.putAll(result.getPostTags());
                     sharedData.putAll(result.getSharedDataSubmission());
-                    if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
-                    if(result.shouldCancelTags()) break;
+                    if(result.shouldCancelPostTags() != Tristate.UNDEFINED){ postCancelled = result.shouldCancelPostTags().asBoolean(); }
+                    if(result.shouldCancelTags().asBoolean()) break;
                 }
             }
             if(!postCancelled){
@@ -209,7 +210,7 @@ public class AstroTagManager {
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
                     if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
                     sharedData.putAll(result.getSharedDataSubmission());
-                    if(result.shouldCancelPostTags().orElse(false)){ break; }
+                    if(result.shouldCancelPostTags().asBoolean()){ break; }
                 }
             }
             if(usedContext.isCancelled()) event.setCancelled(true);
@@ -242,8 +243,8 @@ public class AstroTagManager {
                     postTags = removePostTags(postTags, result.getQueueRemoveTags());
                     postTags.putAll(result.getPostTags());
                     sharedData.putAll(result.getSharedDataSubmission());
-                    if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
-                    if(result.shouldCancelTags()) break;
+                    if(result.shouldCancelPostTags() != Tristate.UNDEFINED){ postCancelled = result.shouldCancelPostTags().asBoolean(); }
+                    if(result.shouldCancelTags().asBoolean()) break;
                 }
             }
             if(!postCancelled){
@@ -256,7 +257,7 @@ public class AstroTagManager {
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
                     if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
                     sharedData.putAll(result.getSharedDataSubmission());
-                    if(result.shouldCancelPostTags().orElse(false)){ break; }
+                    if(result.shouldCancelPostTags().asBoolean()){ break; }
                 }
             }
 
@@ -286,8 +287,8 @@ public class AstroTagManager {
                     postTags = removePostTags(postTags, result.getQueueRemoveTags());
                     postTags.putAll(result.getPostTags());
                     sharedData.putAll(result.getSharedDataSubmission());
-                    if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
-                    if(result.shouldCancelTags()) break;
+                    if(result.shouldCancelPostTags() != Tristate.UNDEFINED){ postCancelled = result.shouldCancelPostTags().asBoolean(); }
+                    if(result.shouldCancelTags().asBoolean()) break;
                 }
             }
             if(!postCancelled){
@@ -300,7 +301,7 @@ public class AstroTagManager {
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
                     if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
                     sharedData.putAll(result.getSharedDataSubmission());
-                    if(result.shouldCancelPostTags().orElse(false)){ break; }
+                    if(result.shouldCancelPostTags().asBoolean()){ break; }
                 }
             }
 
@@ -328,8 +329,8 @@ public class AstroTagManager {
                     postTags = removePostTags(postTags, result.getQueueRemoveTags());
                     postTags.putAll(result.getPostTags());
                     sharedData.putAll(result.getSharedDataSubmission());
-                    if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
-                    if(result.shouldCancelTags()) break;
+                    if(result.shouldCancelPostTags() != Tristate.UNDEFINED){ postCancelled = result.shouldCancelPostTags().asBoolean(); }
+                    if(result.shouldCancelTags().asBoolean()) break;
                 }
             }
             if(!postCancelled){
@@ -341,7 +342,7 @@ public class AstroTagManager {
                     if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
                     if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
                     sharedData.putAll(result.getSharedDataSubmission());
-                    if(result.shouldCancelPostTags().orElse(false)){ break; }
+                    if(result.shouldCancelPostTags().asBoolean()){ break; }
                 }
             }
             if (usedContext.isCancelled()) event.setCancelled(true);
@@ -383,8 +384,8 @@ public class AstroTagManager {
                 postTags = removePostTags(postTags, result.getQueueRemoveTags());
                 postTags.putAll(result.getPostTags());
                 sharedData.putAll(result.getSharedDataSubmission());
-                if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
-                if(result.shouldCancelTags()) break;
+                if(result.shouldCancelPostTags() != Tristate.UNDEFINED){ postCancelled = result.shouldCancelPostTags().asBoolean(); }
+                if(result.shouldCancelTags().asBoolean()) break;
             }
         }
         if(!postCancelled){
@@ -396,7 +397,7 @@ public class AstroTagManager {
                 if(t.getType() == ExecutionTypes.ITEM_HOLD) { result = t.run(ExecutionTypes.ITEM_HOLD, tag, arguments, istack, true, new HoldContext(player, sharedData, event)); }
                 if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
                 sharedData.putAll(result.getSharedDataSubmission());
-                if(result.shouldCancelPostTags().orElse(false)){ break; }
+                if(result.shouldCancelPostTags().asBoolean()){ break; }
             }
         }
     }
@@ -466,8 +467,8 @@ public class AstroTagManager {
                     postTags = removePostTags(postTags, result.getQueueRemoveTags());
                     postTags.putAll(result.getPostTags());
                     sharedData.putAll(result.getSharedDataSubmission());
-                    if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
-                    if(result.shouldCancelTags()) break;
+                    if(result.shouldCancelPostTags() != Tristate.UNDEFINED){ postCancelled = result.shouldCancelPostTags().asBoolean(); }
+                    if(result.shouldCancelTags().asBoolean()) break;
                 }
             }
             if(!postCancelled){
@@ -489,7 +490,7 @@ public class AstroTagManager {
                     }
                     if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
                     sharedData.putAll(result.getSharedDataSubmission());
-                    if(result.shouldCancelPostTags().orElse(false)){ break; }
+                    if(result.shouldCancelPostTags().asBoolean()){ break; }
                 }
             }
         });
@@ -547,8 +548,8 @@ public class AstroTagManager {
                 postTags = removePostTags(postTags, result.getQueueRemoveTags());
                 postTags.putAll(result.getPostTags());
                 sharedData.putAll(result.getSharedDataSubmission());
-                if(result.shouldCancelPostTags().isPresent()){ postCancelled = result.shouldCancelPostTags().get(); }
-                if(result.shouldCancelTags()) break;
+                if(result.shouldCancelPostTags() != Tristate.UNDEFINED){ postCancelled = result.shouldCancelPostTags().asBoolean(); }
+                if(result.shouldCancelTags().asBoolean()) break;
             }
         }
         if(!postCancelled){
@@ -561,7 +562,7 @@ public class AstroTagManager {
                 if(t.getType() == ExecutionTypes.ITEM_USED) { result = t.run(ExecutionTypes.ITEM_USED, tag, arguments, istack, true, usedContext); }
                 if(t.getType() == ExecutionTypes.POST_PROCESSING){ result = t.run(ExecutionTypes.POST_PROCESSING, tag, arguments, istack, true, new ExecutionContext.Generic(player, sharedData)); }
                 sharedData.putAll(result.getSharedDataSubmission());
-                if(result.shouldCancelPostTags().orElse(false)){ break; }
+                if(result.shouldCancelPostTags().asBoolean()){ break; }
             }
         }
 
@@ -603,10 +604,8 @@ public class AstroTagManager {
                                 Utils.dropItem(
                                         blockChange.getBlock().getLocation().get(),
                                         entry.getItemStack().orElse(ItemStack.builder()
-                                                .itemType(ItemTypes.POISONOUS_POTATO)
-                                                .quantity(1)
-                                                .build().createSnapshot()),
-                                        5);
+                                                .itemType(ItemTypes.POISONOUS_POTATO).quantity(1)
+                                                .build().createSnapshot()), 5);
                                 break;
                         }
                     }
