@@ -603,9 +603,7 @@ public class AstroTagManager {
                             case ITEMSTACKSNAPSHOT:
                                 Utils.dropItem(
                                         blockChange.getBlock().getLocation().get(),
-                                        entry.getItemStack().orElse(ItemStack.builder()
-                                                .itemType(ItemTypes.POISONOUS_POTATO).quantity(1)
-                                                .build().createSnapshot()), 5);
+                                        entry.getItemStack().orElse(ItemStack.builder().itemType(ItemTypes.POISONOUS_POTATO).quantity(1).build().createSnapshot()), 5);
                                 break;
                         }
                     }
