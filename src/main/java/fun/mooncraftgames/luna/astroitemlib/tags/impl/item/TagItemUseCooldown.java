@@ -33,7 +33,7 @@ public class TagItemUseCooldown extends AbstractTag {
                 if(now.isBefore(ti)){
                     context.getPlayer().sendTitle(Title.builder().reset().build());
                     context.getPlayer().sendTitle(Title.builder()
-                            .actionBar(Text.of(TextColors.DARK_RED, TextStyles.BOLD, "COOLDOWN ", TextStyles.RESET, TextColors.RED, "You must wait", Utils.compareDateTimes(now, ti)))
+                            .actionBar(Text.of(TextColors.DARK_RED, TextStyles.BOLD, "COOLDOWN ", TextStyles.RESET, TextColors.RED, "You must wait ", Utils.compareDateTimes(now, ti), " before you can use this."))
                             .build());
                     context.getPlayer().playSound(SoundTypes.ENTITY_WITHER_SPAWN, context.getPlayer().getPosition(), 1d, 0.7d, 0.7d);
                     ((UsedContext) context).setCancelled(true);
@@ -60,10 +60,11 @@ public class TagItemUseCooldown extends AbstractTag {
         @Override
         public TagResult run(ExecutionTypes type, String fullTag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
             if(type == ExecutionTypes.ITEM_USED && isAppended){
-                int milliseconds = 1500;
-                if(args.length > 0){ try { milliseconds = Integer.parseInt(args[0]); } catch (Exception ignored) { }}
-                AstroItemLib.getCooldownManager().addItemCooldownMillis(Utils.generateItemID(context.getPlayer(), itemStack), milliseconds);
-                return TagResult.builder().build();
+                if(context.getSharedData().containsKey("failure")) {
+                    int milliseconds = 1500;
+                    if (args.length > 0) { try { milliseconds = Integer.parseInt(args[0]); } catch (Exception ignored) { } }
+                    AstroItemLib.getCooldownManager().addItemCooldownMillis(Utils.generateItemID(context.getPlayer(), itemStack), milliseconds);
+                }
             }
             return TagResult.builder().build();
         }

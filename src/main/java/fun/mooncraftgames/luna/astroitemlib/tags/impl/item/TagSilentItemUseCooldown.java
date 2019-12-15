@@ -20,17 +20,14 @@ public class TagSilentItemUseCooldown extends AbstractTag {
     @Override
     public TagResult run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
         if(type == ExecutionTypes.ITEM_USED) {
-            AstroItemLib.getLogger().info("Silent Cooldown");
             Optional<LocalDateTime> t = AstroItemLib.getCooldownManager().getSilentItemCooldown(Utils.generateItemID(context.getPlayer(), itemStack));
             if (t.isPresent()) {
                 LocalDateTime ti = t.get();
                 LocalDateTime now = LocalDateTime.now();
-                AstroItemLib.getLogger().info("Time present: "+ti.toString());
                 if(now.isBefore(ti)){
                     ((UsedContext) context).setCancelled(true);
                     return TagResult.builder().setShouldCancelTags(true).setShouldCancelPostTags(true).build();
                 } else {
-                    AstroItemLib.getLogger().info("Removing silent cooldown.");
                     AstroItemLib.getCooldownManager().removeSilentItemCooldown(Utils.generateItemID(context.getPlayer(), itemStack));
                 }
             }
@@ -55,11 +52,8 @@ public class TagSilentItemUseCooldown extends AbstractTag {
             if(type == ExecutionTypes.ITEM_USED && isAppended){
                 int milliseconds = 1500;
                 if(args.length > 0){ try { milliseconds = Integer.parseInt(args[0]); } catch (Exception ignored) { }}
-                AstroItemLib.getLogger().info("Added cooldown");
                 AstroItemLib.getCooldownManager().addSilentItemCooldownMillis(Utils.generateItemID(context.getPlayer(), itemStack), milliseconds);
-                return TagResult.builder().build();
             }
-            AstroItemLib.getLogger().info("Item Used or isAppened is false");
             return TagResult.builder().build();
         }
     }
