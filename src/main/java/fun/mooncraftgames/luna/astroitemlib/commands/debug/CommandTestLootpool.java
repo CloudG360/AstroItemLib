@@ -15,6 +15,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 
 import java.util.Optional;
 
@@ -54,9 +55,10 @@ public class CommandTestLootpool implements CommandExecutor {
 
             Utils.fillInventory(i, items);
 
+            src.sendMessage(Text.of(TextColors.GOLD, TextStyles.BOLD, "DEBUG ", TextStyles.RESET, TextColors.YELLOW, "Bloop! There's a loot table!"));
             player.openInventory(i);
         } else {
-            src.sendMessage(Text.of(TextColors.RED, "You're not a player. This command uses inventories."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, TextStyles.BOLD, "COOLDOWN ", TextStyles.RESET, TextColors.RED, "As this command uses inventories, this command source cannot use it."));
         }
 
         return CommandResult.success();
