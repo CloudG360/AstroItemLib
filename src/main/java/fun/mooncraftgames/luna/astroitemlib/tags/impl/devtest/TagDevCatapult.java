@@ -10,6 +10,7 @@ import fun.mooncraftgames.luna.astroitemlib.tags.context.entities.EntityHitConte
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.util.Tristate;
 
 public class TagDevCatapult extends AbstractTag {
 
@@ -29,7 +30,7 @@ public class TagDevCatapult extends AbstractTag {
             entityHitContext.getEvent().getTargetEntity().getLocation().getExtent()
                     .spawnParticles(e, entityHitContext.getEvent().getTargetEntity().getLocation().getPosition());
 
-            return TagResult.builder().setShouldCancelTags(true).build();
+            return TagResult.builder().setShouldCancelTags(Tristate.TRUE).build();
         }
         return TagResult.builder().build();
     }

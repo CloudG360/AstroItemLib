@@ -15,6 +15,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.util.Tristate;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public class TagItemUseCooldown extends AbstractTag {
                             .build());
                     context.getPlayer().playSound(SoundTypes.ENTITY_WITHER_SPAWN, context.getPlayer().getPosition(), 1d, 0.7d, 0.7d);
                     ((UsedContext) context).setCancelled(true);
-                    return TagResult.builder().setShouldCancelTags(true).setShouldCancelPostTags(true).build();
+                    return TagResult.builder().setShouldCancelTags(Tristate.TRUE).setShouldCancelPostTags(Tristate.TRUE).build();
                 } else {
                     AstroItemLib.getCooldownManager().removeItemCooldown(Utils.generateItemID(context.getPlayer(), itemStack));
                 }

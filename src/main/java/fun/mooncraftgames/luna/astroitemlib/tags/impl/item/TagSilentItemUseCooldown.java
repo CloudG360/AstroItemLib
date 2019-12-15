@@ -10,6 +10,7 @@ import fun.mooncraftgames.luna.astroitemlib.tags.context.item.UsedContext;
 import fun.mooncraftgames.luna.astroitemlib.utilities.Utils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.util.Tristate;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public class TagSilentItemUseCooldown extends AbstractTag {
                 LocalDateTime now = LocalDateTime.now();
                 if(now.isBefore(ti)){
                     ((UsedContext) context).setCancelled(true);
-                    return TagResult.builder().setShouldCancelTags(true).setShouldCancelPostTags(true).build();
+                    return TagResult.builder().setShouldCancelTags(Tristate.TRUE).setShouldCancelPostTags(Tristate.TRUE).build();
                 } else {
                     AstroItemLib.getCooldownManager().removeSilentItemCooldown(Utils.generateItemID(context.getPlayer(), itemStack));
                 }
