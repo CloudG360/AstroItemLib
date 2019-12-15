@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 import fun.mooncraftgames.luna.astroitemlib.commands.admin.CommandListCustomItems;
 import fun.mooncraftgames.luna.astroitemlib.commands.admin.CommandListPools;
 import fun.mooncraftgames.luna.astroitemlib.commands.admin.CommandReloadPools;
-import fun.mooncraftgames.luna.astroitemlib.commands.debug.CommandTestItemTag;
+import fun.mooncraftgames.luna.astroitemlib.commands.admin.CommandTestItemTag;
 import fun.mooncraftgames.luna.astroitemlib.commands.debug.CommandTestLootpool;
 import fun.mooncraftgames.luna.astroitemlib.commands.debug.CommandWriteDefaults;
 import fun.mooncraftgames.luna.astroitemlib.commands.shop.CommandGiveTemplateItem;
@@ -115,13 +115,13 @@ public class AstroItemLib {
                 .permission("astro.admin.list.items")
                 .executor(new CommandListCustomItems())
                 .build();
-
-        //Debug
-        CommandSpec testItemTags = CommandSpec.builder()
-                .description(Text.of("Debug command which shows an items AstroTags."))
-                .permission("astro.debug.tags")
+        CommandSpec adminListItemTags = CommandSpec.builder()
+                .description(Text.of("Command which lists an items AstroTags."))
+                .permission("astro.debug.tags.list")
                 .executor(new CommandTestItemTag())
                 .build();
+
+        //Debug
         CommandSpec testSupplyLoot = CommandSpec.builder()
                 .description(Text.of("Debug command which shows loot table."))
                 .arguments(
@@ -152,8 +152,8 @@ public class AstroItemLib {
         Sponge.getCommandManager().register(this, adminReloadAstro, "reloadastro");
         Sponge.getCommandManager().register(this, adminListPools, "listpools");
         Sponge.getCommandManager().register(this, adminListItems, "listitems");
+        Sponge.getCommandManager().register(this, adminListItemTags, "listitemtags");
 
-        Sponge.getCommandManager().register(this, testItemTags, "testitemtags");
         Sponge.getCommandManager().register(this, testSupplyLoot, "testlootpool");
         Sponge.getCommandManager().register(this, testJsonExport, "exportjsondefaults");
 

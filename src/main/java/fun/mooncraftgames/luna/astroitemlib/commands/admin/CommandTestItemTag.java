@@ -1,4 +1,4 @@
-package fun.mooncraftgames.luna.astroitemlib.commands.debug;
+package fun.mooncraftgames.luna.astroitemlib.commands.admin;
 
 import fun.mooncraftgames.luna.astroitemlib.data.AstroKeys;
 import org.spongepowered.api.command.CommandException;
@@ -13,9 +13,9 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * (C) Copyright 2019 - Will Scully (CloudGamer360), All rights reserved
@@ -40,13 +40,19 @@ public class CommandTestItemTag implements CommandExecutor {
             if(i.isPresent()){
                 Optional<List<String>> data = i.get().get(AstroKeys.FUNCTION_TAGS);
                 if(data.isPresent()){
-                    src.sendMessage(Text.of(TextColors.GREEN, TextStyles.BOLD,  "TAGS ", TextStyles.RESET, Arrays.toString(data.get().toArray())));
+                    src.sendMessage(Text.of(TextColors.DARK_GREEN, TextStyles.BOLD, "TAGS ", TextStyles.RESET, TextColors.GREEN, "Here are the item's tags:"));
+                    for(String tg : data.get()){
+                        String[] split = tg.split(Pattern.quote(":"), 2);
+                        String s1 = split.length > 0 ? split[0] : "NULL_TAG_UH_OH";
+                        String s2 = split.length > 1 ? split[1] : "(No Parameters)";
+                        src.sendMessage(Text.of(TextColors.DARK_AQUA, split[0], TextColors.DARK_GRAY, " : ", TextColors.AQUA, split[1]));
+                    }
                 } else {
-                    src.sendMessage(Text.of(TextColors.RED, "Data not present"));
+                    src.sendMessage(Text.of(TextColors.DARK_RED, TextStyles.BOLD, "COOLDOWN ", TextStyles.RESET, TextColors.RED, "As this command uses inventories, this command source cannot use it."));
                 }
             }
         } else {
-            src.sendMessage(Text.of(TextColors.RED, "You're not a player. This command uses inventories."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, TextStyles.BOLD, "COOLDOWN ", TextStyles.RESET, TextColors.RED, "As this command uses inventories, this command source cannot use it."));
         }
 
         return CommandResult.success();
