@@ -50,7 +50,7 @@ public class CommandWriteDefaults implements CommandExecutor {
             String string = gson.toJson(supplyLoot);
             write.write(string);
             write.close();
-            src.sendMessage(Text.of(TextColors.GOLD, TextStyles.BOLD, "DEBUG ", TextStyles.RESET, "Created file at "+f.getAbsolutePath()));
+            src.sendMessage(Text.of(TextColors.GOLD, TextStyles.BOLD, "DEBUG ", TextStyles.RESET, "Created loot table file at "+f.getAbsolutePath()));
 
             File fi = new File("./generated_item.json");
             fi.createNewFile();
@@ -60,7 +60,7 @@ public class CommandWriteDefaults implements CommandExecutor {
             String stringi = gson.toJson(item);
             writei.write(stringi);
             writei.close();
-            src.sendMessage(Text.of(TextColors.GOLD, TextStyles.BOLD, "DEBUG ", TextStyles.RESET, "Created file at "+fi.getAbsolutePath()));
+            src.sendMessage(Text.of(TextColors.GOLD, TextStyles.BOLD, "DEBUG ", TextStyles.RESET, "Created item file at "+fi.getAbsolutePath()));
         } catch (Exception err){
             err.printStackTrace();
         }
