@@ -182,7 +182,7 @@ public class AstroTagManager {
             EntityInteractContext interactContext = new EntityInteractContext(player, sharedData, ClickType.LEFT, event.getTargetEntity(), event.isCancelled());
 
             boolean postCancelled = false;
-            HashMap<AbstractTag, String> postTags = new HashMap<>(); //TODO: Add Post Tags, remove unneeded ones, and run them after. Add tagData as well.
+            HashMap<AbstractTag, String> postTags = new HashMap<>();
             for(String tag: otags){
                 if(getTag(tag).isPresent()){
                     AbstractTag t = getTag(tag).get();
@@ -422,8 +422,6 @@ public class AstroTagManager {
             Optional<List<String>> tgs = istack.get(AstroKeys.FUNCTION_TAGS);
             if(!tgs.isPresent()) return;
             List<String> tags = tgs.get();
-
-            //TODO: Determine ClickType & If shift.
             ClickType clickType = ClickType.UNKNOWN;
             InventoryChangeStates state = InventoryChangeStates.NOTHING;
             boolean isShift = false;
@@ -498,7 +496,6 @@ public class AstroTagManager {
     }
 
     @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) { onBlockEditCommon(event, player); }
-
     @Listener(beforeModifications = true, order = Order.DEFAULT) public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) { onBlockEditCommon(event, player); }
 
     @Listener(beforeModifications = true, order = Order.LATE)
@@ -629,7 +626,6 @@ public class AstroTagManager {
         return true;
     }
     private boolean digBlock(BlockChangeContext.BlockChange blockChange, ItemStack t, Player player){
-        //TODO: Remove item data temporarily
         if(AstroItemLib.getGriefPrevention().isPresent()){
             GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
             Claim claim = api.getClaimManager(player.getWorld()).getClaimAt(blockChange.getBlock().getLocation().get());

@@ -37,12 +37,8 @@ public class AstroItemManager {
 
     public void registerCustomItem(String id, ItemTemplate item) throws OverwriteDeniedException {
         item.verifyIntegrity();
-        if(item.getId().equals("DEFAULT")){
-            throw new InvalidItemException(InvalidItemException.ExceptionType.ITEM_ID, id, "No uid field was detected in json definition.");
-        }
-        if(itemTemplates.containsKey(id.toLowerCase())){
-            throw new OverwriteDeniedException(String.format("A custom item was registered with a duplicate id: %s", id.toLowerCase()));
-        }
+        if(item.getId().equals("DEFAULT")){ throw new InvalidItemException(InvalidItemException.ExceptionType.ITEM_ID, id, "No uid field was detected in json definition."); }
+        if(itemTemplates.containsKey(id.toLowerCase())){ throw new OverwriteDeniedException(String.format("A custom item was registered with a duplicate id: %s", id.toLowerCase())); }
         itemTemplates.put(id.toLowerCase(), item);
     }
     public void unregisterCustomItem(String id){ lootpools.remove(id.toLowerCase()); }

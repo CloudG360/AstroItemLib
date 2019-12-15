@@ -65,9 +65,7 @@ import java.util.Optional;
         name = "AstroItemLib",
         version = "Pipeline V4.4.2",
         description = "Implements Custom Item Tags, Templates, and Loot Pools (Loot Tables for Sponge)",
-        authors = {
-                "CloudGamer360"
-        },
+        authors = {"CloudGamer360"},
         dependencies = {
                 @Dependency(id = "griefprevention", version = "4.0.3", optional = true),
                 @Dependency(id = "astrofb", version = "1.0.0", optional = false)
@@ -162,40 +160,29 @@ public class AstroItemLib {
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
-
         taskManager.startTaskManager();
-
         resetPools();
         resetItemTemplates();
+        try { this.griefPrevention = GriefPrevention.getApi(); } catch (Exception err){ this.griefPrevention = null; }
 
-        try {
-            this.griefPrevention = GriefPrevention.getApi();
-        } catch (Exception err){
-            this.griefPrevention = null;
-        }
         // -- TAG REGISTERING --
-
         getAstroTagManager()
+                // Dev
                 .registerTag(new TagDevCookie("dev_cookie", TagPriority.NORMAL, ExecutionTypes.ITEM_USED))
                 .registerTag(new TagDevCatapult("dev_catapult", TagPriority.HIGH, ExecutionTypes.ENTITY_HIT))
                 .registerTag(new TagDevTestInventory("dev_test_click", TagPriority.NORMAL, ExecutionTypes.ITEM_CLICKED))
                 .registerTag(new TagDevTracking("dev_tracking", TagPriority.NORMAL, ExecutionTypes.ITEM_HOLDING))
-
-                //TODO: Add ability to ignore tag-blocking statements for stuff which should be ran last. "Append Tags" or something
+                // World
                 .registerTag(new TagUnplaceable("unplaceable", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
                 .registerTag(new TagStopBreakBlock("stopbreakblock", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
                 .registerTag(new TagSmelting("smelting", TagPriority.LOW, ExecutionTypes.BLOCK_CHANGE))
-                //TODO: Add a doubler tag. Requires some forge bridge stuff.
-
+                // Item
                 .registerTag(new TagButterfingers("butterfingers", TagPriority.HIGHEST, ExecutionTypes.ITEM_HOLD))
                 .registerTag(new TagDoubler("double_mine", TagPriority.LOWEST, ExecutionTypes.BLOCK_CHANGE))
                 .registerTag(new TagUndroppable("undroppable", TagPriority.HIGH, ExecutionTypes.ITEM_DROPPED))
-
                 .registerTag(new TagItemUseCooldown("iu_cooldown", TagPriority.COOLDOWN, ExecutionTypes.ITEM_USED))
                 .registerTag(new TagSilentItemUseCooldown("iu_s_cooldown", TagPriority.COOLDOWN, ExecutionTypes.ITEM_USED));
-
         Sponge.getEventManager().registerListeners(this, astroTagManager);
-
         taskManager.registerTask(new CooldownGCTask());
     }
 
@@ -214,7 +201,6 @@ public class AstroItemLib {
     @Listener
     public void onDataRegistration(GameRegistryEvent.Register<DataRegistration<?, ?>> event){
         logger.info("<Items> Registering AstroBackbone Data");
-
         this.R_ASTRO_ITEM_DATA = DataRegistration.builder()
                 .dataClass(AstroItemData.class)
                 .immutableClass(ImmutableAstroItemData.class)
@@ -231,53 +217,29 @@ public class AstroItemLib {
         getAstroItemManager().clearPoolDatabase();
         File lootDirectory = new File("./lootpools");
         if (!lootDirectory.isDirectory()) lootDirectory.mkdirs();
-
         File[] pools = lootDirectory.listFiles();
-
         if(!(pools == null)) {
             for (File pool : pools) {
                 String json = "";
-                // Stage: Read
                 try {
                     FileReader reader = new FileReader(pool);
                     BufferedReader r = new BufferedReader(reader);
                     Iterator<String> i = r.lines().iterator();
-
-                    while(i.hasNext()){
-                        String next = i.next();
-                        json = json.concat(next);
-                    }
+                    while(i.hasNext()){ String next = i.next();json = json.concat(next); }
                     r.close();
                 } catch (Exception err){
                     getLogger().info("An error occured while opening the loottable at "+pool.getAbsolutePath());
                     err.printStackTrace();
                     continue;
                 }
-                // Stage: Parse
-
                 Gson gson = new Gson();
                 SupplyLoot loot;
                 try {
                     loot = gson.fromJson(json, SupplyLoot.class);
                     if(loot == null) throw new MalformedLootPoolException("The pool was empty? Actually write something in the json file.");
-                } catch(JsonSyntaxException err){
-                    getLogger().info("Malformed json in loottable at "+pool.getAbsolutePath());
-                    continue;
-                } catch (Exception err){
-                    getLogger().info("An error occured while processing the loottable at "+pool.getAbsolutePath());
-                    continue;
-                }
-
-                // Stage: Validate & Register
-
-                try {
-                    getAstroItemManager().registerLootPool(loot.getId(), loot);
-                } catch (Exception err) {
-                    err.printStackTrace();
-                }
-
-                //TODO: Validate rolls on register rather than on roll
-
+                } catch(JsonSyntaxException err){ getLogger().info("Malformed json in loottable at "+pool.getAbsolutePath()); continue;
+                } catch (Exception err){ getLogger().info("An error occured while processing the loottable at "+pool.getAbsolutePath()); continue; }
+                try { getAstroItemManager().registerLootPool(loot.getId(), loot); } catch (Exception err) { err.printStackTrace(); }
             }
         }
     }
@@ -286,51 +248,29 @@ public class AstroItemLib {
         getAstroItemManager().clearItemDatabase();
         File lootDirectory = new File("./itemtemplates");
         if (!lootDirectory.isDirectory()) lootDirectory.mkdirs();
-
         File[] pools = lootDirectory.listFiles();
-
         if(!(pools == null)) {
             for (File pool : pools) {
                 String json = "";
-                // Stage: Read
                 try {
                     FileReader reader = new FileReader(pool);
                     BufferedReader r = new BufferedReader(reader);
                     Iterator<String> i = r.lines().iterator();
-
-                    while(i.hasNext()){
-                        String next = i.next();
-                        json = json.concat(next);
-                    }
+                    while(i.hasNext()){ String next = i.next();json = json.concat(next); }
                     r.close();
                 } catch (Exception err){
                     getLogger().info("An error occured while opening the custom item at "+pool.getAbsolutePath());
                     err.printStackTrace();
                     continue;
                 }
-                // Stage: Parse
-
                 Gson gson = new Gson();
                 ItemTemplate loot;
                 try {
                     loot = gson.fromJson(json, ItemTemplate.class);
                     if(loot == null) throw new MalformedLootPoolException("The custom item was empty? Actually write something in the json file.");
-                } catch(JsonSyntaxException err){
-                    getLogger().info("Malformed json in custom item at "+pool.getAbsolutePath());
-                    continue;
-                } catch (Exception err){
-                    getLogger().info("An error occured while processing the custom item at "+pool.getAbsolutePath());
-                    continue;
-                }
-
-                // Stage: Validate & Register
-
-                try {
-                    getAstroItemManager().registerCustomItem(loot.getUniqueID(), loot);
-                } catch (Exception err) {
-                    err.printStackTrace();
-                }
-
+                } catch(JsonSyntaxException err){ getLogger().info("Malformed json in custom item at "+pool.getAbsolutePath()); continue;
+                } catch (Exception err){ getLogger().info("An error occured while processing the custom item at "+pool.getAbsolutePath()); continue; }
+                try { getAstroItemManager().registerCustomItem(loot.getUniqueID(), loot); } catch (Exception err) { err.printStackTrace(); }
             }
         }
     }

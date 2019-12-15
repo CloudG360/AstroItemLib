@@ -18,7 +18,6 @@ public abstract class AbstractTag {
         this.type = type;
     }
 
-    //TODO: Replace boolean return with .set functions. Should be able to disable tag in the future.
     /**
      * Handles execution for a tag's functions. Designed to
      * be run by the AstroTagManager's listener events.

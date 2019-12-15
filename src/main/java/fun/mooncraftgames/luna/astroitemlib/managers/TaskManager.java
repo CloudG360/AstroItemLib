@@ -52,8 +52,8 @@ public final class TaskManager {
     public void process() {
         HashMap<UUID, IAstroTask> clone = new HashMap<>(tasks);
         for(Map.Entry<UUID, IAstroTask> entry: clone.entrySet()){
-            if(runningasynctasks.contains(entry.getKey())){ continue; } //Skips it if Async (implied) and on list
-            if(suspendedtasks.contains(entry.getKey())){ continue; } //Skips it if scheduled to rerun later.
+            if(runningasynctasks.contains(entry.getKey())){ continue; }
+            if(suspendedtasks.contains(entry.getKey())){ continue; }
             if(entry.getValue().isAsync()){
                 Task.builder().async().execute(() -> {
                         runningasynctasks.add(entry.getKey());

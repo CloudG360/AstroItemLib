@@ -49,7 +49,7 @@ public class TagSmelting extends AbstractTag {
                     }
                 }
             }
-        } //TODO: Add a detection for entity hit for smelting food drops.
+        }
         return TagResult.builder().build();
     }
 }
