@@ -45,7 +45,7 @@ public class CommandTestItemTag implements CommandExecutor {
                         String[] split = tg.split(Pattern.quote(":"), 2);
                         String s1 = split.length > 0 ? split[0] : "NULL_TAG_UH_OH";
                         String s2 = split.length > 1 ? split[1] : "(No Parameters)";
-                        src.sendMessage(Text.of(TextColors.DARK_AQUA, split[0], TextColors.DARK_GRAY, " : ", TextColors.AQUA, split[1]));
+                        src.sendMessage(Text.of(TextColors.DARK_AQUA, s1, TextColors.DARK_GRAY, " : ", TextColors.AQUA, s2));
                     }
                 } else {
                     src.sendMessage(Text.of(TextColors.DARK_RED, TextStyles.BOLD, "COOLDOWN ", TextStyles.RESET, TextColors.RED, "As this command uses inventories, this command source cannot use it."));
