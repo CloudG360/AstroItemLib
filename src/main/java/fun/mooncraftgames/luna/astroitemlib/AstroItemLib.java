@@ -140,9 +140,9 @@ public class AstroItemLib {
         CommandSpec shopGiveItem = CommandSpec.builder()
                 .description(Text.of("Gives a player a custom item (Designed for a key) "))
                 .arguments(
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("player"))),
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("item template"))),
-                        GenericArguments.onlyOne(GenericArguments.integer(Text.of("quantity")))
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("Item Template"))),
+                        GenericArguments.optional(GenericArguments.onlyOne(GenericArguments.integer(Text.of("Quantity")))),
+                        GenericArguments.optional(GenericArguments.onlyOne(GenericArguments.string(Text.of("Player Name"))))
                 )
                 .permission("astro.shop.items")
                 .executor(new CommandGiveTemplateItem())
