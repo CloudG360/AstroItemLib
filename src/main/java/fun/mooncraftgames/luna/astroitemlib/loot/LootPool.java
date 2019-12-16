@@ -22,6 +22,14 @@ public class LootPool {
 
     private transient ItemStack[] lastRoll;
 
+    public LootPool() {
+        this.id = "generated_pool_internal";
+        this.title = "&6&lServer Loot Pool";
+        this.lootpool = new LootPoolRoll[]{ new LootPoolRoll().setConfig(1, 1,1, true, 1, new ItemTemplate().setAir())};
+        this.minrolls = 1;
+        this.maxrolls = 1;
+    }
+
     public ItemStack[] rollLootPool(int result_size){
         verifyIntergirty();
 
