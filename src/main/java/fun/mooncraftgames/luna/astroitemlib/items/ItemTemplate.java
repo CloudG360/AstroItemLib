@@ -32,6 +32,16 @@ public class ItemTemplate {
     private SerializableItemKeys keys;
     private SerializableItemEnchantment[] enchantments;
 
+    public ItemTemplate(){
+        this.uid = "server:internal";
+        this.id = "minecraft:air";
+        this.display_name = "IGNORE";
+        this.lore = new String[] {"IGNORE"};
+        this.astro_tags = new String[] {"IGNORE"};
+        this.keys = new SerializableItemKeys().setEmpty();
+        this.enchantments = new SerializableItemEnchantment[] { new SerializableItemEnchantment().setEmpty() };
+    }
+
     public ItemTemplate setConfig(String uid, String id, String display_name, String[] lore, SerializableItemKeys keys, SerializableItemEnchantment[] enchantments) {
         this.uid = uid;
         this.id = id;
