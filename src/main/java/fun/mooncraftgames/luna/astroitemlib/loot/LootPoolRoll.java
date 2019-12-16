@@ -6,18 +6,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Random;
 
-/**
- * (C) Copyright 2019 - Will Scully (CloudGamer360), All rights reserved
- *
- * By using the following application, you are accepting all responsibility
- * for any damage or legal issues which arise over it. Additionally, you are
- * agreeing not to use this application or it's components anywhere other
- * than the Mooncraft Minecraft Server unless you have written permission from
- * the copyright holder.
- *
- *
- * Failure to follow the license will result in a termination of license.
- */
 public class LootPoolRoll {
 
     private int weight = 5; //Example: 500 will put it in the loot pool 500 times. All get removed from the lootpool if it hits the max stack amount
