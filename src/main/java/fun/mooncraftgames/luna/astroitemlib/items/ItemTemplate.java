@@ -59,6 +59,7 @@ public class ItemTemplate {
         this.display_name = "IGNORE";
         this.lore = new String[] {"IGNORE"};
         this.keys = new SerializableItemKeys().setEmpty();
+        this.astro_tags = new String[] {"IGNORE"};
         this.enchantments = new SerializableItemEnchantment[] { new SerializableItemEnchantment().setEmpty() };
         this.verifyIntegrity();
         return this;
