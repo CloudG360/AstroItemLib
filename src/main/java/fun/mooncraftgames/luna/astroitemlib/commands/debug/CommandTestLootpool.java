@@ -1,7 +1,7 @@
 package fun.mooncraftgames.luna.astroitemlib.commands.debug;
 
 import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
-import fun.mooncraftgames.luna.astroitemlib.loot.SupplyLoot;
+import fun.mooncraftgames.luna.astroitemlib.loot.LootPool;
 import fun.mooncraftgames.luna.astroitemlib.utilities.Utils;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -40,10 +40,10 @@ public class CommandTestLootpool implements CommandExecutor {
 
             Optional<String> a =  args.getOne(Text.of("Loot Pool"));
 
-            SupplyLoot supplyLoot = new SupplyLoot().setToDefault();
+            LootPool supplyLoot = new LootPool().setToDefault();
 
             if(a.isPresent()) {
-                Optional<SupplyLoot> p = AstroItemLib.getAstroManager().getPool(a.get());
+                Optional<LootPool> p = AstroItemLib.getAstroManager().getPool(a.get());
                 if(p.isPresent()) supplyLoot = p.get();
             }
 

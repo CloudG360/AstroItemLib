@@ -18,7 +18,7 @@ import java.util.Random;
  *
  * Failure to follow the license will result in a termination of license.
  */
-public class SupplyRoll {
+public class LootPoolRoll {
 
     private int weight = 5; //Example: 500 will put it in the loot pool 500 times. All get removed from the lootpool if it hits the max stack amount
 
@@ -53,7 +53,7 @@ public class SupplyRoll {
         return item.generateStack(quantity);
     }
 
-    public void copyFrom(SupplyRoll roll){
+    public void copyFrom(LootPoolRoll roll){
         this.weight = roll.getWeight();
         this.minStackAmount = roll.getMinStackAmount();
         this.maxStackAmount = roll.getMaxStackAmount();
@@ -73,7 +73,7 @@ public class SupplyRoll {
         this.verifyIntegrity();
     }
 
-    public SupplyRoll setConfig(int weight, int minStackAmount, int maxStackAmount, boolean forcePresent, int maxAmount, ItemTemplate item){
+    public LootPoolRoll setConfig(int weight, int minStackAmount, int maxStackAmount, boolean forcePresent, int maxAmount, ItemTemplate item){
         this.weight = weight;
         this.minStackAmount = minStackAmount;
         this.maxStackAmount = maxStackAmount;

@@ -19,7 +19,7 @@ import fun.mooncraftgames.luna.astroitemlib.data.impl.AstroItemDataImpl;
 import fun.mooncraftgames.luna.astroitemlib.data.impl.ImmutableAstroItemDataImpl;
 import fun.mooncraftgames.luna.astroitemlib.exceptions.MalformedLootPoolException;
 import fun.mooncraftgames.luna.astroitemlib.items.ItemTemplate;
-import fun.mooncraftgames.luna.astroitemlib.loot.SupplyLoot;
+import fun.mooncraftgames.luna.astroitemlib.loot.LootPool;
 import fun.mooncraftgames.luna.astroitemlib.managers.AstroCooldownManager;
 import fun.mooncraftgames.luna.astroitemlib.managers.AstroItemManager;
 import fun.mooncraftgames.luna.astroitemlib.managers.AstroTagManager;
@@ -233,9 +233,9 @@ public class AstroItemLib {
                     continue;
                 }
                 Gson gson = new Gson();
-                SupplyLoot loot;
+                LootPool loot;
                 try {
-                    loot = gson.fromJson(json, SupplyLoot.class);
+                    loot = gson.fromJson(json, LootPool.class);
                     if(loot == null) throw new MalformedLootPoolException("The pool was empty? Actually write something in the json file.");
                 } catch(JsonSyntaxException err){ getLogger().info("Malformed json in loottable at "+pool.getAbsolutePath()); continue;
                 } catch (Exception err){ getLogger().info("An error occured while processing the loottable at "+pool.getAbsolutePath()); continue; }

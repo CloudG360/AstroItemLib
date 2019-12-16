@@ -6,7 +6,7 @@ import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
 import fun.mooncraftgames.luna.astroitemlib.data.AstroItemData;
 import fun.mooncraftgames.luna.astroitemlib.data.AstroKeys;
 import fun.mooncraftgames.luna.astroitemlib.data.impl.AstroItemDataImpl;
-import fun.mooncraftgames.luna.astroitemlib.loot.SupplyLoot;
+import fun.mooncraftgames.luna.astroitemlib.loot.LootPool;
 import fun.mooncraftgames.luna.astroitemlib.tags.*;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.ExecutionContext;
 import fun.mooncraftgames.luna.astroitemlib.tags.context.blocks.BlockChangeContext;
@@ -593,7 +593,7 @@ public class AstroTagManager {
                     for(BlockDestroyLootEntry entry: blockChange.getAdditionalDrops()){
                         switch (entry.getType()){
                             case SUPPLYLOOT:
-                                for(ItemStack lootentry: entry.getLootTable().orElse(new SupplyLoot().setToDefault()).rollLootPool(-1)){
+                                for(ItemStack lootentry: entry.getLootTable().orElse(new LootPool().setToDefault()).rollLootPool(-1)){
                                     Utils.dropItem(blockChange.getBlock().getLocation().get(), lootentry.createSnapshot(), 5);
                                 }
                                 break;

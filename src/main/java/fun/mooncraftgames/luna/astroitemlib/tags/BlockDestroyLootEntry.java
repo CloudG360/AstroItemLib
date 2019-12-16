@@ -1,6 +1,6 @@
 package fun.mooncraftgames.luna.astroitemlib.tags;
 
-import fun.mooncraftgames.luna.astroitemlib.loot.SupplyLoot;
+import fun.mooncraftgames.luna.astroitemlib.loot.LootPool;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -13,7 +13,7 @@ public class BlockDestroyLootEntry {
     private Type type;
     private Object data;
 
-    public BlockDestroyLootEntry(SupplyLoot lootTable) { this.type = Type.SUPPLYLOOT;this.data = lootTable; }
+    public BlockDestroyLootEntry(LootPool lootTable) { this.type = Type.SUPPLYLOOT;this.data = lootTable; }
     public BlockDestroyLootEntry(ItemStackSnapshot itemStack) { this.type = Type.ITEMSTACKSNAPSHOT; this.data = itemStack; }
     public BlockDestroyLootEntry(boolean isEmpty) {
         // isEmpty is just there to make it less "Oh why aren't drops working" due to an empty constructor. = True is a shortcut for an air stack.
@@ -26,6 +26,6 @@ public class BlockDestroyLootEntry {
     }
 
     public Type getType() { return type; }
-    public Optional<SupplyLoot> getLootTable() { if(type == Type.SUPPLYLOOT){ return Optional.ofNullable((SupplyLoot) data); } else { return Optional.empty(); } }
+    public Optional<LootPool> getLootTable() { if(type == Type.SUPPLYLOOT){ return Optional.ofNullable((LootPool) data); } else { return Optional.empty(); } }
     public Optional<ItemStackSnapshot> getItemStack() { if(type == Type.ITEMSTACKSNAPSHOT){ return Optional.ofNullable((ItemStackSnapshot) data); } else { return Optional.empty(); } }
 }

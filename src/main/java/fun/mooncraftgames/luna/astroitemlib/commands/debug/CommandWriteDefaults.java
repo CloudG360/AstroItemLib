@@ -2,7 +2,7 @@ package fun.mooncraftgames.luna.astroitemlib.commands.debug;
 
 import com.google.gson.Gson;
 import fun.mooncraftgames.luna.astroitemlib.items.ItemTemplate;
-import fun.mooncraftgames.luna.astroitemlib.loot.SupplyLoot;
+import fun.mooncraftgames.luna.astroitemlib.loot.LootPool;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -33,7 +33,7 @@ public class CommandWriteDefaults implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        SupplyLoot supplyLoot = new SupplyLoot();
+        LootPool supplyLoot = new LootPool();
         supplyLoot.setToDefault();
 
         ItemTemplate item = new ItemTemplate();
