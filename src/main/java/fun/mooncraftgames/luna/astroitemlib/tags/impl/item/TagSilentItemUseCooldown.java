@@ -34,7 +34,6 @@ public class TagSilentItemUseCooldown extends AbstractTag {
             }
             String milliseconds = "1500";
             if(args.length > 0){ milliseconds = args[0]; }
-            AstroItemLib.getLogger().info("Got time");
             return TagResult.builder().addPostTags(Pair.of(
                     new Post("s_cooldown_post", TagPriority.COOLDOWN, ExecutionTypes.ITEM_USED), String.format("s_cooldown_post:%s", milliseconds))
             ).build();

@@ -59,7 +59,7 @@ public class RunnableManageContinousTags implements IAstroTask {
                     if (tgs.isPresent()) {
                         List<String> tags = tgs.get();
 
-                        String[] otags = AstroItemLib.getTagManager().orderedTags(tags.toArray(new String[0]));
+                        String[] otags = AstroItemLib.getTagManager().silentOrderedTags(tags.toArray(new String[0]));
 
                         HashMap<String, String> sharedData = new HashMap<>();
 
@@ -100,7 +100,7 @@ public class RunnableManageContinousTags implements IAstroTask {
                     if (tgs.isPresent()) {
                         List<String> tags = tgs.get();
 
-                        String[] otags = AstroItemLib.getTagManager().orderedTags(tags.toArray(new String[0]));
+                        String[] otags = AstroItemLib.getTagManager().silentOrderedTags(tags.toArray(new String[0]));
 
                         HashMap<String, String> sharedData = new HashMap<>();
 

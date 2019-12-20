@@ -115,6 +115,29 @@ public class AstroTagManager {
         return tags.toArray(new String[0]);
     }
 
+    public String[] silentOrderedTags(String[] tagsIn){
+        List<String> tags = new ArrayList<>();
+        for(String t:tagsIn){
+            String shorttag = t.toLowerCase().split(Pattern.quote(":"))[0];
+            if(!tagMap.containsKey(shorttag)){ continue; }
+            if(tags.size() == 0){
+                tags.add(t);
+            } else {
+                boolean added = false;
+                for(int i = 0; i < tags.size(); i++){
+                    String shortother = tags.get(i).toLowerCase().split(Pattern.quote(":"))[0];
+                    if(tagMap.get(shorttag).getPriority().getIntegerPriority() > tagMap.get(shortother).getPriority().getIntegerPriority()){
+                        tags.add(i, t);
+                        added = true;
+                        break;
+                    }
+                }
+                if(!added) tags.add(t);
+            }
+        }
+        return tags.toArray(new String[0]);
+    }
+
     public static String[] getTagArguments(String raw_tag){
         String processed = raw_tag.replace( "\\:", "{feature.colon}");
         processed = processed.replace( "\\,", "{feature.comma}");
@@ -152,7 +175,7 @@ public class AstroTagManager {
             }
         }
         AstroItemLib.getLogger().info("Starting new TagProcessor...");
-        AstroItemLib.getTaskManager().registerTask(new RunnableManageContinousTags(1, tagProcessors.size()).addPlayer(event.getTargetEntity().getUniqueId()));
+        AstroItemLib.getTaskManager().registerTask(new RunnableManageContinousTags(2, tagProcessors.size()).addPlayer(event.getTargetEntity().getUniqueId()));
 
     }
 

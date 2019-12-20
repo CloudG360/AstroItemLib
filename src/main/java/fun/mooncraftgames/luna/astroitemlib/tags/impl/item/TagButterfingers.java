@@ -1,6 +1,5 @@
 package fun.mooncraftgames.luna.astroitemlib.tags.impl.item;
 
-import fun.mooncraftgames.luna.astroitemlib.AstroItemLib;
 import fun.mooncraftgames.luna.astroitemlib.tags.AbstractTag;
 import fun.mooncraftgames.luna.astroitemlib.tags.ExecutionTypes;
 import fun.mooncraftgames.luna.astroitemlib.tags.TagPriority;
@@ -30,7 +29,6 @@ public class TagButterfingers extends AbstractTag {
     @Override
     public TagResult run(ExecutionTypes type, String tag, String[] args, ItemStackSnapshot itemStack, boolean isAppended, ExecutionContext context) {
         if(type == ExecutionTypes.ITEM_HOLD){
-            AstroItemLib.getLogger().info("BUTTERFINGERS");
             HoldContext d = (HoldContext) context;
             Random random = new Random();
             if(random.nextFloat() <= BUTTERFINGERS_CHANCE){
