@@ -345,7 +345,6 @@ public class Utils {
             for(String t:tags.get() ){ tlist = tlist.concat(t); }
         }
         String rtn = player.getName()+stackSnapshot.getType().getId()+tlist;
-        AstroItemLib.getLogger().info("ID: "+rtn);
         return rtn;
     }
 }

@@ -640,7 +640,7 @@ public class AstroTagManager {
             GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
             Claim claim = api.getClaimManager(player.getLocation().getExtent()).getClaimAt(blockChange.getBlock().getLocation().get());
             Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
-            AstroItemLib.getLogger().info(Utils.dataToMap(placeperms));
+            //AstroItemLib.getLogger().info(Utils.dataToMap(placeperms));
         }
         player.getLocation().getExtent().setBlock(blockChange.getBlock().getPosition(), blockChange.getBlock().getState(), BlockChangeFlags.ALL);
         return true;
@@ -650,7 +650,7 @@ public class AstroTagManager {
             GriefPreventionApi api = AstroItemLib.getGriefPrevention().get();
             Claim claim = api.getClaimManager(player.getWorld()).getClaimAt(blockChange.getBlock().getLocation().get());
             Map<String, Boolean> placeperms = claim.getPermissions(player, claim.getContext());
-            AstroItemLib.getLogger().info(Arrays.toString(placeperms.keySet().toArray(new String[0])));
+            //AstroItemLib.getLogger().info(Arrays.toString(placeperms.keySet().toArray(new String[0])));
         }
         ItemStack tool = t.copy();
         AstroItemData adat = tool.getOrCreate(AstroItemDataImpl.class).orElse(new AstroItemDataImpl());
